@@ -103,7 +103,12 @@ jobs:
           MF_WSFT_KEY: ${{ secrets.MF_WSFT_KEY }}
           OPEN_WEATHER_KEY: ${{ secrets.OPEN_WEATHER_KEY }}
 
+      - name: Test and assemble the Philippine fork
+        if: github.repository == 'scaredpenguin627/breezy-weather'
+        run: ./gradlew :app:testBasicDebugUnitTest :app:assembleBasicDebug
+
       - name: Assemble basic flavor
+        if: github.repository != 'scaredpenguin627/breezy-weather'
         run: ./gradlew assembleBasicRelease -Pbreezy # /!\ You’re NOT allowed to redistribute modified APKs with the breezy config enabled, see license terms
 
       - name: Delete local.properties
