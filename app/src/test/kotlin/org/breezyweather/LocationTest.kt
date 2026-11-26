@@ -16,4 +16,28 @@
 
 package org.breezyweather
 
-class LocationTest
+import breezyweather.domain.location.model.Location
+import breezyweather.domain.weather.model.Base
+import breezyweather.domain.weather.model.Weather
+import io.kotest.matchers.shouldBe
+import org.junit.jupiter.api.Test
+import java.util.Date
+
+class LocationTest {
+
+    @Test
+    fun `current position movement is visible with the same cached weather and location id`() {
+        val original = Location(
+            latitude = 14.294,
+            longitude = 121.0337,
+            isCurrentPosition = true,
+            weather = Weather(base = Base(refreshTime = Date(1000)))
+        )
+        val moved = original.copy(latitude = 14.293)
+
+        moved.formattedId shouldBe original.formattedId
+        (moved == original) shouldBe false
+        original.copy() shouldBe original
+        original.copy().hashCode() shouldBe original.hashCode()
+    }
+}
