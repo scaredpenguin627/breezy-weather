@@ -8,8 +8,8 @@ import kotlinx.serialization.json.Json
 import org.breezyweather.common.exceptions.InvalidOrIncompleteDataException
 import org.breezyweather.common.exceptions.OutdatedServerDataException
 import org.breezyweather.sources.completeCurrentFromHourlyData
+import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import java.util.Date
 import java.util.concurrent.TimeUnit
 
@@ -64,8 +64,10 @@ class EmbReportTest {
     @Test
     fun `rejects readings far from the requested location and expired snapshots`() {
         val cebu = Location(latitude = 10.32, longitude = 123.90, countryCode = "PH")
-        assertThrows<InvalidOrIncompleteDataException> { report.toAirQuality(cebu, report.fetchedAt.time) }
-        assertThrows<OutdatedServerDataException> {
+        assertThrows(InvalidOrIncompleteDataException::class.java) {
+            report.toAirQuality(cebu, report.fetchedAt.time)
+        }
+        assertThrows(OutdatedServerDataException::class.java) {
             report.toAirQuality(manila, report.fetchedAt.time + TimeUnit.HOURS.toMillis(25))
         }
     }
