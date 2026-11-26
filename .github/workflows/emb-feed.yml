@@ -1,0 +1,42 @@
+name: Refresh EMB air quality
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '23 * * * *'
+
+jobs:
+  refresh:
+    if: github.repository == 'scaredpenguin627/breezy-weather'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    concurrency: emb-feed
+    permissions:
+      contents: write
+    steps:
+      - name: Check out the PANaHON project’s EMB collector
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: scaredpenguin627/panahon-zh
+          ref: 258fa2905cc136a4d9f3fca4d412313f80283ad3
+          path: collector
+          persist-credentials: false
+          sparse-checkout: services/emb-aqi
+      - name: Collect and validate current station indices
+        run: |
+          node collector/services/emb-aqi/src/collect.mjs > "$RUNNER_TEMP/aqi.json"
+          jq -e '.stations | any(.[]; (.id | type == "string") and (.aqi | type == "number" and . >= 0))' "$RUNNER_TEMP/aqi.json"
+      - name: Check out the published feed
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: emb-data
+          path: feed
+      - name: Publish the snapshot
+        working-directory: feed
+        run: |
+          cp "$RUNNER_TEMP/aqi.json" aqi.json
+          git add -- aqi.json
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m "Refresh EMB station indices"
+          git push origin HEAD:emb-data
