@@ -107,6 +107,14 @@ jobs:
         if: github.repository == 'scaredpenguin627/breezy-weather'
         run: ./gradlew :app:testBasicDebugUnitTest :app:assembleBasicDebug
 
+      - name: Save the tested fork APK
+        if: github.repository == 'scaredpenguin627/breezy-weather'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: Philippines-weather-basic-debug
+          path: app/build/outputs/apk/basic/debug/app-basic-universal-debug.apk
+          if-no-files-found: error
+
       - name: Assemble basic flavor
         if: github.repository != 'scaredpenguin627/breezy-weather'
         run: ./gradlew assembleBasicRelease -Pbreezy # /!\ You’re NOT allowed to redistribute modified APKs with the breezy config enabled, see license terms

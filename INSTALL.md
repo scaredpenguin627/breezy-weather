@@ -1,6 +1,8 @@
 # Building this fork
 
-To install the version with the Philippine data sources, connect an Android device with USB debugging enabled and run `./gradlew :app:installBasicDebug` from the project root. On Windows, use `.\gradlew.bat :app:installBasicDebug`. The [source guide](docs/SOURCES.md#panahon) covers provider selection and EMB service setup.
+The [push CI runs](https://github.com/scaredpenguin627/breezy-weather/actions/workflows/push.yml?query=branch%3Amain) provide a universal debug APK. Sign in to GitHub, open a successful fork build and download the `Philippines-weather-basic-debug` artifact. Extract the ZIP to install the APK.
+
+To build it locally, connect an Android device with USB debugging enabled and run `./gradlew :app:installBasicDebug` from the project root. On Windows, use `.\gradlew.bat :app:installBasicDebug`. The [source guide](docs/SOURCES.md#panahon) covers provider selection and EMB service setup.
 
 # Upstream releases
 
