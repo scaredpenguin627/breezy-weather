@@ -81,6 +81,7 @@ import org.breezyweather.sources.debug.DebugService
 import org.breezyweather.sources.dmi.DmiService
 import org.breezyweather.sources.eccc.EcccService
 import org.breezyweather.sources.ekuk.EkukService
+import org.breezyweather.sources.emb.EmbService
 import org.breezyweather.sources.epdhk.EpdHkService
 import org.breezyweather.sources.fmi.FmiService
 import org.breezyweather.sources.fpas.FpasService
@@ -115,6 +116,7 @@ import org.breezyweather.sources.nws.NwsService
 import org.breezyweather.sources.openmeteo.OpenMeteoService
 import org.breezyweather.sources.openweather.OpenWeatherService
 import org.breezyweather.sources.pagasa.PagasaService
+import org.breezyweather.sources.panahon.PanahonService
 import org.breezyweather.sources.pirateweather.PirateWeatherService
 import org.breezyweather.sources.polleninfo.PollenInfoService
 import org.breezyweather.sources.recosante.RecosanteService
@@ -154,6 +156,7 @@ class SourceManager @Inject constructor(
     dwrGmService: DwrGmService,
     ecccService: EcccService,
     ekukService: EkukService,
+    embService: EmbService,
     epdHkService: EpdHkService,
     ethioMetService: EthioMetService,
     fmiService: FmiService,
@@ -197,6 +200,7 @@ class SourceManager @Inject constructor(
     openMeteoService: OpenMeteoService,
     openWeatherService: OpenWeatherService,
     pagasaService: PagasaService,
+    panahonService: PanahonService,
     pirateWeatherService: PirateWeatherService,
     pollenInfoService: PollenInfoService,
     recosanteService: RecosanteService,
@@ -263,6 +267,7 @@ class SourceManager @Inject constructor(
         dwrGmService,
         ecccService,
         ekukService,
+        embService,
         epdHkService,
         ethioMetService,
         fmiService,
@@ -296,6 +301,7 @@ class SourceManager @Inject constructor(
         nwsService,
         pollenInfoService,
         pagasaService,
+        panahonService,
         recosanteService,
         smaScService,
         smaSuService,

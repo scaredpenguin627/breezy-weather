@@ -32,13 +32,8 @@ import java.util.Calendar
 import java.util.Date
 
 val Weather.validAirQuality: AirQuality?
-    get() = if (current?.airQuality != null && current!!.airQuality!!.isIndexValid) {
-        current!!.airQuality
-    } else if (today?.airQuality != null && today!!.airQuality!!.isIndexValid) {
-        today!!.airQuality
-    } else {
-        null
-    }
+    get() = current?.airQuality?.takeIf { it.reportedAqi != null || it.isIndexValid }
+        ?: today?.airQuality?.takeIf { it.isIndexValid }
 
 val Weather.hasMinutelyPrecipitation: Boolean
     get() = minutelyForecast.any { (it.dbz ?: 0) > 0 }

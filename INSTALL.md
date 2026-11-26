@@ -1,4 +1,8 @@
-# Simple instructions
+# Building this fork
+
+To install the version with the Philippine data sources, connect an Android device with USB debugging enabled and run `./gradlew :app:installBasicDebug` from the project root. On Windows, use `.\gradlew.bat :app:installBasicDebug`. The [source guide](docs/SOURCES.md#panahon) covers provider selection and EMB service setup.
+
+# Upstream releases
 
 Go to [Releases page](https://github.com/breezy-weather/breezy-weather/releases) and download the file with the following format `breezy-weather-vX.Y.Z_standard.apk`.
 

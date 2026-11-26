@@ -27,6 +27,7 @@ import android.view.animation.DecelerateInterpolator
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
+import androidx.core.view.isVisible
 import breezyweather.domain.location.model.Location
 import org.breezyweather.R
 import org.breezyweather.common.activities.BreezyActivity
@@ -64,6 +65,25 @@ class AirQualityViewHolder(parent: ViewGroup) : AbstractMainCardViewHolder(
     ) {
         super.onBindView(activity, location, provider, listAnimationEnabled, itemAnimationEnabled)
 
+        itemView.setOnClickListener {
+            IntentHelper.startDailyWeatherActivity(
+                context as BreezyActivity,
+                location.formattedId,
+                location.weather!!.todayIndex,
+                DetailScreen.TAG_AIR_QUALITY
+            )
+        }
+
+        val reportedAqi = location.weather?.validAirQuality?.reportedAqi
+        mAttachAnimatorSet?.cancel()
+        aqiProgress.isVisible = reportedAqi == null
+        if (reportedAqi != null) {
+            mEnable = false
+            aqiLevelView.setText(R.string.emb_particulate_aqi)
+            aqiValueView.text = reportedAqi.format(decimals = 0, locale = context.currentLocale)
+            itemView.contentDescription = "${aqiLevelView.text} ${aqiValueView.text}"
+            return
+        }
         val talkBackBuilder = StringBuilder()
         location.weather!!.validAirQuality?.let { airQuality ->
             mAqiIndex = airQuality.getIndex() ?: 0
@@ -98,14 +118,6 @@ class AirQualityViewHolder(parent: ViewGroup) : AbstractMainCardViewHolder(
                 .append(airQuality.getName(context))
         }
         itemView.contentDescription = talkBackBuilder.toString()
-        itemView.setOnClickListener {
-            IntentHelper.startDailyWeatherActivity(
-                context as BreezyActivity,
-                location.formattedId,
-                location.weather!!.todayIndex,
-                DetailScreen.TAG_AIR_QUALITY
-            )
-        }
     }
 
     override fun onEnterScreen() {

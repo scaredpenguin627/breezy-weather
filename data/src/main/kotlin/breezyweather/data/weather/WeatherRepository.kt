@@ -161,6 +161,9 @@ class WeatherRepository(
                 no2 = weather.current?.airQuality?.nO2,
                 o3 = weather.current?.airQuality?.o3,
                 co = weather.current?.airQuality?.cO,
+                reportedAqi = weather.current?.airQuality?.reportedAqi?.toLong(),
+                reportedStation = weather.current?.airQuality?.reportedStation,
+                reportedClock = weather.current?.airQuality?.reportedClock,
 
                 relativeHumidity = weather.current?.relativeHumidity,
                 dewPoint = weather.current?.dewPoint,

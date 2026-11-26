@@ -16,6 +16,7 @@
 
 package breezyweather.domain.weather.wrappers
 
+import breezyweather.domain.weather.model.AirQuality
 import breezyweather.domain.weather.model.Current
 import breezyweather.domain.weather.model.UV
 import breezyweather.domain.weather.model.Wind
@@ -50,12 +51,14 @@ data class CurrentWrapper(
 ) {
     fun toCurrent(
         uV: UV? = null,
+        airQuality: AirQuality? = null,
     ) = Current(
         weatherText = this.weatherText,
         weatherCode = this.weatherCode,
         temperature = this.temperature?.toTemperature(),
         wind = this.wind,
         uV = uV ?: this.uV,
+        airQuality = airQuality,
         relativeHumidity = this.relativeHumidity,
         dewPoint = this.dewPoint,
         pressure = this.pressure,

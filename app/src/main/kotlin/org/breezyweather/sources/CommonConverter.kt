@@ -1400,7 +1400,8 @@ internal fun completeCurrentFromHourlyData(
                 )
             } else {
                 newCurrent.uV
-            }
+            },
+            airQuality = currentAirQuality
         )
     }
 

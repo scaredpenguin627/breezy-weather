@@ -91,6 +91,9 @@ object WeatherMapper {
         ceiling: Distance?,
         dailyForecast: String?,
         hourlyForecast: String?,
+        reportedAqi: Long?,
+        reportedStation: String?,
+        reportedClock: String?,
     ): Weather = Weather(
         Base(
             refreshTime?.let { Date(it) },
@@ -126,7 +129,10 @@ object WeatherMapper {
                 so2,
                 no2,
                 o3,
-                co
+                co,
+                reportedAqi = reportedAqi?.toInt(),
+                reportedStation = reportedStation,
+                reportedClock = reportedClock
             ),
             relativeHumidity,
             dewPoint,

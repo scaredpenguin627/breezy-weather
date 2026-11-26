@@ -84,6 +84,8 @@ Below, you can find details about the support and implementation status for feat
 | 🇲🇵 Northern Mariana Is.          | [NWS](#national-weather-service)                                                                  | Forecast, Current, Alerts, Address                                                   |
 | 🇳🇴 Norway                        | [MET Norway](#met-norway)                                                                         | Forecast, Nowcasting, Air quality, Alerts                                            |
 | 🇵🇭 Philippines                   | [PAGASA](#pagasa)                                                                                 | Forecast, Current                                                                    |
+| 🇵🇭 Philippines                   | [PANaHON](#panahon) | Local nowcast, hourly and daily forecasts |
+| 🇵🇭 Philippines (Metro Manila)    | [DENR-EMB](#denr-emb) | Current particulate AQI |
 | 🇵🇹 Portugal                      | [IPMA](#instituto-português-do-mar-e-da-atmosfera)                                                | Forecast, Alerts, Address                                                            |
 | 🇵🇷 Puerto Rico                   | [NWS](#national-weather-service)                                                                  | Forecast, Current, Alerts, Address                                                   |
 | 🇷🇪 Réunion                       | [Météo-France](#météo-france)                                                                     | Forecast, Alert, Normals, Address                                                    |
@@ -1159,6 +1161,16 @@ This source aggregates data from Beijing Meteorological Service, ColorfulClouds 
 | Wind                      | ✅         | Visibility        | ❌         |
 | Pressure                  | ✅         | Ceiling           | ❌         |
 </details>
+
+### PANaHON
+
+For a Philippine location, select **PANaHON (PAGASA)** for the forecast, current conditions, or both. PAGASA’s [PANaHON dashboard](https://www.panahon.gov.ph/) provides a local nowcast, up to 24 hourly forecast entries and five daily forecasts. The current conditions come from the nowcast. These options are available in the standard build of this fork.
+
+### DENR-EMB
+
+Select **DENR-EMB** as the air quality source for a location within 10 km of a mapped Metro Manila monitoring station with a reading. The [EMB NCR report](https://ncr.emb.gov.ph/realtimeairmonitoring/) supplies PM2.5 and PM10 subindices. The home card shows the higher available subindex at the selected station, with details on tap. The details show the station name, the clock as printed on the report and the time the collector fetched it.
+
+The app reads [the fork’s JSON feed](https://raw.githubusercontent.com/scaredpenguin627/breezy-weather/emb-data/aqi.json) and matches stations on the device. GitHub Actions runs the [panahon-zh collector](https://github.com/scaredpenguin627/panahon-zh/tree/legacy/services/emb-aqi) hourly. A failed collection leaves the last successful snapshot available. To use a different deployment, enter the full HTTPS URL of its `/api/aqi` endpoint in the DENR-EMB source settings.
 
 ### Serviços Meteorológicos e Geofísicos
 

@@ -33,10 +33,16 @@ data class AirQuality(
     val nO2: PollutantConcentration? = null,
     val o3: PollutantConcentration? = null,
     val cO: PollutantConcentration? = null,
+    /** Current particulate AQI supplied by the EMB relay, on its own scale. */
+    val reportedAqi: Int? = null,
+    val reportedStation: String? = null,
+    /** Literal clock shown in the source report, independent of the fetch timestamp. */
+    val reportedClock: String? = null,
 ) : Serializable {
 
     val isValid: Boolean
-        get() = pM25 != null || pM10 != null || sO2 != null || nO2 != null || o3 != null || cO != null
+        get() = pM25 != null || pM10 != null || sO2 != null || nO2 != null || o3 != null ||
+            cO != null || reportedAqi != null
 
     val isIndexValid: Boolean
         get() = pM25 != null || pM10 != null || nO2 != null || o3 != null
@@ -48,7 +54,8 @@ data class AirQuality(
             sO2 = sO2?.toValidOrNull(),
             nO2 = nO2?.toValidOrNull(),
             o3 = o3?.toValidOrNull(),
-            cO = cO?.toValidOrNull()
+            cO = cO?.toValidOrNull(),
+            reportedAqi = reportedAqi?.takeIf { it >= 0 }
         )
     }
 }

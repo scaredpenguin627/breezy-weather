@@ -443,8 +443,8 @@ fun DailyPagerContent(
                     setSelectedPollutant,
                     hourlyList,
                     daily,
-                    current?.airQuality?.let {
-                        if (it.isValid) Pair(currentUpdateTime, it) else null
+                    location.weather!!.current?.airQuality?.takeIf { daily.isToday(location) && it.isValid }?.let {
+                        Pair(location.weather!!.base.airQualityUpdateTime ?: currentUpdateTime, it)
                     }
                 )
             }

@@ -1,0 +1,3 @@
+ALTER TABLE weathers ADD COLUMN reported_aqi INTEGER;
+ALTER TABLE weathers ADD COLUMN reported_station TEXT;
+ALTER TABLE weathers ADD COLUMN reported_clock TEXT;

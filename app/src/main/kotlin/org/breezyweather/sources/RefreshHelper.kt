@@ -826,7 +826,7 @@ class RefreshHelper @Inject constructor(
                             null
                         } else {
                             sourceCalls.getOrElse(location.airQualitySource!!) { null }?.airQuality?.let {
-                                airQualityUpdateTime = Date()
+                                airQualityUpdateTime = it.fetchedAt ?: Date()
                                 it
                             }
                         } ?: location.weather?.toAirQualityWrapperList(yesterdayMidnight)
@@ -994,7 +994,9 @@ class RefreshHelper @Inject constructor(
                     currentHour,
                     currentDay,
                     weatherWrapperCompleted.airQuality?.current?.toValid()
-                        ?: if (isUpdateStillValid(base.currentUpdateTime, wait = 30)) {
+                        ?: if (!location.airQualitySource.isNullOrEmpty() &&
+                            isUpdateStillValid(base.airQualityUpdateTime, wait = 30)
+                        ) {
                             // Allow to re-use current data if it was successfully refreshed less than 30 min ago
                             location.weather?.current?.airQuality
                         } else {

@@ -85,6 +85,7 @@ import org.breezyweather.R
 import org.breezyweather.common.extensions.currentLocale
 import org.breezyweather.common.extensions.formatMeasure
 import org.breezyweather.common.extensions.getFormattedTime
+import org.breezyweather.common.extensions.getRelativeTime
 import org.breezyweather.common.extensions.is12Hour
 import org.breezyweather.common.extensions.roundUpToNearestMultiplier
 import org.breezyweather.common.extensions.toDate
@@ -138,6 +139,26 @@ fun DetailsAirQuality(
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
+    if (location.airQualitySource == "emb") {
+        Column(
+            modifier = modifier.padding(dimensionResource(R.dimen.normal_margin)),
+            verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.small_margin))
+        ) {
+            DetailsSectionHeader(stringResource(R.string.emb_particulate_aqi))
+            val index = defaultValue?.second?.reportedAqi
+            if (index != null) {
+                Text(
+                    text = index.format(decimals = 0, locale = context.currentLocale),
+                    style = MaterialTheme.typography.displaySmall
+                )
+                defaultValue.second.reportedStation?.let { Text(stringResource(R.string.emb_monitoring_station, it)) }
+                defaultValue.second.reportedClock?.let { Text(stringResource(R.string.emb_report_clock, it)) }
+                Text(stringResource(R.string.emb_report_fetched, defaultValue.first.getRelativeTime(context)))
+            }
+            DetailsCardText(stringResource(R.string.emb_particulate_aqi_description))
+        }
+        return
+    }
     val mappedValues = remember(hourlyList, selectedPollutant) {
         buildMap(hourlyList.size) {
             hourlyList.forEach { hourly ->

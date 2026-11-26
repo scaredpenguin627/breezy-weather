@@ -868,4 +868,12 @@
     <string name="settings_main_background_title">基于天气的背景</string>
     <string name="settings_weather_source_no_longer_exists">%s（不再存在）</string>
     <string name="action_reset_to_default">重置为默认</string>
+
+    <string name="emb_particulate_aqi">EMB 颗粒物 AQI</string>
+    <string name="emb_particulate_aqi_description">站点指数取 PM2.5 和 PM10 可用分指数中的较高值。数据来自大马尼拉地区的 EMB 监测站。</string>
+    <string name="emb_monitoring_station">监测站 · %1$s</string>
+    <string name="emb_report_clock">EMB 报表显示时间 · %1$s</string>
+    <string name="emb_report_fetched">报表抓取于%1$s</string>
+    <string name="settings_weather_source_emb_endpoint">EMB 空气质量 JSON 地址</string>
+    <string name="settings_weather_source_emb_endpoint_hint">留空使用默认数据源，也可以填写自有 EMB 服务的完整 HTTPS JSON 地址。</string>
 </resources>

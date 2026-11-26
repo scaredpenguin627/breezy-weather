@@ -155,7 +155,15 @@ data class Weather(
         val hourlyAirQuality = hourlyForecast.filter { it.date >= startDate && it.airQuality?.isValid == true }
         val dailyAirQuality = dailyForecast.filter { it.date >= startDate && it.airQuality?.isValid == true }
         val currentAirQuality = current?.airQuality
-        if (hourlyAirQuality.isEmpty() && dailyAirQuality.isEmpty()) return null
+        if (hourlyAirQuality.isEmpty() && dailyAirQuality.isEmpty()) {
+            // A current-only source can still supply the card between refreshes.
+            val fetchedAt = base.airQualityUpdateTime ?: return null
+            val age = System.currentTimeMillis() - fetchedAt.time
+            if (currentAirQuality?.reportedAqi == null || age > 1.days.inWholeMilliseconds) {
+                return null
+            }
+            return AirQualityWrapper(current = currentAirQuality, fetchedAt = fetchedAt)
+        }
 
         return AirQualityWrapper(
             current = currentAirQuality,
