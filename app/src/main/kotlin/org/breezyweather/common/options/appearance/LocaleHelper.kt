@@ -17,78 +17,43 @@
 package org.breezyweather.common.options.appearance
 
 import android.content.Context
-import androidx.core.os.LocaleListCompat
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import org.breezyweather.R
-import org.breezyweather.common.extensions.capitalize
+import org.breezyweather.common.extensions.isTraditionalChinese
 import org.xmlpull.v1.XmlPullParser
 import java.util.Locale
 
 object LocaleHelper {
 
     fun getLangs(context: Context): ImmutableList<Language> {
-        val langs = mutableListOf<Language>()
-        val parser = context.resources.getXml(R.xml.locales_config)
-        var eventType = parser.eventType
-        while (eventType != XmlPullParser.END_DOCUMENT) {
-            if (eventType == XmlPullParser.START_TAG && parser.name == "locale") {
-                for (i in 0..<parser.attributeCount) {
-                    if (parser.getAttributeName(i) == "name") {
-                        val langTag = parser.getAttributeValue(i)
-                        val displayName = getLocalizedDisplayName(langTag)
-                        if (displayName.isNotEmpty()) {
-                            langs.add(
-                                Language(
-                                    langTag,
-                                    displayName
-                                    // getDisplayName(langTag)
-                                )
-                            )
-                        }
+        val langs = mutableListOf(Language("", context.getString(R.string.settings_follow_system)))
+        context.resources.getXml(R.xml.locales_config).use { parser ->
+            while (parser.next() != XmlPullParser.END_DOCUMENT) {
+                if (parser.eventType == XmlPullParser.START_TAG && parser.name == "locale") {
+                    val tag = parser.getAttributeValue("http://schemas.android.com/apk/res/android", "name")
+                    val locale = Locale.forLanguageTag(tag)
+                    val displayName = when {
+                        locale.isTraditionalChinese -> "繁體中文"
+                        locale.language == "zh" -> "简体中文"
+                        else -> locale.getDisplayName(locale)
                     }
+                    langs.add(Language(tag, displayName))
                 }
             }
-            eventType = parser.next()
         }
-
-        langs.sortBy { it.displayName }
-        langs.add(
-            0,
-            Language(
-                "",
-                context.getString(R.string.settings_follow_system)
-                // null
-            )
-        )
-
         return langs.toImmutableList()
     }
 
-    fun getDisplayName(lang: String): String {
-        return Locale.forLanguageTag(lang).displayName
-    }
-
-    /**
-     * Returns display name of a string language code.
-     *
-     * @param lang empty for system language
-     */
-    fun getLocalizedDisplayName(lang: String?): String {
-        if (lang == null) {
-            return ""
-        }
-
-        val locale = when (lang) {
-            "" -> LocaleListCompat.getAdjustedDefault()[0]
-            else -> Locale.forLanguageTag(lang)
-        }
-        return locale!!.getDisplayName(locale).capitalize(locale)
+    // Map app-language overrides from versions which offered additional regional variants.
+    fun supportedTag(locale: Locale?): String = when (locale?.language) {
+        "en" -> "en"
+        "zh" -> if (locale.isTraditionalChinese) "zh-TW" else "zh-CN"
+        else -> ""
     }
 
     data class Language(
         val langTag: String,
         val displayName: String,
-        // val localizedDisplayName: String?,
     )
 }

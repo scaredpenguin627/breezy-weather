@@ -24,10 +24,12 @@ import androidx.activity.enableEdgeToEdge
 import androidx.annotation.CallSuper
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.Lifecycle
 import org.breezyweather.BreezyWeather
 import org.breezyweather.common.extensions.isDarkMode
 import org.breezyweather.common.extensions.setSystemBarStyle
+import org.breezyweather.common.options.appearance.LocaleHelper
 import org.breezyweather.common.snackbar.SnackbarContainer
 
 abstract class BreezyActivity : AppCompatActivity() {
@@ -35,6 +37,14 @@ abstract class BreezyActivity : AppCompatActivity() {
     @CallSuper
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val selectedLocale = AppCompatDelegate.getApplicationLocales().get(0)
+        if (selectedLocale != null) {
+            val supportedTag = LocaleHelper.supportedTag(selectedLocale)
+            if (supportedTag != selectedLocale.toLanguageTag()) {
+                AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(supportedTag))
+            }
+        }
 
         enableEdgeToEdge()
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {

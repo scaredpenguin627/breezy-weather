@@ -863,4 +863,11 @@
     <string name="settings_source_api_key_invalid">值不符合預期的格式</string>
     <string name="message_please_wait_refresh">請等待重新整理完成</string>
     <string name="settings_main_background_title">天氣為基的背景</string>
+    <string name="emb_particulate_aqi">EMB 懸浮微粒 AQI</string>
+    <string name="emb_particulate_aqi_description">測站指數取 PM2.5 與 PM10 可用副指標中的較高值。資料來自大馬尼拉地區的 EMB 測站。</string>
+    <string name="emb_monitoring_station">測站 · %1$s</string>
+    <string name="emb_report_clock">EMB 報表顯示時間 · %1$s</string>
+    <string name="emb_report_fetched">取得報表的時間 · %1$s</string>
+    <string name="settings_weather_source_emb_endpoint">EMB 空氣品質 JSON 網址</string>
+    <string name="settings_weather_source_emb_endpoint_hint">留空以使用預設資料來源，或輸入自有 EMB 服務的完整 HTTPS JSON 網址。</string>
 </resources>

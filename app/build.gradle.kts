@@ -3,7 +3,6 @@
 import breezy.buildlogic.Config
 import breezy.buildlogic.getCommitCount
 import breezy.buildlogic.getGitSha
-import breezy.buildlogic.registerLocalesConfigTask
 import com.android.build.api.dsl.ApplicationExtension
 import java.util.Properties
 
@@ -39,6 +38,11 @@ configure<ApplicationExtension> {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         vectorDrawables.useSupportLibrary = true
+    }
+
+    androidResources {
+        // AAPT filters region-specific translations by their full resource qualifier.
+        localeFilters += setOf("en", "en-rAU", "en-rCA", "en-rGB", "en-rUS", "zh", "zh-rCN", "zh-rHK", "zh-rTW")
     }
 
     splits {
@@ -544,35 +548,6 @@ dependencies {
 
     // debugImplementation because LeakCanary should only run in debug builds.
     // debugImplementation(libs.leakcanary)
-}
-
-tasks {
-    // May be too heavy to run, so let’s keep the generated file in Git
-    // val naturalEarthConfigTask = registerNaturalEarthConfigTask(project)
-    val localesConfigTask = registerLocalesConfigTask(project)
-
-    // Duplicating Hebrew string assets due to some locale code issues on different devices
-    val copyHebrewStrings by registering(Copy::class) {
-        from("./src/main/res/values-he")
-        into("./src/main/res/values-iw")
-        include("**/*")
-    }
-
-    // Duplicating Indonesian string assets due to some locale code issues on different devices
-    val copyIndonesianStrings by registering(Copy::class) {
-        from("./src/main/res/values-id")
-        into("./src/main/res/values-in")
-        include("**/*")
-    }
-
-    preBuild {
-        dependsOn(
-            // naturalEarthConfigTask,
-            copyHebrewStrings,
-            copyIndonesianStrings,
-            localesConfigTask
-        )
-    }
 }
 
 buildscript {

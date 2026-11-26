@@ -23,8 +23,12 @@ import java.util.Locale
 
 val Context.currentLocale: Locale
     get() {
-        return AppCompatDelegate.getApplicationLocales().get(0)
-            ?: resources.configuration.locales[0]
+        val selected = AppCompatDelegate.getApplicationLocales().get(0)
+        if (selected?.language == "en" || selected?.language == "zh") return selected
+
+        val locales = resources.configuration.locales
+        return (0 until locales.size()).map { locales[it] }.firstOrNull { it.language == "en" || it.language == "zh" }
+            ?: Locale.ENGLISH
     }
 
 // TODO: Review this use vs toLanguageTag()
@@ -33,7 +37,7 @@ val Locale.code: String
         val language = language
         val country = country
         return if (isTraditionalChinese) {
-            language.lowercase() + "-" + country.lowercase()
+            language.lowercase() + "-" + country.ifEmpty { "TW" }.lowercase()
         } else {
             language.lowercase()
         }
@@ -74,17 +78,15 @@ val Locale.codeForNaturalEarth: String
 val Locale.isChinese: Boolean
     get() = language.equals("zh", ignoreCase = true)
 
-// There is no way to access the script used, so assume Taiwan, Hong Kong and Macao
 val Locale.isTraditionalChinese: Boolean
-    get() = isChinese &&
-        arrayOf("TW", "HK", "MO").any { country.equals(it, ignoreCase = true) }
+    get() = isChinese && (script == "Hant" || (script.isEmpty() && country in setOf("TW", "HK", "MO")))
 
 fun Locale.getCountryName(countryCode: String): String {
     return Locale.Builder()
         .setLanguage(language)
         .setRegion(countryCode)
         .build()
-        .displayCountry
+        .getDisplayCountry(this)
 }
 
 /**
