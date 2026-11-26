@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="panahon_thunderstorm_watch">雷暴關注</string>
+    <string name="panahon_thunderstorm_advisory">雷暴警報</string>
+    <string name="panahon_rainfall_warning">暴雨預警</string>
+    <string name="panahon_flood_advisory">洪水提示</string>
+    <string name="panahon_cyclone_warning">熱帶氣旋預警</string>
+    <string name="panahon_alert_province">%1$s省</string>
+    <string name="panahon_alert_aklan">阿克蘭省</string>
+    <string name="panahon_alert_metro_manila">馬尼拉大都會</string>
+</resources>

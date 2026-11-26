@@ -22,6 +22,7 @@ import android.animation.FloatEvaluator
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.view.animation.DecelerateInterpolator
 import android.widget.TextView
@@ -40,6 +41,7 @@ import org.breezyweather.domain.weather.model.getColor
 import org.breezyweather.domain.weather.model.getIndex
 import org.breezyweather.domain.weather.model.getName
 import org.breezyweather.domain.weather.model.validAirQuality
+import org.breezyweather.sources.emb.isOutsideEmbAirQualityCoverage
 import org.breezyweather.ui.common.widgets.ArcProgress
 import org.breezyweather.ui.theme.resource.providers.ResourceProvider
 import org.breezyweather.unit.formatting.format
@@ -48,6 +50,8 @@ import kotlin.math.roundToInt
 class AirQualityViewHolder(parent: ViewGroup) : AbstractMainCardViewHolder(
     LayoutInflater.from(parent.context).inflate(R.layout.container_main_air_quality, parent, false)
 ) {
+    private val aqiReadingView: View = itemView.findViewById(R.id.aqi_reading)
+    private val aqiNoNearbyStationView: TextView = itemView.findViewById(R.id.aqi_no_nearby_station)
     private val aqiValueView: TextView = itemView.findViewById(R.id.aqi_value)
     private val aqiLevelView: TextView = itemView.findViewById(R.id.aqi_level)
     private val aqiProgress: ArcProgress = itemView.findViewById(R.id.aqi_progress)
@@ -65,6 +69,18 @@ class AirQualityViewHolder(parent: ViewGroup) : AbstractMainCardViewHolder(
     ) {
         super.onBindView(activity, location, provider, listAnimationEnabled, itemAnimationEnabled)
 
+        mAttachAnimatorSet?.cancel()
+        val noNearbyStation = location.isOutsideEmbAirQualityCoverage
+        aqiReadingView.isVisible = !noNearbyStation
+        aqiNoNearbyStationView.isVisible = noNearbyStation
+        if (noNearbyStation) {
+            mEnable = false
+            itemView.setOnClickListener(null)
+            itemView.isClickable = false
+            itemView.contentDescription = null
+            return
+        }
+
         itemView.setOnClickListener {
             IntentHelper.startDailyWeatherActivity(
                 context as BreezyActivity,
@@ -75,7 +91,6 @@ class AirQualityViewHolder(parent: ViewGroup) : AbstractMainCardViewHolder(
         }
 
         val reportedAqi = location.weather?.validAirQuality?.reportedAqi
-        mAttachAnimatorSet?.cancel()
         aqiProgress.isVisible = reportedAqi == null
         if (reportedAqi != null) {
             mEnable = false

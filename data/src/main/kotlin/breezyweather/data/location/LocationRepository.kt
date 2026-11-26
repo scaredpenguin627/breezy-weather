@@ -238,7 +238,11 @@ class LocationRepository(
         }
     }
 
-    suspend fun update(location: Location, oldFormattedId: String? = null): Boolean {
+    suspend fun update(
+        location: Location,
+        oldFormattedId: String? = null,
+        clearAlerts: Boolean = false,
+    ): Boolean {
         return try {
             handler.await(inTransaction = true) {
                 if (oldFormattedId != null && oldFormattedId != location.formattedId) {
@@ -246,6 +250,10 @@ class LocationRepository(
                         oldFormattedId = oldFormattedId,
                         newFormattedId = location.formattedId
                     )
+                }
+                if (clearAlerts) {
+                    alertsQueries.deleteAlertListForLocationId(location.formattedId)
+                    weathersQueries.clearAlertsUpdateTime(location.formattedId)
                 }
                 locationsQueries.update(
                     formattedId = location.formattedId,

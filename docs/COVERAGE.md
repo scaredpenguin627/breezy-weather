@@ -122,7 +122,7 @@ In general, a weather source can be considered for inclusion in the official rel
 | 🇵🇰 Pakistan             | [PMD](http://www.pmd.gov.pk/)                 | ❌ no geolocation, no JSON                                                              | 2024-11-30   |
 | 🇵🇸 Palestine            | [PMD](https://www.pmd.ps/)                    | ❌ no hourly, no JSON                                                                   | 2024-12-05   |
 | 🇵🇭 Philippines          | [PAGASA](https://www.pagasa.dost.gov.ph/)     | ✅ included from v5.3.0                                                                 |              |
-| 🇵🇭 Philippines          | [PANaHON](SOURCES.md#panahon) | Included in this fork | Local nowcast and forecast |
+| 🇵🇭 Philippines          | [PANaHON](SOURCES.md#panahon) | Included in this fork | Local nowcast, forecast and weather alerts |
 | 🇵🇭 Philippines          | [DENR-EMB](SOURCES.md#denr-emb) | Included in this fork | Metro Manila particulate AQI |
 | 🇶🇦 Qatar                | [QWeather](http://qweather.gov.qa/)           |                                                                                        |              |
 | 🇸🇦 Saudi Arabia         | [NCM](https://ncm.gov.sa/)                    |                                                                                        |              |

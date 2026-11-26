@@ -870,6 +870,7 @@
     <string name="action_reset_to_default">重置为默认</string>
 
     <string name="emb_particulate_aqi">EMB 颗粒物 AQI</string>
+    <string name="emb_no_nearby_station">附近没有已接入的 EMB 监测站</string>
     <string name="emb_particulate_aqi_description">站点指数取 PM2.5 和 PM10 可用分指数中的较高值。数据来自大马尼拉地区的 EMB 监测站。</string>
     <string name="emb_monitoring_station">监测站 · %1$s</string>
     <string name="emb_report_clock">EMB 报表显示时间 · %1$s</string>

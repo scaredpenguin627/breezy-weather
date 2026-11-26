@@ -95,6 +95,8 @@ import org.breezyweather.remoteviews.presenters.MultiCityWidgetIMP
 import org.breezyweather.remoteviews.presenters.TextWidgetIMP
 import org.breezyweather.remoteviews.presenters.WeekWidgetIMP
 import org.breezyweather.remoteviews.presenters.notification.WidgetNotificationIMP
+import org.breezyweather.sources.emb.isOutsideEmbAirQualityCoverage
+import org.breezyweather.sources.emb.withoutUncoveredEmbAirQuality
 import org.breezyweather.ui.main.utils.RefreshErrorType
 import org.breezyweather.ui.theme.resource.ResourcesProviderFactory
 import org.breezyweather.wallpaper.MaterialLiveWallpaperService
@@ -196,7 +198,7 @@ class RefreshHelper @Inject constructor(
         // Longitude and latitude incorrect? Let’s return earlier
         if (location.isCurrentPosition && !currentLocationStore.isUsable) {
             // There was already an error earlier in the process, so no errors
-            return LocationResult(location, emptyList())
+            return LocationResult(clearCachedEmbAirQualityOutsideCoverage(location), emptyList())
         }
 
         var needsCountryCodeRefresh = false
@@ -366,12 +368,32 @@ class RefreshHelper @Inject constructor(
             locationInfoFromDefaultSource
         }
 
-        // STEP 5 - If there was any change, update in database
+        // STEP 5 - Update the saved location and invalidate AQI for a station left behind.
+        val point = clearCachedEmbAirQualityOutsideCoverage(locationWithTimeZone)
+        val movedAlertLocation = point.alertSource == "panahon" &&
+            (point.latitude != location.latitude || point.longitude != location.longitude)
+        val updatedLocation = if (movedAlertLocation) {
+            point.copy(
+                weather = point.weather?.let {
+                    it.copy(base = it.base.copy(alertsUpdateTime = null), alertList = emptyList())
+                }
+            )
+        } else {
+            point
+        }
         if (needsSavingToDb) {
-            locationRepository.update(locationWithTimeZone)
+            locationRepository.update(updatedLocation, clearAlerts = movedAlertLocation)
         }
 
-        return LocationResult(locationWithTimeZone, currentErrors)
+        return LocationResult(updatedLocation, currentErrors)
+    }
+
+    private suspend fun clearCachedEmbAirQualityOutsideCoverage(location: Location): Location {
+        val updatedLocation = location.withoutUncoveredEmbAirQuality()
+        if (updatedLocation !== location) {
+            weatherRepository.insert(updatedLocation, requireNotNull(updatedLocation.weather))
+        }
+        return updatedLocation
     }
 
     /**
@@ -519,10 +541,11 @@ class RefreshHelper @Inject constructor(
 
     suspend fun getWeather(
         context: Context,
-        location: Location,
+        resolvedLocation: Location,
         coordinatesChanged: Boolean,
         ignoreCaching: Boolean = false,
     ): WeatherResult {
+        val location = resolvedLocation.withoutUncoveredEmbAirQuality()
         try {
             if (!location.isUsable || location.needsGeocodeRefresh) {
                 return WeatherResult(
@@ -537,7 +560,7 @@ class RefreshHelper @Inject constructor(
                 listOf(
                     Pair(forecastSource, SourceFeature.FORECAST),
                     Pair(currentSource, SourceFeature.CURRENT),
-                    Pair(airQualitySource, SourceFeature.AIR_QUALITY),
+                    Pair(airQualitySource.takeUnless { isOutsideEmbAirQualityCoverage }, SourceFeature.AIR_QUALITY),
                     Pair(pollenSource, SourceFeature.POLLEN),
                     Pair(minutelySource, SourceFeature.MINUTELY),
                     Pair(alertSource, SourceFeature.ALERT),

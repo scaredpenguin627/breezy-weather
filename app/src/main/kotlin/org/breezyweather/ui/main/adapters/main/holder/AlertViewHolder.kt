@@ -36,6 +36,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.toShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -49,10 +50,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import breezyweather.domain.location.model.Location
+import breezyweather.domain.weather.model.Alert
 import org.breezyweather.R
 import org.breezyweather.common.activities.BreezyActivity
 import org.breezyweather.common.utils.helpers.IntentHelper
 import org.breezyweather.domain.weather.model.getFormattedDates
+import org.breezyweather.ui.alert.currentPanahonAlerts
 import org.breezyweather.ui.theme.ThemeManager
 import org.breezyweather.ui.theme.compose.BreezyWeatherTheme
 import org.breezyweather.ui.theme.compose.themeRipple
@@ -81,10 +84,15 @@ class AlertViewHolder(parent: ViewGroup) : AbstractMainCardViewHolder(
             }
             itemView.findViewById<ComposeView>(R.id.container_main_first_card_alert_list).setContent {
                 BreezyWeatherTheme(!ThemeManager.isLightTheme(activity, location)) {
-                    if (location.weather!!.currentAlertList.isEmpty()) {
-                        UpcomingAlerts(location.formattedId)
+                    if (location.alertSource == "panahon") {
+                        val alerts = currentPanahonAlerts(location.weather!!.alertList)
+                        SideEffect { itemView.visibility = if (alerts.isEmpty()) View.GONE else View.VISIBLE }
+                        if (alerts.isNotEmpty()) {
+                            AlertList(location, alerts.take(1), additionalCount = alerts.size - 1)
+                        }
                     } else {
-                        AlertList(location)
+                        val alerts = location.weather!!.currentAlertList
+                        if (alerts.isEmpty()) UpcomingAlerts(location.formattedId) else AlertList(location, alerts)
                     }
                 }
             }
@@ -131,14 +139,16 @@ class AlertViewHolder(parent: ViewGroup) : AbstractMainCardViewHolder(
     }
 
     @Composable
-    fun AlertList(
+    private fun AlertList(
         location: Location,
+        alerts: List<Alert>,
+        additionalCount: Int = 0,
         modifier: Modifier = Modifier,
     ) {
         val activity = LocalActivity.current
         val context = LocalContext.current
         Column {
-            location.weather!!.currentAlertList.forEach { currentAlert ->
+            alerts.forEach { currentAlert ->
                 ListItem(
                     modifier = modifier
                         .clickable(
@@ -177,6 +187,17 @@ class AlertViewHolder(parent: ViewGroup) : AbstractMainCardViewHolder(
                                     }
                             )
                         }
+                    },
+                    trailingContent = if (additionalCount > 0) {
+                        {
+                            Text(
+                                stringResource(R.string.alert_additional_count, additionalCount),
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    } else {
+                        null
                     },
                     leadingContent = {
                         Box(

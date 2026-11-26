@@ -37,7 +37,8 @@ abstract class PanahonServiceStub : HttpSource(), WeatherSource, NonFreeNetSourc
     override val attributionLinks = mapOf(attribution to "https://www.panahon.gov.ph/")
     override val supportedFeatures = mapOf(
         SourceFeature.FORECAST to attribution,
-        SourceFeature.CURRENT to attribution
+        SourceFeature.CURRENT to attribution,
+        SourceFeature.ALERT to attribution
     )
 
     override fun isFeatureSupportedForLocation(location: Location, feature: SourceFeature): Boolean =
@@ -54,7 +55,8 @@ abstract class PanahonServiceStub : HttpSource(), WeatherSource, NonFreeNetSourc
             timeZone = TimeZone.getTimeZone("Asia/Manila"),
             countryCode = "PH",
             forecastSource = id,
-            currentSource = id
+            currentSource = id,
+            alertSource = id
         )
     )
 }

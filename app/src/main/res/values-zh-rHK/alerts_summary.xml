@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="alert_additional_count">另有 %d 則</string>
+    <string name="alerts_last_checked">上次檢查 PANaHON 警報：%s</string>
+</resources>

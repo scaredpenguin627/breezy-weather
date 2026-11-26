@@ -21,7 +21,10 @@ import breezyweather.domain.location.model.Location
 import breezyweather.domain.source.SourceFeature
 import breezyweather.domain.weather.wrappers.WeatherWrapper
 import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.schedulers.Schedulers
 import org.breezyweather.common.exceptions.InvalidLocationException
+import org.breezyweather.common.extensions.currentLocale
+import org.breezyweather.common.extensions.getStringByLocale
 import retrofit2.Retrofit
 import javax.inject.Inject
 import javax.inject.Named
@@ -39,12 +42,56 @@ class PanahonService @Inject constructor(
         location: Location,
         requestedFeatures: List<SourceFeature>,
     ): Observable<WeatherWrapper> {
-        if (requestedFeatures.none { it in supportedFeatures }) return Observable.just(WeatherWrapper())
+        val features = requestedFeatures.filter { it in supportedFeatures }
+        if (features.isEmpty()) return Observable.just(WeatherWrapper())
         if (!location.countryCode.equals("PH", ignoreCase = true)) return Observable.error(InvalidLocationException())
 
-        return api.getDashboard(location.latitude, location.longitude).map {
+        val dashboard = api.getDashboard(location.latitude, location.longitude).map {
             if (it.success && !it.meta.matches(location.latitude, location.longitude)) throw InvalidLocationException()
-            it.toWeather(requestedFeatures, System.currentTimeMillis())
+            it
+        }
+        if (SourceFeature.ALERT !in features) {
+            return dashboard.map { it.toWeather(features, System.currentTimeMillis()) }
+        }
+
+        val weatherFeatures = features.filterNot { it == SourceFeature.ALERT }
+        val locale = context.currentLocale
+        return Observable.zip(dashboard.asResult(), api.getAlerts().asResult()) { weatherResult, alertResult ->
+            combinePanahonWeather(
+                weatherResult,
+                alertResult,
+                weatherFeatures,
+                location,
+                System.currentTimeMillis()
+            ) { context.getStringByLocale(it, locale) }
         }
     }
+}
+
+private fun <T : Any> Observable<T>.asResult(): Observable<Result<T>> =
+    subscribeOn(Schedulers.io()).map { Result.success(it) }.onErrorReturn { Result.failure(it) }
+
+internal fun combinePanahonWeather(
+    dashboard: Result<PanahonResponse>,
+    feed: Result<PanahonAlertResponse>,
+    weatherFeatures: List<SourceFeature>,
+    location: Location,
+    now: Long,
+    getString: (Int) -> String,
+): WeatherWrapper {
+    val weather = if (weatherFeatures.isEmpty()) {
+        WeatherWrapper()
+    } else {
+        dashboard.mapCatching { it.toWeather(weatherFeatures, now) }.getOrElse { error ->
+            WeatherWrapper(failedFeatures = weatherFeatures.associateWith { error })
+        }
+    }
+    val metadata = dashboard.getOrNull()?.takeIf { it.success }?.meta
+    val alerts = feed.mapCatching { it.toAlerts(location, metadata, now, getString) }.getOrElse {
+        WeatherWrapper(failedFeatures = mapOf(SourceFeature.ALERT to it))
+    }
+    return weather.copy(
+        alertList = alerts.alertList,
+        failedFeatures = weather.failedFeatures.orEmpty() + alerts.failedFeatures.orEmpty()
+    )
 }

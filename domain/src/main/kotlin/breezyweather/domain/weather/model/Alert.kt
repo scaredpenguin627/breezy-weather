@@ -46,6 +46,9 @@ data class Alert(
     @ColorInt val color: Int,
 ) : Serializable {
 
+    fun isActiveAt(time: Long): Boolean =
+        (startDate == null || startDate.time <= time) && (endDate == null || endDate.time > time)
+
     companion object {
         @ColorInt
         fun colorFromSeverity(severity: AlertSeverity): Int {

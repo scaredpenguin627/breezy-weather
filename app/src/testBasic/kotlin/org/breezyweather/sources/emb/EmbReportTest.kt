@@ -1,7 +1,11 @@
 package org.breezyweather.sources.emb
 
 import breezyweather.domain.location.model.Location
+import breezyweather.domain.weather.model.AirQuality
 import breezyweather.domain.weather.model.Base
+import breezyweather.domain.weather.model.Current
+import breezyweather.domain.weather.model.Daily
+import breezyweather.domain.weather.model.Hourly
 import breezyweather.domain.weather.model.Weather
 import io.kotest.matchers.shouldBe
 import kotlinx.serialization.json.Json
@@ -70,5 +74,81 @@ class EmbReportTest {
         assertThrows(OutdatedServerDataException::class.java) {
             report.toAirQuality(manila, report.fetchedAt.time + TimeUnit.HOURS.toMillis(25))
         }
+    }
+
+    @Test
+    fun `leaving station coverage clears air quality even for a small GPS move with cached weather`() {
+        val now = Date()
+        val beforeMove = Location(
+            latitude = 14.294,
+            longitude = 121.0337,
+            countryCode = "PH",
+            isCurrentPosition = true,
+            airQualitySource = EmbServiceStub.ID
+        )
+        val reading = report.copy(stations = listOf(EmbStation("Muntinlupa (Bilibid)", 25)))
+            .toAirQuality(beforeMove, report.fetchedAt.time).current
+        val weather = Weather(
+            base = Base(forecastUpdateTime = now, airQualityUpdateTime = now),
+            current = Current(weatherText = "Cloudy", airQuality = reading),
+            dailyForecast = listOf(Daily(date = now, airQuality = reading)),
+            hourlyForecast = listOf(Hourly(date = now, weatherText = "Rain", airQuality = reading))
+        )
+        val moved = beforeMove.copy(latitude = 14.293, weather = weather)
+
+        beforeMove.isOutsideEmbAirQualityCoverage shouldBe false
+        moved.isOutsideEmbAirQualityCoverage shouldBe true
+        moved.formattedId shouldBe beforeMove.formattedId
+        val cleared = moved.withoutUncoveredEmbAirQuality()
+        cleared.airQualitySource shouldBe EmbServiceStub.ID
+        cleared.weather?.current shouldBe Current(weatherText = "Cloudy")
+        cleared.weather?.base?.airQualityUpdateTime shouldBe null
+        cleared.weather?.base?.forecastUpdateTime shouldBe now
+        cleared.weather?.dailyForecast shouldBe listOf(Daily(date = now))
+        cleared.weather?.hourlyForecast shouldBe listOf(Hourly(date = now, weatherText = "Rain"))
+        cleared.weather?.toAirQualityWrapperList(now) shouldBe null
+        (cleared.withoutUncoveredEmbAirQuality() === cleared) shouldBe true
+    }
+
+    @Test
+    fun `station coverage is independent of whether the feed has a reading`() {
+        val covered = manila.copy(airQualitySource = EmbServiceStub.ID, weather = Weather())
+        val emptyReport = report.copy(stations = listOf(EmbStation("Manila")))
+
+        covered.isOutsideEmbAirQualityCoverage shouldBe false
+        (covered.withoutUncoveredEmbAirQuality() === covered) shouldBe true
+        assertThrows(InvalidOrIncompleteDataException::class.java) {
+            emptyReport.toAirQuality(covered, report.fetchedAt.time)
+        }
+    }
+
+    @Test
+    fun `empty cache placeholders do not trigger repeated clearing outside coverage`() {
+        val date = Date()
+        val emptyAirQuality = AirQuality()
+        val boracay = Location(
+            latitude = 11.98013,
+            longitude = 121.91932,
+            countryCode = "PH",
+            airQualitySource = EmbServiceStub.ID,
+            weather = Weather(
+                current = Current(airQuality = emptyAirQuality),
+                dailyForecast = listOf(Daily(date = date, airQuality = emptyAirQuality)),
+                hourlyForecast = listOf(Hourly(date = date, airQuality = emptyAirQuality))
+            )
+        )
+
+        (boracay.withoutUncoveredEmbAirQuality() === boracay) shouldBe true
+    }
+
+    @Test
+    fun `only a located place with EMB selected gets the no-station state`() {
+        val boracay = Location(latitude = 11.98013, longitude = 121.91932, countryCode = "PH")
+
+        boracay.copy(airQualitySource = EmbServiceStub.ID).isOutsideEmbAirQualityCoverage shouldBe true
+        boracay.copy(airQualitySource = "openmeteo").isOutsideEmbAirQualityCoverage shouldBe false
+        boracay.isOutsideEmbAirQualityCoverage shouldBe false
+        Location(isCurrentPosition = true, airQualitySource = EmbServiceStub.ID)
+            .isOutsideEmbAirQualityCoverage shouldBe false
     }
 }

@@ -855,6 +855,7 @@
     <string name="message_please_wait_refresh">請等待更新完成</string>
     <string name="settings_main_background_title">天氣為本的背景</string>
     <string name="emb_particulate_aqi">EMB 懸浮粒子 AQI</string>
+    <string name="emb_no_nearby_station">附近沒有已接入的 EMB 監測站</string>
     <string name="emb_particulate_aqi_description">監測站指數取 PM2.5 和 PM10 已提供的分指數中的較高值。數據來自大馬尼拉地區的 EMB 監測站。</string>
     <string name="emb_monitoring_station">監測站 · %1$s</string>
     <string name="emb_report_clock">EMB 報表顯示時間 · %1$s</string>

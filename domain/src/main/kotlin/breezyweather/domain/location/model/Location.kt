@@ -159,6 +159,10 @@ data class Location(
             return false
         }
 
+        if (isCurrentPosition && (latitude != other.latitude || longitude != other.longitude)) {
+            return false
+        }
+
         if (customName != other.customName) {
             return false
         }

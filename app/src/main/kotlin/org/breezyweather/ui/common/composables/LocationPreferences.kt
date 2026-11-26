@@ -886,6 +886,11 @@ fun SecondarySourcesPreference(
                             // if we only change a secondary weather source
                             weather = location.weather?.let { weather ->
                                 weather.copy(
+                                    alertList = if (location.alertSource == alertSource.value) {
+                                        weather.alertList
+                                    } else {
+                                        emptyList()
+                                    },
                                     base = weather.base.copy(
                                         refreshTime = null,
                                         forecastUpdateTime = null,

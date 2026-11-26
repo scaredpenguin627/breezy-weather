@@ -28,6 +28,7 @@ import org.breezyweather.domain.settings.SettingsManager
 import org.breezyweather.domain.weather.model.hasMinutelyPrecipitation
 import org.breezyweather.domain.weather.model.isIndexValid
 import org.breezyweather.domain.weather.model.validAirQuality
+import org.breezyweather.sources.emb.isOutsideEmbAirQualityCoverage
 import org.breezyweather.ui.main.MainActivity
 import org.breezyweather.ui.main.adapters.main.holder.AbstractMainCardViewHolder
 import org.breezyweather.ui.main.adapters.main.holder.AbstractMainViewHolder
@@ -138,7 +139,9 @@ class MainAdapter(
                 if (c === CardDisplay.CARD_WIND && weather.current?.wind?.isValid != true) {
                     continue
                 }
-                if (c === CardDisplay.CARD_AIR_QUALITY && weather.validAirQuality == null) {
+                if (c === CardDisplay.CARD_AIR_QUALITY && weather.validAirQuality == null &&
+                    !location.isOutsideEmbAirQualityCoverage
+                ) {
                     continue
                 }
                 if (c === CardDisplay.CARD_POLLEN &&

@@ -23,7 +23,7 @@
 - Per-app language is now correctly remembered (@zbigniewfr)
 
 **Sources**
-- Philippines (fork) - Added PANaHON forecasts and nowcasts, and DENR-EMB particulate AQI for Metro Manila
+- Philippines (fork) - Added PANaHON forecasts, nowcasts and local warnings, and DENR-EMB particulate AQI for Metro Manila. EMB clears its station reading when the location leaves the network.
 - BMKG - Should now work without any API key or token
 - Bright Sky (DWD) - Fix missing hourly pressure
 - Cyprus Department of Meteorology - Added as a new source for Cyprus (@sashkent3)

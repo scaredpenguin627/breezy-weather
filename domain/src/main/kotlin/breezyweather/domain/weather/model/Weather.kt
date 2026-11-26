@@ -76,12 +76,10 @@ data class Weather(
             (currentTime >= updateTime && currentTime - updateTime < pollingIntervalHours.inWholeMilliseconds)
     }
 
-    val currentAlertList: List<Alert> = alertList
-        .filter {
-            (it.startDate == null && it.endDate == null) ||
-                (it.startDate != null && it.endDate != null && Date() in it.startDate..it.endDate) ||
-                (it.startDate == null && it.endDate != null && Date() < it.endDate) ||
-                (it.startDate != null && it.endDate == null && Date() > it.startDate)
+    val currentAlertList: List<Alert>
+        get() {
+            val now = System.currentTimeMillis()
+            return alertList.filter { it.isActiveAt(now) }
         }
 
     val minutelyForecastBy5Minutes: List<Minutely>

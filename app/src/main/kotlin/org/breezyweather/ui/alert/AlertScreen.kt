@@ -59,6 +59,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import org.breezyweather.R
 import org.breezyweather.common.actionmodecallback.BreezySelectionContainer
+import org.breezyweather.common.extensions.getFormattedDate
 import org.breezyweather.common.extensions.plus
 import org.breezyweather.common.extensions.setSystemBarStyle
 import org.breezyweather.domain.weather.model.getFormattedDates
@@ -85,20 +86,14 @@ internal fun AlertScreen(
     val scrollBehavior = generateCollapsedScrollBehavior()
 
     val isLightTheme = ThemeManager.isLightTheme(context, alertUiState.location)
+    val location = alertUiState.location
+    val latest = location?.weather?.alertList.orEmpty()
+    val alerts = if (location?.alertSource == "panahon") currentPanahonAlerts(latest) else latest
+    val lastChecked = location?.weather?.base?.alertsUpdateTime?.takeIf { location.alertSource == "panahon" }
     LaunchedEffect(alertUiState.location) {
-        alertUiState.location?.weather?.alertList?.let { alerts ->
-            if (alerts.isNotEmpty()) {
-                if (!alertUiState.alertId.isNullOrEmpty()) {
-                    val alertIndex = alerts.indexOfFirst { it.alertId == alertUiState.alertId }
-                    if (alertIndex != -1) {
-                        listState.scrollToItem(alertIndex)
-                    } else {
-                        listState.scrollToItem(0)
-                    }
-                } else {
-                    listState.scrollToItem(0)
-                }
-            }
+        if (alerts.isNotEmpty()) {
+            val index = alerts.indexOfFirst { it.alertId == alertUiState.alertId }
+            listState.scrollToItem(index.coerceAtLeast(0))
         }
 
         // re-setting the status bar color once the location is fetched
@@ -125,7 +120,7 @@ internal fun AlertScreen(
                 ),
                 state = listState
             ) {
-                itemsIndexed(alertUiState.location?.weather?.alertList ?: emptyList()) { index, alert ->
+                itemsIndexed(alerts) { index, alert ->
                     Material3ExpressiveCardListItem(isFirst = true, isLast = true) {
                         Column(
                             modifier = Modifier
@@ -214,8 +209,22 @@ internal fun AlertScreen(
                             }
                         }
                     }
-                    if (index != alertUiState.location!!.weather!!.alertList.lastIndex) {
+                    if (index != alerts.lastIndex) {
                         Spacer(modifier = Modifier.height(dimensionResource(R.dimen.normal_margin)))
+                    }
+                }
+
+                if (lastChecked != null && location != null) {
+                    item {
+                        Text(
+                            stringResource(
+                                R.string.alerts_last_checked,
+                                lastChecked.getFormattedDate("MMM d HH:mm", location, context, withBestPattern = true)
+                            ),
+                            modifier = Modifier.padding(dimensionResource(R.dimen.normal_margin)),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            style = MaterialTheme.typography.bodySmall
+                        )
                     }
                 }
 

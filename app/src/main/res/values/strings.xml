@@ -1337,6 +1337,7 @@
     <string name="knmi_weather_text_fog" translatable="false">@string/common_weather_text_fog</string>
 
     <string name="emb_particulate_aqi">EMB particulate AQI</string>
+    <string name="emb_no_nearby_station">No supported EMB monitoring station nearby</string>
     <string name="emb_particulate_aqi_description">The station index is the higher of its available PM2.5 and PM10 subindices. EMB reports readings for Metro Manila.</string>
     <string name="emb_monitoring_station">Monitoring station · %1$s</string>
     <string name="emb_report_clock">Time shown in the EMB report · %1$s</string>

@@ -19,6 +19,7 @@ package org.breezyweather.sources.panahon
 import io.reactivex.rxjava3.core.Observable
 import kotlinx.serialization.Serializable
 import retrofit2.http.GET
+import retrofit2.http.Headers
 import retrofit2.http.Query
 
 internal interface PanahonApi {
@@ -27,6 +28,10 @@ internal interface PanahonApi {
         @Query("lat") latitude: Double,
         @Query("lon") longitude: Double,
     ): Observable<PanahonResponse>
+
+    @Headers("Accept: application/json")
+    @GET("https://www.panahon.gov.ph/api/v1/cap-alerts")
+    fun getAlerts(): Observable<PanahonAlertResponse>
 }
 
 @Serializable
@@ -40,6 +45,9 @@ internal data class PanahonResponse(
 internal data class PanahonCoordinates(
     val lat: String? = null,
     val lon: String? = null,
+    val municipality: String? = null,
+    val province: String? = null,
+    val region: String? = null,
 )
 
 @Serializable

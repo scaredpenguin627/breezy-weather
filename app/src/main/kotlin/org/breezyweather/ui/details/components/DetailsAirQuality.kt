@@ -98,6 +98,8 @@ import org.breezyweather.domain.weather.model.getConcentration
 import org.breezyweather.domain.weather.model.getDescription
 import org.breezyweather.domain.weather.model.getIndex
 import org.breezyweather.domain.weather.model.getName
+import org.breezyweather.sources.emb.EmbServiceStub
+import org.breezyweather.sources.emb.isOutsideEmbAirQualityCoverage
 import org.breezyweather.ui.common.charts.compose.BreezyLineChart
 import org.breezyweather.ui.common.charts.compose.SpecificVerticalAxisItemPlacer
 import org.breezyweather.ui.common.charts.compose.TimeTopAxisItemPlacer
@@ -138,8 +140,17 @@ fun DetailsAirQuality(
     defaultValue: Pair<Date, AirQuality>?,
     modifier: Modifier = Modifier,
 ) {
+    if (location.isOutsideEmbAirQualityCoverage) {
+        Text(
+            text = stringResource(R.string.emb_no_nearby_station),
+            modifier = modifier.padding(dimensionResource(R.dimen.normal_margin)),
+            style = MaterialTheme.typography.bodyMedium
+        )
+        return
+    }
+
     val context = LocalContext.current
-    if (location.airQualitySource == "emb") {
+    if (location.airQualitySource == EmbServiceStub.ID) {
         Column(
             modifier = modifier.padding(dimensionResource(R.dimen.normal_margin)),
             verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.small_margin))
