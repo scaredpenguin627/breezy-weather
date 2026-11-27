@@ -16,9 +16,13 @@
 
 package org.breezyweather.sources.panahon
 
+import android.content.Context
 import breezyweather.domain.location.model.Location
 import breezyweather.domain.source.SourceContinent
 import breezyweather.domain.source.SourceFeature
+import org.breezyweather.R
+import org.breezyweather.common.extensions.currentLocale
+import org.breezyweather.common.extensions.getStringByLocale
 import org.breezyweather.common.source.HttpSource
 import org.breezyweather.common.source.NonFreeNetSource
 import org.breezyweather.common.source.WeatherSource
@@ -27,7 +31,7 @@ import org.breezyweather.common.source.WeatherSource.Companion.PRIORITY_HIGHEST
 import org.breezyweather.common.source.WeatherSource.Companion.PRIORITY_NONE
 import java.util.TimeZone
 
-abstract class PanahonServiceStub : HttpSource(), WeatherSource, NonFreeNetSource {
+abstract class PanahonServiceStub(private val context: Context) : HttpSource(), WeatherSource, NonFreeNetSource {
 
     override val id = Location.PANAHON_SOURCE
     override val name = "PANaHON (PAGASA)"
@@ -35,12 +39,23 @@ abstract class PanahonServiceStub : HttpSource(), WeatherSource, NonFreeNetSourc
     override val privacyPolicyUrl = ""
 
     private val attribution = "PAGASA PANaHON"
-    override val attributionLinks = mapOf(attribution to "https://www.panahon.gov.ph/")
-    override val supportedFeatures = mapOf(
-        SourceFeature.FORECAST to attribution,
-        SourceFeature.CURRENT to attribution,
-        SourceFeature.ALERT to attribution
+    override val attributionLinks = mapOf(
+        attribution to "https://www.panahon.gov.ph/",
+        "Open-Meteo" to "https://open-meteo.com/"
     )
+    override val supportedFeatures: Map<SourceFeature, String>
+        get() {
+            val locale = context.currentLocale
+            val windCredit = context.getStringByLocale(R.string.panahon_forecast_wind_credit, locale)
+                .format(locale, "Open-Meteo")
+            val currentWindCredit = context.getStringByLocale(R.string.panahon_current_wind_credit, locale)
+                .format(locale, "Open-Meteo")
+            return mapOf(
+                SourceFeature.FORECAST to "$attribution • $windCredit (CC BY 4.0)",
+                SourceFeature.CURRENT to "$attribution • $currentWindCredit (CC BY 4.0)",
+                SourceFeature.ALERT to attribution
+            )
+        }
 
     override fun isFeatureSupportedForLocation(location: Location, feature: SourceFeature): Boolean =
         feature in supportedFeatures && location.countryCode.equals("PH", ignoreCase = true)

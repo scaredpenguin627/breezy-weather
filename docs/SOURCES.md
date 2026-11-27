@@ -1131,6 +1131,8 @@ This source aggregates data from Beijing Meteorological Service, ColorfulClouds 
 
 The automatic preset uses **PANaHON (PAGASA)** for both forecasts and current conditions at new Philippine locations. A GPS location using **Automatic** follows this preference while it is in the Philippines and uses its worldwide fallback elsewhere. To use **PAGASA** instead, select it in the location’s weather source settings. Existing locations retain their saved providers. You can also switch an existing GPS location to **Automatic** in its weather source settings. PAGASA’s [PANaHON dashboard](https://www.panahon.gov.ph/) provides a local nowcast, up to 24 hourly forecast entries and five daily forecasts. The current conditions come from the nowcast. These options are available in the standard build of this fork.
 
+When PANaHON provides the forecast, [Open-Meteo](https://open-meteo.com/en/docs) supplies additional 10-metre wind speed and direction for the same coordinates. The daily chart uses the highest available forecast wind speed in each daytime and nighttime period, with the direction at that hour. Breezy Weather can also use wind from the current forecast hour when the current conditions lack a wind reading. A failed wind request leaves the other PANaHON forecast fields available.
+
 To receive local warnings independently of your forecast provider, select PANaHON under **Alerts** in the location’s weather source settings. The home screen shows the highest-severity active bulletin for that location. Tap it to read the official messages, affected areas, issuing offices and validity times. The app checks for new bulletins when it refreshes the weather. Android background scheduling and your notification settings affect delivery.
 
 ### DENR-EMB

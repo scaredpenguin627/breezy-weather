@@ -8,7 +8,7 @@ The icon packs feature (which allows you to customize weather icons) requires to
 
 Breezy Weather relies on third-party APIs to get various data such as your current location (if you decide to not use native GPS), location search or weather, please review their privacy policy (from Settings > Info icon > Privacy policy) and only use the ones you agree with.
 
-In this fork, selecting PANaHON sends the chosen coordinates to the PAGASA PANaHON API. Selecting DENR-EMB downloads a shared station feed from GitHub or your configured service. The app matches the location to a station on your device.
+In this fork, selecting PANaHON sends the chosen coordinates to the PAGASA PANaHON API. When PANaHON is the forecast source, the app also sends the forecast coordinates to Open-Meteo to obtain wind speed and direction. Selecting DENR-EMB downloads a shared station feed from GitHub or your configured service. The app matches the location to a station on your device.
 
 Breezy Weather can optionally share your location and weather data with other apps. Please review their privacy policy before you decide to grant them permission.
 

@@ -873,5 +873,6 @@
     <string name="settings_weather_source_emb_endpoint">EMB 空气质量 JSON 地址</string>
     <string name="settings_weather_source_emb_endpoint_hint">留空使用默认数据源，也可以填写自有 EMB 服务的完整 HTTPS JSON 地址。</string>
     <string name="daily_trend_no_data">暂无这项逐日预报数据</string>
-    <string name="daily_trend_emb_current_only">EMB 仅提供当前空气质量读数</string>
+    <string name="panahon_forecast_wind_credit">预报风况：%1$s</string>
+    <string name="panahon_current_wind_credit">使用 PANaHON 预报时，缺测的风况可由 %1$s 补充</string>
 </resources>

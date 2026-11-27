@@ -20,18 +20,21 @@ import android.content.Context
 import breezyweather.domain.location.model.Location
 import breezyweather.domain.source.SourceFeature
 import breezyweather.domain.weather.wrappers.WeatherWrapper
+import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import org.breezyweather.common.exceptions.InvalidLocationException
 import org.breezyweather.common.extensions.currentLocale
 import org.breezyweather.common.extensions.getStringByLocale
 import retrofit2.Retrofit
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Named
 
 class PanahonService @Inject constructor(
+    @ApplicationContext context: Context,
     @Named("JsonClient") client: Retrofit.Builder,
-) : PanahonServiceStub() {
+) : PanahonServiceStub(context) {
 
     private val api by lazy {
         client.baseUrl("https://api.mobile.panahon.gov.ph/").build().create(PanahonApi::class.java)
@@ -50,20 +53,28 @@ class PanahonService @Inject constructor(
             if (it.success && !it.meta.matches(location.latitude, location.longitude)) throw InvalidLocationException()
             it
         }
-        if (SourceFeature.ALERT !in features) {
-            return dashboard.map { it.toWeather(features, System.currentTimeMillis()) }
+        val weather = if (SourceFeature.ALERT !in features) {
+            dashboard.map { it.toWeather(features, System.currentTimeMillis()) }
+        } else {
+            val weatherFeatures = features.filterNot { it == SourceFeature.ALERT }
+            val locale = context.currentLocale
+            Observable.zip(dashboard.asResult(), api.getAlerts().asResult()) { weatherResult, alertResult ->
+                combinePanahonWeather(
+                    weatherResult,
+                    alertResult,
+                    weatherFeatures,
+                    location,
+                    System.currentTimeMillis()
+                ) { context.getStringByLocale(it, locale) }
+            }
         }
+        if (SourceFeature.FORECAST !in features) return weather
 
-        val weatherFeatures = features.filterNot { it == SourceFeature.ALERT }
-        val locale = context.currentLocale
-        return Observable.zip(dashboard.asResult(), api.getAlerts().asResult()) { weatherResult, alertResult ->
-            combinePanahonWeather(
-                weatherResult,
-                alertResult,
-                weatherFeatures,
-                location,
-                System.currentTimeMillis()
-            ) { context.getStringByLocale(it, locale) }
+        val wind = api.getForecastWind(location.latitude, location.longitude)
+            .timeout(8, TimeUnit.SECONDS)
+            .asResult()
+        return Observable.zip(weather.subscribeOn(Schedulers.io()), wind) { native, result ->
+            result.getOrNull()?.let { native.withForecastWind(it) } ?: native
         }
     }
 }

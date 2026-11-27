@@ -8,7 +8,9 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic
 import kotlinx.collections.immutable.persistentListOf
+import org.breezyweather.R
 import org.breezyweather.common.extensions.currentLocale
+import org.breezyweather.common.extensions.getStringByLocale
 import org.breezyweather.common.source.WeatherSource
 import org.breezyweather.domain.location.model.applyDefaultPreset
 import org.breezyweather.sources.SourceManager
@@ -18,26 +20,31 @@ import java.util.Locale
 
 class PhilippinePresetTest {
     private val boracay = Location(latitude = 11.98, longitude = 121.92, countryCode = "PH")
-    private val panahon = PanahonService(mockk())
 
     @Test
     fun automaticRankingSelectsPanahonAndPagasaRemainsSelectable() {
         val context = mockk<Context>()
-        lateinit var pagasa: PagasaService
         mockkStatic("org.breezyweather.common.extensions.LanguageExtensionsKt") {
             every { context.currentLocale } returns Locale.ENGLISH
-            pagasa = PagasaService(context, mockk())
-        }
-        val manager = mockk<SourceManager>()
-        every { manager.getSupportedFeatureSources(any(), any(), null) } returns persistentListOf(pagasa, panahon)
-        every { manager.getBestSourceForFeature(any(), any()) } answers { callOriginal() }
+            every {
+                context.getStringByLocale(R.string.panahon_forecast_wind_credit, Locale.ENGLISH)
+            } returns "Forecast wind: %s"
+            every {
+                context.getStringByLocale(R.string.panahon_current_wind_credit, Locale.ENGLISH)
+            } returns "When using PANaHON forecasts, missing wind can come from %s"
+            val pagasa = PagasaService(context, mockk())
+            val panahon = PanahonService(context, mockk())
+            val manager = mockk<SourceManager>()
+            every { manager.getSupportedFeatureSources(any(), any(), null) } returns persistentListOf(pagasa, panahon)
+            every { manager.getBestSourceForFeature(any(), any()) } answers { callOriginal() }
 
-        for (feature in listOf(SourceFeature.FORECAST, SourceFeature.CURRENT)) {
-            pagasa.isFeatureSupportedForLocation(boracay, feature) shouldBe true
-            manager.getBestSourceForFeature(boracay, feature)?.id shouldBe "panahon"
-            manager.getBestSourceForFeature(boracay.copy(countryCode = "ID"), feature) shouldBe null
+            for (feature in listOf(SourceFeature.FORECAST, SourceFeature.CURRENT)) {
+                pagasa.isFeatureSupportedForLocation(boracay, feature) shouldBe true
+                manager.getBestSourceForFeature(boracay, feature)?.id shouldBe "panahon"
+                manager.getBestSourceForFeature(boracay.copy(countryCode = "ID"), feature) shouldBe null
+            }
+            panahon.getFeaturePriorityForLocation(boracay, SourceFeature.ALERT) shouldBe WeatherSource.PRIORITY_HIGH
         }
-        panahon.getFeaturePriorityForLocation(boracay, SourceFeature.ALERT) shouldBe WeatherSource.PRIORITY_HIGH
     }
 
     @Test

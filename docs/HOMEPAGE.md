@@ -113,13 +113,13 @@ You can drag a guideline on the chart to see the expected precipitation quantity
 
 ### Daily forecast
 
-The daily forecast shows Conditions, Air quality, Wind, Precipitation and Feels like, in that order at every location.
+The daily forecast shows Conditions, Wind, Precipitation and Feels like, in that order at every location.
 
 For each trend, the day of the week or "Today" is shown on top of each column, and just below, the day of the month and the month are shown.
 
 The number of columns shown at once depends on your display size and font scale.
 
-When daily data is unavailable for a trend, its tab stays visible and shows an availability message. An air quality source that provides only a current station reading will show that reading on the air quality card.
+When daily data is unavailable for a trend, its tab stays visible and shows an availability message. The air quality card shows the current reading.
 
 
 #### Conditions trends
@@ -131,22 +131,6 @@ From top to bottom:
 - Minimum temperature of nighttime (graph)
 - Weather condition of nighttime (icon)
 - Maximum precipitation probability for daytime + nighttime (bar + text)
-
-#### Air quality trends
-
-Each column shows the maximum air quality index for the day (bar + text) from 00:00 to 23:59. More details about air quality index can be read in Air quality block section.
-
-Bar color will have a different color according to air quality index:
-
-- Green: from 0 to 20
-- Yellow: from 21 to 50
-- Orange: from 51 to 100
-- Red: from 101 to 150
-- Purple: from 151 to 250
-- Brown: 251 and above
-
-Two lines show two alert levels (20 and 150). It can be disabled in the settings (Appearance).
-
 
 #### Wind trends
 

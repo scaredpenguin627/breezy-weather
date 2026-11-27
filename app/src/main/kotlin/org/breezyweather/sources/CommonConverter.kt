@@ -733,7 +733,7 @@ private fun completeHalfDayFromHourlyList(
 
     val initialWind = newHalfDay.wind?.validate()
     val maxWind = if (initialWind?.speed == null) {
-        getHalfDayWindFromHourlyList(halfDayHourlyList)
+        halfDayPeakWind(halfDayHourlyList.mapNotNull { it.wind })
     } else {
         initialWind
     }
@@ -1041,17 +1041,9 @@ private fun getHalfDayPrecipitationProbabilityFromHourlyList(
     )
 }
 
-private fun getHalfDayWindFromHourlyList(
-    halfDayHourlyList: List<Hourly>,
-): Wind? {
-    val maxWind = halfDayHourlyList
-        .filter { it.wind?.speed != null }
-        .maxByOrNull { it.wind!!.speed!! }
-        ?.wind
-    val maxWindGusts = halfDayHourlyList
-        .filter { it.wind?.gusts != null }
-        .maxByOrNull { it.wind!!.gusts!! }
-        ?.wind?.gusts
+internal fun halfDayPeakWind(winds: List<Wind>): Wind? {
+    val maxWind = winds.filter { it.speed != null }.maxByOrNull { it.speed!! }
+    val maxWindGusts = winds.mapNotNull { it.gusts }.maxOrNull()
     return if (maxWindGusts == null || maxWindGusts == maxWind?.gusts) {
         maxWind
     } else {
@@ -1362,6 +1354,13 @@ private fun getCurrentUVFromDayMax(
  * CURRENT FROM DAILY AND HOURLY LIST
  */
 
+internal fun Map<Date, AirQuality>.currentHourAirQuality(now: Long): AirQuality? =
+    entries.asSequence()
+        .filter { it.key.time <= now && it.key.time > now - 1.hours.inWholeMilliseconds }
+        .sortedByDescending { it.key.time }
+        .map { it.value.toValid() }
+        .firstOrNull { it.isValid }
+
 /**
  * Completes Current object from today daily and hourly data:
  * - Weather text
@@ -1452,7 +1451,7 @@ internal fun completeCurrentFromHourlyData(
         weatherCode = newCurrent.weatherCode ?: hourly.weatherCode,
         temperature = newTemperature,
         wind = newWind,
-        airQuality = currentAirQuality ?: hourly.airQuality,
+        airQuality = currentAirQuality,
         relativeHumidity = newRelativeHumidity,
         dewPoint = newDewPoint,
         pressure = newCurrent.pressure?.toValidOrNull() ?: hourly.pressure,

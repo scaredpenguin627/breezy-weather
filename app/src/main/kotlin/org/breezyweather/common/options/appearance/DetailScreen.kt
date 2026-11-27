@@ -62,7 +62,7 @@ enum class DetailScreen(
                             it.day?.wind?.speed != null || it.night?.wind?.speed != null
                         } == true ||
                             location.weather?.hourlyForecast?.any { it.wind?.speed != null } == true
-                        TAG_AIR_QUALITY -> !location.airQualitySource.isNullOrEmpty()
+                        TAG_AIR_QUALITY -> false // Opened from the current card or the hourly chart
                         TAG_POLLEN -> !location.pollenSource.isNullOrEmpty()
                         TAG_UV_INDEX -> location.weather?.dailyForecast?.any {
                             (it.uV?.index ?: 0.0) > 0.0

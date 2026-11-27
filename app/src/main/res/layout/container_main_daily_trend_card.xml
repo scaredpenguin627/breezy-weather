@@ -70,6 +70,7 @@
 
         <TextView
             android:id="@+id/daily_block_empty"
+            android:text="@string/daily_trend_no_data"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/large_margin"

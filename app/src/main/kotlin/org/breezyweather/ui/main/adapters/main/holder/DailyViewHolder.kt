@@ -30,8 +30,6 @@ import org.breezyweather.common.activities.BreezyActivity
 import org.breezyweather.common.extensions.getThemeColor
 import org.breezyweather.common.options.appearance.DailyTrendDisplay
 import org.breezyweather.domain.settings.SettingsManager
-import org.breezyweather.sources.emb.EmbServiceStub
-import org.breezyweather.sources.emb.isOutsideEmbAirQualityCoverage
 import org.breezyweather.ui.common.widgets.trend.DailyTrendLayoutManager
 import org.breezyweather.ui.common.widgets.trend.TrendRecyclerView
 import org.breezyweather.ui.main.adapters.trend.DailyTrendAdapter
@@ -89,16 +87,6 @@ class DailyViewHolder(parent: ViewGroup) : AbstractMainCardViewHolder(
             val hasData = trend.hasData(location)
             trendRecyclerView.isVisible = hasData
             emptyState.isVisible = !hasData
-            if (!hasData) {
-                emptyState.setText(
-                    when {
-                        trend != DailyTrendDisplay.TAG_AIR_QUALITY -> R.string.daily_trend_no_data
-                        location.isOutsideEmbAirQualityCoverage -> R.string.emb_no_nearby_station
-                        location.airQualitySource == EmbServiceStub.ID -> R.string.daily_trend_emb_current_only
-                        else -> R.string.daily_trend_no_data
-                    }
-                )
-            }
         }
 
         DailyTrendDisplay.entries.forEach { trend ->

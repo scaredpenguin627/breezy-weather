@@ -29,6 +29,15 @@ internal interface PanahonApi {
         @Query("lon") longitude: Double,
     ): Observable<PanahonResponse>
 
+    @GET(
+        "https://api.open-meteo.com/v1/forecast?hourly=wind_speed_10m,wind_direction_10m" +
+            "&wind_speed_unit=ms&timeformat=unixtime&timezone=Asia%2FManila&forecast_days=6&past_days=1"
+    )
+    fun getForecastWind(
+        @Query("latitude") latitude: Double,
+        @Query("longitude") longitude: Double,
+    ): Observable<OpenMeteoWindReport>
+
     @Headers("Accept: application/json")
     @GET("https://www.panahon.gov.ph/api/v1/cap-alerts")
     fun getAlerts(): Observable<PanahonAlertResponse>

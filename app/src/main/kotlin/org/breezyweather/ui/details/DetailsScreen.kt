@@ -87,7 +87,6 @@ import org.breezyweather.common.options.appearance.CalendarHelper
 import org.breezyweather.common.options.appearance.DetailScreen
 import org.breezyweather.common.source.PollenIndexSource
 import org.breezyweather.domain.weather.index.PollutantIndex
-import org.breezyweather.domain.weather.model.getConcentration
 import org.breezyweather.domain.weather.model.isToday
 import org.breezyweather.ui.common.widgets.Material3Scaffold
 import org.breezyweather.ui.common.widgets.insets.BWCenterAlignedTopAppBar
@@ -134,7 +133,7 @@ internal fun DailyWeatherScreen(
                 )
             },
             floatingActionButton = {
-                detailsUiState.location?.let { loc ->
+                detailsUiState.location?.takeUnless { detailsViewModel.currentAirQualityOnly }?.let { loc ->
                     DetailsDropdownMenu(
                         location = loc,
                         selectedChart = detailsUiState.selectedChart,
@@ -145,6 +144,15 @@ internal fun DailyWeatherScreen(
             floatingActionButtonPosition = FabPosition.End
         ) { paddings ->
             detailsUiState.location?.let { loc ->
+                if (detailsViewModel.currentAirQualityOnly) {
+                    DetailsAirQuality(
+                        location = loc,
+                        selectedPollutant = detailsUiState.selectedPollutant,
+                        setSelectedPollutant = detailsViewModel::setSelectedPollutant,
+                        modifier = Modifier.padding(paddings)
+                    )
+                    return@let
+                }
                 val scope = rememberCoroutineScope()
                 val pages = remember(loc.weather!!.dailyForecast) {
                     loc.weather!!.dailyForecast.map { it.date }.toImmutableList()
@@ -421,29 +429,12 @@ fun DailyPagerContent(
                 )
             }
             DetailScreen.TAG_AIR_QUALITY -> {
-                val supportedPollutants = remember(location) {
-                    PollutantIndex.entries
-                        .filter { pollutant ->
-                            location.weather!!.dailyForecast.any {
-                                it.airQuality?.getConcentration(pollutant) != null
-                            } ||
-                                location.weather!!.hourlyForecast.any {
-                                    it.airQuality?.getConcentration(pollutant) != null
-                                } ||
-                                location.weather!!.current?.airQuality?.getConcentration(pollutant) != null
-                        }.toImmutableList()
-                }
-
                 DetailsAirQuality(
-                    location,
-                    supportedPollutants,
-                    selectedPollutant,
-                    setSelectedPollutant,
-                    hourlyList,
-                    daily,
-                    location.weather!!.current?.airQuality?.takeIf { daily.isToday(location) && it.isValid }?.let {
-                        Pair(location.weather!!.base.airQualityUpdateTime ?: currentUpdateTime, it)
-                    }
+                    location = location,
+                    selectedPollutant = selectedPollutant,
+                    setSelectedPollutant = setSelectedPollutant,
+                    hourlyList = hourlyList,
+                    chartDay = daily.date
                 )
             }
             DetailScreen.TAG_POLLEN -> {

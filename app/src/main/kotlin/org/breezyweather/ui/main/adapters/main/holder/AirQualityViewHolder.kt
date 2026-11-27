@@ -85,8 +85,8 @@ class AirQualityViewHolder(parent: ViewGroup) : AbstractMainCardViewHolder(
             IntentHelper.startDailyWeatherActivity(
                 context as BreezyActivity,
                 location.formattedId,
-                location.weather!!.todayIndex,
-                DetailScreen.TAG_AIR_QUALITY
+                chart = DetailScreen.TAG_AIR_QUALITY,
+                currentAirQualityOnly = true
             )
         }
 

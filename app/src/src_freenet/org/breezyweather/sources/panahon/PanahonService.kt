@@ -20,11 +20,14 @@ import android.content.Context
 import breezyweather.domain.location.model.Location
 import breezyweather.domain.source.SourceFeature
 import breezyweather.domain.weather.wrappers.WeatherWrapper
+import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.core.Observable
 import org.breezyweather.common.exceptions.NonFreeNetSourceException
 import javax.inject.Inject
 
-class PanahonService @Inject constructor() : PanahonServiceStub() {
+class PanahonService @Inject constructor(
+    @ApplicationContext context: Context,
+) : PanahonServiceStub(context) {
 
     override fun requestWeather(
         context: Context,

@@ -20,12 +20,10 @@ import androidx.annotation.StringRes
 import breezyweather.domain.location.model.Location
 import org.breezyweather.R
 import org.breezyweather.common.extensions.toTimezoneSpecificHour
-import org.breezyweather.domain.weather.model.getIndex
 import java.util.Date
 
 enum class DailyTrendDisplay(val id: String, @StringRes val nameId: Int) {
     TAG_TEMPERATURE("temperature", R.string.conditions),
-    TAG_AIR_QUALITY("air_quality", R.string.air_quality),
     TAG_WIND("wind", R.string.wind),
     TAG_PRECIPITATION("precipitation", R.string.precipitation),
     TAG_FEELS_LIKE("feels_like", R.string.temperature_feels_like),
@@ -41,7 +39,6 @@ enum class DailyTrendDisplay(val id: String, @StringRes val nameId: Int) {
                 TAG_TEMPERATURE -> listOfNotNull(day.day, day.night).any {
                     it.temperature?.temperature != null || it.weatherCode != null || !it.weatherText.isNullOrBlank()
                 }
-                TAG_AIR_QUALITY -> day.airQuality?.getIndex() != null
                 TAG_WIND -> day.day?.wind?.speed != null || day.night?.wind?.speed != null
                 TAG_PRECIPITATION -> day.day?.precipitation?.total != null || day.night?.precipitation?.total != null
                 TAG_FEELS_LIKE ->

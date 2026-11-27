@@ -69,7 +69,6 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import breezyweather.domain.location.model.Location
 import breezyweather.domain.weather.model.AirQuality
-import breezyweather.domain.weather.model.Daily
 import breezyweather.domain.weather.model.Hourly
 import com.patrykandpatrick.vico.compose.cartesian.data.CartesianChartModelProducer
 import com.patrykandpatrick.vico.compose.cartesian.data.lineModel
@@ -89,6 +88,7 @@ import org.breezyweather.common.extensions.getRelativeTime
 import org.breezyweather.common.extensions.is12Hour
 import org.breezyweather.common.extensions.roundUpToNearestMultiplier
 import org.breezyweather.common.extensions.toDate
+import org.breezyweather.common.extensions.toTimezoneSpecificHour
 import org.breezyweather.common.options.appearance.DetailScreen
 import org.breezyweather.common.utils.UnitUtils
 import org.breezyweather.domain.settings.SettingsManager
@@ -98,7 +98,7 @@ import org.breezyweather.domain.weather.model.getConcentration
 import org.breezyweather.domain.weather.model.getDescription
 import org.breezyweather.domain.weather.model.getIndex
 import org.breezyweather.domain.weather.model.getName
-import org.breezyweather.sources.emb.EmbServiceStub
+import org.breezyweather.domain.weather.model.validAirQuality
 import org.breezyweather.sources.emb.isOutsideEmbAirQualityCoverage
 import org.breezyweather.ui.common.charts.compose.BreezyLineChart
 import org.breezyweather.ui.common.charts.compose.SpecificVerticalAxisItemPlacer
@@ -132,17 +132,17 @@ data class AqiItem(
 @Composable
 fun DetailsAirQuality(
     location: Location,
-    supportedPollutants: ImmutableList<PollutantIndex>,
     selectedPollutant: PollutantIndex?,
     setSelectedPollutant: (PollutantIndex?) -> Unit,
-    hourlyList: ImmutableList<Hourly>,
-    daily: Daily,
-    defaultValue: Pair<Date, AirQuality>?,
     modifier: Modifier = Modifier,
+    hourlyList: ImmutableList<Hourly> = persistentListOf(),
+    chartDay: Date? = null,
 ) {
-    if (location.isOutsideEmbAirQualityCoverage) {
+    val current = if (chartDay == null) location.weather?.validAirQuality else null
+    val outsideCoverage = location.isOutsideEmbAirQualityCoverage
+    if (outsideCoverage || (chartDay == null && current == null)) {
         Text(
-            text = stringResource(R.string.emb_no_nearby_station),
+            text = stringResource(if (outsideCoverage) R.string.emb_no_nearby_station else R.string.null_data_text),
             modifier = modifier.padding(dimensionResource(R.dimen.normal_margin)),
             style = MaterialTheme.typography.bodyMedium
         )
@@ -150,21 +150,21 @@ fun DetailsAirQuality(
     }
 
     val context = LocalContext.current
-    if (location.airQualitySource == EmbServiceStub.ID) {
+    val reportedAqi = current?.reportedAqi
+    if (reportedAqi != null) {
         Column(
             modifier = modifier.padding(dimensionResource(R.dimen.normal_margin)),
             verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.small_margin))
         ) {
             DetailsSectionHeader(stringResource(R.string.emb_particulate_aqi))
-            val index = defaultValue?.second?.reportedAqi
-            if (index != null) {
-                Text(
-                    text = index.format(decimals = 0, locale = context.currentLocale),
-                    style = MaterialTheme.typography.displaySmall
-                )
-                defaultValue.second.reportedStation?.let { Text(stringResource(R.string.emb_monitoring_station, it)) }
-                defaultValue.second.reportedClock?.let { Text(stringResource(R.string.emb_report_clock, it)) }
-                Text(stringResource(R.string.emb_report_fetched, defaultValue.first.getRelativeTime(context)))
+            Text(
+                text = reportedAqi.format(decimals = 0, locale = context.currentLocale),
+                style = MaterialTheme.typography.displaySmall
+            )
+            current.reportedStation?.let { Text(stringResource(R.string.emb_monitoring_station, it)) }
+            current.reportedClock?.let { Text(stringResource(R.string.emb_report_clock, it)) }
+            location.weather?.base?.airQualityUpdateTime?.let {
+                Text(stringResource(R.string.emb_report_fetched, it.getRelativeTime(context)))
             }
             DetailsCardText(stringResource(R.string.emb_particulate_aqi_description))
         }
@@ -182,8 +182,14 @@ fun DetailsAirQuality(
             }
         }.toImmutableMap()
     }
-    var activeItem: Pair<Date, AirQuality>? by remember { mutableStateOf(null) }
-    val markerVisibilityListener = remember {
+    val supportedPollutants = remember(current, hourlyList) {
+        PollutantIndex.entries.filter { pollutant ->
+            current?.getConcentration(pollutant) != null ||
+                hourlyList.any { it.airQuality?.getConcentration(pollutant) != null }
+        }.toImmutableList()
+    }
+    var activeItem: Pair<Date, AirQuality>? by remember(mappedValues) { mutableStateOf(null) }
+    val markerVisibilityListener = remember(mappedValues) {
         object : CartesianMarkerVisibilityListener {
             override fun onShown(marker: CartesianMarker, targets: List<CartesianMarker.Target>) {
                 activeItem = targets.firstOrNull()?.let { target ->
@@ -202,12 +208,19 @@ fun DetailsAirQuality(
             }
         }
     }
-    val selectedAirQuality = remember(daily, defaultValue) {
-        if (daily.airQuality?.isValid == true) {
-            daily.airQuality
-        } else {
-            defaultValue?.second
+    val firstHourlyReading = remember(chartDay, hourlyList, mappedValues, location.timeZone) {
+        chartDay?.let { date ->
+            val dayStart = date.toTimezoneSpecificHour(location.timeZone, 0)
+            hourlyList.firstOrNull {
+                it.date.time in mappedValues && it.date.toTimezoneSpecificHour(location.timeZone, 0) == dayStart
+            }
         }
+    }
+    val selectedAirQuality = activeItem?.second ?: current ?: firstHourlyReading?.airQuality
+    val selectedTime = activeItem?.first ?: if (chartDay == null) {
+        location.weather?.base?.airQualityUpdateTime
+    } else {
+        firstHourlyReading?.date
     }
 
     val detailedPollutants = remember(selectedAirQuality) {
@@ -269,18 +282,22 @@ fun DetailsAirQuality(
         )
     ) {
         item {
-            AirQualityHeader(location, daily, selectedPollutant, activeItem, defaultValue)
+            AirQualityItem(
+                header = selectedTime?.getFormattedTime(location, context, context.is12Hour),
+                selectedPollutant = selectedPollutant,
+                airQuality = selectedAirQuality
+            )
         }
         item {
             Spacer(modifier = Modifier.height(dimensionResource(R.dimen.normal_margin)))
         }
-        if (mappedValues.size >= DetailScreen.CHART_MIN_COUNT) {
+        if (chartDay != null) {
             item {
-                AirQualityChart(location, selectedPollutant, mappedValues, daily, markerVisibilityListener)
-            }
-        } else {
-            item {
-                UnavailableChart(mappedValues.size)
+                if (mappedValues.size >= DetailScreen.CHART_MIN_COUNT) {
+                    AirQualityChart(location, selectedPollutant, mappedValues, chartDay, markerVisibilityListener)
+                } else {
+                    UnavailableChart(mappedValues.size)
+                }
             }
         }
         if (supportedPollutants.isNotEmpty()) {
@@ -385,37 +402,6 @@ fun DetailsAirQuality(
 }
 
 @Composable
-private fun AirQualityHeader(
-    location: Location,
-    daily: Daily,
-    selectedPollutant: PollutantIndex?,
-    activeItem: Pair<Date, AirQuality>?,
-    defaultValue: Pair<Date, AirQuality>?,
-) {
-    val context = LocalContext.current
-
-    if (activeItem != null) {
-        AirQualityItem(
-            header = activeItem.first.getFormattedTime(location, context, context.is12Hour),
-            selectedPollutant = selectedPollutant,
-            airQuality = activeItem.second
-        )
-    } else if (daily.airQuality?.isValid == true) {
-        AirQualityItem(
-            header = stringResource(R.string.air_quality_average),
-            selectedPollutant = selectedPollutant,
-            airQuality = daily.airQuality
-        )
-    } else {
-        AirQualityItem(
-            header = defaultValue?.first?.getFormattedTime(location, context, context.is12Hour),
-            selectedPollutant = selectedPollutant,
-            airQuality = defaultValue?.second
-        )
-    }
-}
-
-@Composable
 private fun AirQualityItem(
     header: String?,
     selectedPollutant: PollutantIndex?,
@@ -482,7 +468,7 @@ private fun AirQualityChart(
     location: Location,
     selectedPollutant: PollutantIndex?,
     mappedValues: ImmutableMap<Long, AirQuality>,
-    daily: Daily,
+    chartDay: Date,
     markerVisibilityListener: CartesianMarkerVisibilityListener,
 ) {
     val context = LocalContext.current
@@ -527,7 +513,7 @@ private fun AirQualityChart(
     BreezyLineChart(
         location = location,
         modelProducer = modelProducer,
-        theDay = daily.date,
+        theDay = chartDay,
         maxY = maxY.toDouble(),
         topAxisItemPlacer = remember(mappedValues) {
             TimeTopAxisItemPlacer(mappedValues.keys.toImmutableList())

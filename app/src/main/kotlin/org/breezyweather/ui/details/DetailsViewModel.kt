@@ -45,8 +45,10 @@ class DetailsViewModel @Inject constructor(
     private val selectedChart: DetailScreen = DetailScreen.entries.firstOrNull {
         it.id == savedStateHandle.get<String>(DetailsActivity.KEY_CURRENT_PAGE)
     } ?: DetailScreen.TAG_CONDITIONS
+    val currentAirQualityOnly = selectedChart == DetailScreen.TAG_AIR_QUALITY &&
+        savedStateHandle.get<Boolean>(DetailsActivity.KEY_CURRENT_AIR_QUALITY_ONLY) == true
 
-    private val _uiState = MutableStateFlow(DetailsUiState())
+    private val _uiState = MutableStateFlow(DetailsUiState(selectedChart = selectedChart))
     val uiState: StateFlow<DetailsUiState> = _uiState.asStateFlow()
 
     init {
@@ -79,26 +81,19 @@ class DetailsViewModel @Inject constructor(
 
             val weather = weatherRepository.getWeatherByLocationId(
                 locationC.formattedId,
-                withDaily = true,
-                withHourly = true, // 24-hour charts
+                withDaily = !currentAirQualityOnly,
+                withHourly = !currentAirQualityOnly,
                 withMinutely = false,
                 withAlerts = false
             )
-            if (weather?.dailyForecast.isNullOrEmpty()) {
-                // There is no weather for this location; we should never have entered daily screen
+            if (weather == null || (!currentAirQualityOnly && weather.dailyForecast.isEmpty())) {
                 return@launch
             }
 
             _uiState.value = DetailsUiState(
                 location = locationC.copy(weather = weather),
                 selectedChart = selectedChart,
-                initialIndex = dailyIndex.let {
-                    if (it == null || it == -1 || it >= weather!!.dailyForecast.size) {
-                        weather!!.todayIndex ?: 0
-                    } else {
-                        it
-                    }
-                }
+                initialIndex = dailyIndex?.takeIf { it in weather.dailyForecast.indices } ?: weather.todayIndex ?: 0
             )
         }
     }

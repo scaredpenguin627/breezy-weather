@@ -100,6 +100,7 @@ object IntentHelper {
         formattedId: String?,
         index: Int? = null,
         chart: DetailScreen? = null,
+        currentAirQualityOnly: Boolean = false,
     ) {
         activity.startActivity(
             Intent(activity, DetailsActivity::class.java).apply {
@@ -109,6 +110,9 @@ object IntentHelper {
                 }
                 if (chart != null) {
                     putExtra(DetailsActivity.KEY_CURRENT_PAGE, chart.id)
+                }
+                if (currentAirQualityOnly) {
+                    putExtra(DetailsActivity.KEY_CURRENT_AIR_QUALITY_ONLY, true)
                 }
             }
         )
