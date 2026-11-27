@@ -18,6 +18,7 @@ package org.breezyweather.sources.panahon
 
 import breezyweather.domain.source.SourceFeature
 import breezyweather.domain.weather.model.Precipitation
+import breezyweather.domain.weather.model.Wind
 import breezyweather.domain.weather.reference.WeatherCode
 import breezyweather.domain.weather.wrappers.CurrentWrapper
 import breezyweather.domain.weather.wrappers.DailyWrapper
@@ -25,140 +26,192 @@ import breezyweather.domain.weather.wrappers.HalfDayWrapper
 import breezyweather.domain.weather.wrappers.HourlyWrapper
 import breezyweather.domain.weather.wrappers.TemperatureWrapper
 import breezyweather.domain.weather.wrappers.WeatherWrapper
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.doubleOrNull
 import org.breezyweather.common.exceptions.InvalidOrIncompleteDataException
 import org.breezyweather.common.exceptions.OutdatedServerDataException
+import org.breezyweather.sources.halfDayPeakWind
 import org.breezyweather.unit.precipitation.Precipitation.Companion.millimeters
+import org.breezyweather.unit.speed.Speed.Companion.metersPerSecond
+import org.breezyweather.unit.temperature.Temperature
 import org.breezyweather.unit.temperature.Temperature.Companion.celsius
-import java.text.SimpleDateFormat
-import java.util.Calendar
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeParseException
+import java.time.format.ResolverStyle
 import java.util.Date
 import java.util.Locale
-import java.util.TimeZone
 import kotlin.math.abs
-import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 
-internal fun PanahonResponse.toWeather(features: List<SourceFeature>, now: Long): WeatherWrapper {
-    if (!success || data == null) throw InvalidOrIncompleteDataException()
-    val days = data.dc.orEmpty()
-    val firstDate = days.firstOrNull()?.dt ?: throw InvalidOrIncompleteDataException()
-    val dates = forecastDates(now, days.size)
-    val midnight = dates[firstDate] ?: throw OutdatedServerDataException()
-    val failures = mutableMapOf<SourceFeature, Throwable>()
+private val clockFormat = DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss", Locale.ROOT)
+    .withResolverStyle(ResolverStyle.STRICT)
+private val manila = ZoneId.of("Asia/Manila")
 
+internal fun Instant.mapLocalTime(): String = clockFormat.format(atZone(manila)).replace(' ', 'T')
+
+internal fun PanahonMapValue.airTemperature(
+    latitude: Double,
+    longitude: Double,
+    initialization: Instant,
+): TemperatureWrapper? {
+    val lon = coordinates?.getOrNull(0) ?: return null
+    val lat = coordinates.getOrNull(1) ?: return null
+    if (!lat.isFinite() || !lon.isFinite() || abs(lon - longitude) > 0.0001 || abs(lat - latitude) > 0.0001) return null
+    if (run != clockFormat.format(initialization.atOffset(ZoneOffset.UTC))) return null
+    val temp = values?.firstOrNull()?.doubleOrNull?.takeIf(Double::isFinite)?.celsius?.toValidOrNull()
+    return temp?.let { TemperatureWrapper(temperature = it) }
+}
+
+private fun <T : Any> List<PanahonPoint?>?.readSeries(
+    range: LongRange,
+    run: Long,
+    parse: (JsonPrimitive) -> T?,
+): Map<Long, T> =
+    buildMap {
+        this@readSeries.orEmpty().forEach { point ->
+            val clock = point?.time ?: return@forEach
+            val value = point.value?.let(parse) ?: return@forEach
+            val time = try {
+                LocalDateTime.parse(clock, clockFormat).atZone(manila).toInstant().toEpochMilli()
+            } catch (_: DateTimeParseException) {
+                return@forEach
+            }
+            if (time !in range) return@forEach
+            val sinceRun = time - run
+            val interval = if (sinceRun <= 90.hours.inWholeMilliseconds) 1.hours else 3.hours
+            if (sinceRun % interval.inWholeMilliseconds == 0L) put(time, value)
+        }
+    }
+
+private fun midnight(now: Long): Long =
+    Instant.ofEpochMilli(now).atZone(manila).toLocalDate().atStartOfDay(manila).toInstant().toEpochMilli()
+
+internal fun PanahonPointReport.toPointHours(initialization: Instant, now: Long): List<HourlyWrapper> {
+    if (!success || model != "ecmwf" || data == null) throw InvalidOrIncompleteDataException()
+    val today = midnight(now)
+    val end = today + 120.hours.inWholeMilliseconds
+    // The last nighttime period ends at 06:00 on the next date.
+    val startRun = initialization.toEpochMilli()
+    val range =
+        maxOf(today, startRun)..minOf(end + 6.hours.inWholeMilliseconds, startRun + 144.hours.inWholeMilliseconds)
+    val conditions = data.icons.readSeries(range, startRun) { iconCode(it.content) }
+    val heat = data.heatIndex.readSeries(range, startRun) {
+        it.doubleOrNull?.takeIf(Double::isFinite)?.celsius?.toValidOrNull()
+    }
+    val rain = data.rain.takeIf { rainUnit == "mm" }.readSeries(range, startRun) {
+        it.doubleOrNull?.takeIf { n -> n.isFinite() && n >= 0.0 }?.millimeters?.toValidHourlyOrNull()
+    } - startRun
+    val bearings = data.directions.readSeries(range, startRun) {
+        it.doubleOrNull?.takeIf { n -> n in -180.0..360.0 }?.let { n -> (n + 360.0) % 360.0 }
+    }
+    val speeds = data.speeds.readSeries(range, startRun) {
+        it.doubleOrNull?.takeIf { n -> n.isFinite() && n >= 0.0 }?.metersPerSecond?.toValidOrNull()
+    }
+    return (conditions.keys + heat.keys + rain.keys + speeds.keys).sorted().map { time ->
+        HourlyWrapper(
+            date = Date(time),
+            weatherCode = conditions[time],
+            temperature = heat[time]?.let { TemperatureWrapper(feelsLike = it) },
+            precipitation = rain[time]?.let { Precipitation(total = it) },
+            wind = speeds[time]?.let { Wind(degree = bearings[time], speed = it) }
+        )
+    }
+}
+
+internal fun List<HourlyWrapper>.toWeather(
+    temperatures: Map<Long, Temperature>,
+    features: List<SourceFeature>,
+    now: Long,
+): WeatherWrapper {
+    val today = midnight(now)
+    val end = today + 120.hours.inWholeMilliseconds
+    val hours = map { row ->
+        val actual = temperatures[row.date.time]
+        if (actual != null) row.copy(temperature = TemperatureWrapper(actual, row.temperature?.feelsLike)) else row
+    }
+    val hourNow = now - now % 1.hours.inWholeMilliseconds
+    val failures = mutableMapOf<SourceFeature, Throwable>()
     val current = if (SourceFeature.CURRENT in features) {
-        val row = data.nc
-        val offset = clockOffset(row?.time)
-        when {
-            row == null || offset == null || !row.hasWeather() -> {
-                failures[SourceFeature.CURRENT] = InvalidOrIncompleteDataException()
-                null
-            }
-            now - (midnight + offset) !in -1.hours.inWholeMilliseconds..2.hours.inWholeMilliseconds -> {
-                failures[SourceFeature.CURRENT] = OutdatedServerDataException()
-                null
-            }
-            else -> CurrentWrapper(
-                weatherText = row.desc,
-                weatherCode = weatherCode(row.desc),
-                temperature = temperature(row.tmp, row.hindex)
-            )
+        val row = hours.firstOrNull { it.date.time == hourNow }
+            ?: temperatures[hourNow]?.let { HourlyWrapper(Date(hourNow), temperature = TemperatureWrapper(it)) }
+        if (row == null || (row.weatherCode == null && row.temperature == null && row.wind == null)) {
+            failures[SourceFeature.CURRENT] = OutdatedServerDataException()
+            null
+        } else {
+            CurrentWrapper(weatherCode = row.weatherCode, temperature = row.temperature, wind = row.wind)
         }
     } else {
         null
     }
-
     if (SourceFeature.FORECAST !in features) return WeatherWrapper(current = current, failedFeatures = failures)
-
-    val daily = days.mapNotNull { row ->
-        val date = dates[row.dt] ?: return@mapNotNull null
-        val high = temperature(row.tmax, row.hmax)
-        val low = temperature(row.tmin, row.hmin)
-        if (high == null && low == null && row.desc.isNullOrBlank()) return@mapNotNull null
-        DailyWrapper(
-            date = Date(date),
-            day = HalfDayWrapper(weatherText = row.desc, weatherCode = weatherCode(row.desc), temperature = high),
-            night = low?.let { HalfDayWrapper(temperature = it) }
-        )
+    val forecast = hours.filter { it.date.time < end }
+    if (forecast.none { it.date.time >= hourNow }) {
+        failures[SourceFeature.FORECAST] = OutdatedServerDataException()
+        return WeatherWrapper(current = current, failedFeatures = failures)
     }
-    // The 24 hourly rows only carry a Manila clock time. Earlier clocks belong to the next day.
-    val start = clockOffset(data.nc?.time) ?: clockOffset(data.hc?.firstOrNull()?.time)
-    val hourly = data.hc.orEmpty().mapNotNull { row ->
-        val offset = clockOffset(row.time) ?: return@mapNotNull null
-        val date = midnight + offset + if (start != null && offset < start) 1.days.inWholeMilliseconds else 0L
-        val rain = quantity(row.tprecip, "mm")?.takeIf { it >= 0 }
-        if (!row.hasWeather() && rain == null) return@mapNotNull null
-        HourlyWrapper(
-            date = Date(date),
-            weatherText = row.desc,
-            weatherCode = weatherCode(row.desc),
-            temperature = temperature(row.tmp, row.hindex),
-            precipitation = rain?.let { Precipitation(total = it.millimeters) }
-        )
-    }.distinctBy { it.date }.sortedBy { it.date }
-
-    if (daily.isEmpty() || hourly.isEmpty()) failures[SourceFeature.FORECAST] = InvalidOrIncompleteDataException()
-    return WeatherWrapper(current = current, dailyForecast = daily, hourlyForecast = hourly, failedFeatures = failures)
-}
-
-// The dashboard silently returns Manila when it does not recognize the coordinate parameters.
-// Its metadata echoes the requested point rounded to four decimal places.
-internal fun PanahonCoordinates?.matches(latitude: Double, longitude: Double): Boolean {
-    val echoedLat = this?.lat?.toDoubleOrNull() ?: return false
-    val echoedLon = this.lon?.toDoubleOrNull() ?: return false
-    return abs(latitude - echoedLat) <= 0.0001 && abs(longitude - echoedLon) <= 0.0001
-}
-
-// Dates are MM/dd without a year. Include yesterday for a cached response around local midnight.
-private fun forecastDates(now: Long, count: Int): Map<String, Long> {
-    val zone = TimeZone.getTimeZone("Asia/Manila")
-    val format = SimpleDateFormat("MM/dd", Locale.US).apply { timeZone = zone }
-    val day = Calendar.getInstance(zone).apply {
-        timeInMillis = now
-        set(Calendar.HOUR_OF_DAY, 0)
-        set(Calendar.MINUTE, 0)
-        set(Calendar.SECOND, 0)
-        set(Calendar.MILLISECOND, 0)
-        add(Calendar.DAY_OF_MONTH, -1)
-    }
-    return buildMap {
-        repeat(count + 2) {
-            put(format.format(day.time), day.timeInMillis)
-            day.add(Calendar.DAY_OF_MONTH, 1)
+    val days = (0 until 5).mapNotNull { day ->
+        val midnight = today + (day * 24).hours.inWholeMilliseconds
+        if (forecast.none {
+                it.date.time in midnight until midnight + 24.hours.inWholeMilliseconds
+            }
+        ) {
+            return@mapNotNull null
         }
+        DailyWrapper(
+            date = Date(midnight),
+            day = hours.summarizeHalfDay(midnight + 6.hours.inWholeMilliseconds, daytime = true),
+            night = hours.summarizeHalfDay(midnight + 18.hours.inWholeMilliseconds, daytime = false)
+        )
     }
+    return WeatherWrapper(
+        current = current,
+        hourlyForecast = forecast,
+        dailyForecast = days,
+        forecastWindSamples = forecast.mapNotNull { row -> row.wind?.let { row.date to it } }.toMap(),
+        failedFeatures = failures
+    )
 }
 
-private val clock = Regex("""(1[0-2]|[1-9]):([0-5]\d) (AM|PM)""")
-
-private fun clockOffset(value: String?): Long? {
-    val (hour, minute, period) = clock.matchEntire(value.orEmpty())?.destructured ?: return null
-    val hour24 = hour.toInt() % 12 + if (period == "PM") 12 else 0
-    return (hour24 * 60 + minute.toInt()) * 60_000L
+private fun List<HourlyWrapper>.summarizeHalfDay(start: Long, daytime: Boolean): HalfDayWrapper? {
+    val rows = filter { it.date.time in start until start + 12.hours.inWholeMilliseconds }
+    if (rows.isEmpty()) return null
+    val air = rows.mapNotNull { it.temperature?.temperature }
+    val airExtreme = if (daytime) air.maxOrNull() else air.minOrNull()
+    val heat = rows.mapNotNull { it.temperature?.feelsLike }
+    val heatExtreme = if (daytime) heat.maxOrNull() else heat.minOrNull()
+    // ECMWF precipitation amounts are stamped at the end of their accumulation interval.
+    val hourlyRain = this.mapNotNull { h -> h.precipitation?.total?.let { h.date.time to it } }.toMap()
+    val completeRain = (1..12).mapNotNull { hourlyRain[start + it.hours.inWholeMilliseconds] }
+        .takeIf { it.size == 12 }?.sumOf { it.inMillimeters }?.millimeters
+    val representative = rows.mapNotNull { it.weatherCode }.groupingBy { it }.eachCount().maxByOrNull { it.value }?.key
+    return HalfDayWrapper(
+        weatherCode = representative,
+        temperature = if (airExtreme != null ||
+            heatExtreme != null
+        ) {
+            TemperatureWrapper(airExtreme, heatExtreme)
+        } else {
+            null
+        },
+        precipitation = completeRain?.let { Precipitation(total = it) },
+        wind = halfDayPeakWind(rows.mapNotNull { it.wind })
+    )
 }
 
-private fun PanahonHour.hasWeather() =
-    !desc.isNullOrBlank() || temperature(tmp, hindex) != null
-
-private fun temperature(value: String?, heatIndex: String?): TemperatureWrapper? {
-    val temp = quantity(value, "°C")?.celsius
-    val feelsLike = quantity(heatIndex, "°C")?.celsius
-    return if (temp == null && feelsLike == null) null else TemperatureWrapper(temp, feelsLike)
-}
-
-private fun quantity(value: String?, unit: String): Double? =
-    value?.trim()?.takeIf { it.endsWith(unit) }?.removeSuffix(unit)?.trim()?.toDoubleOrNull()?.takeIf { it.isFinite() }
-
-private fun weatherCode(description: String?): WeatherCode? {
-    val text = description?.lowercase(Locale.ROOT) ?: return null
+private fun iconCode(value: String): WeatherCode? {
+    val icon = value.removePrefix("icon-")
     return when {
-        "thunderstorm" in text -> WeatherCode.THUNDERSTORM
-        "rain" in text || "drizzle" in text -> WeatherCode.RAIN
-        "partly cloudy" in text -> WeatherCode.PARTLY_CLOUDY
-        "cloudy" in text || "overcast" in text -> WeatherCode.CLOUDY
-        "clear" in text || "sunny" in text -> WeatherCode.CLEAR
-        "fog" in text -> WeatherCode.FOG
-        "haze" in text -> WeatherCode.HAZE
+        "thunderstorm" in icon -> WeatherCode.THUNDERSTORM
+        "rain" in icon || "drizzle" in icon -> WeatherCode.RAIN
+        "partly-cloudy" in icon -> WeatherCode.PARTLY_CLOUDY
+        "cloudy" in icon || "overcast" in icon -> WeatherCode.CLOUDY
+        "clear" in icon || "sunny" in icon -> WeatherCode.CLEAR
+        "fog" in icon -> WeatherCode.FOG
+        "haze" in icon -> WeatherCode.HAZE
         else -> null
     }
 }

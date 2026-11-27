@@ -24,14 +24,18 @@ import kotlinx.serialization.json.JsonPrimitive
 import org.breezyweather.R
 import org.breezyweather.common.exceptions.InvalidOrIncompleteDataException
 import org.junit.jupiter.api.Test
-import java.io.IOException
 import java.time.Instant
 import java.util.Date
 
 class PanahonAlertsTest {
     private val boracay =
-        Location(city = "Boracay Island", countryCode = "PH", latitude = 11.98013, longitude = 121.91932)
-    private val metadata = PanahonCoordinates("11.9801", "121.9193", municipality = "Malay", province = "Aklan")
+        Location(
+            city = "Boracay Island",
+            admin2 = "Aklan",
+            countryCode = "PH",
+            latitude = 11.98013,
+            longitude = 121.91932
+        )
     private val now = Instant.parse("2026-11-26T20:30:00Z").toEpochMilli()
     private val feed = Json { ignoreUnknownKeys = true }.decodeFromString<PanahonAlertResponse>(
         """
@@ -75,7 +79,7 @@ class PanahonAlertsTest {
 
     @Test
     fun matchesProvinceWatchAcrossIslandGeometryAndExcludesOtherMunicipalities() {
-        val alert = feed.toAlerts(boracay, metadata, now, ::messageFor).alertList!!.single()
+        val alert = feed.toAlerts(boracay, now, ::messageFor).alertList!!.single()
         alert.headline shouldBe "雷暴关注 · 阿克兰省"
         alert.alertId shouldBe "panahon:VISPRSD_thunderstorm_watch_1795701600"
         alert.source shouldBe "PAGASA PANaHON · VISPRSD"
@@ -83,19 +87,20 @@ class PanahonAlertsTest {
         alert.startDate shouldBe Date.from(Instant.parse("2026-11-26T14:00:00Z"))
         alert.endDate shouldBe Date.from(Instant.parse("2026-11-27T02:00:00Z"))
         alert.severity shouldBe AlertSeverity.MINOR
+        val androidIsland = boracay.copy(admin1 = "Province of Aklan", admin2 = "Malay")
+        feed.toAlerts(androidIsland, now, ::messageFor).alertList?.single()?.alertId shouldBe alert.alertId
     }
 
     @Test
     fun ranksLocalAdvisoryAboveWatchWhileKeepingTheirOwnScope() {
-        val batan = Location(city = "Batan", countryCode = "PH", latitude = 11.63, longitude = 122.49)
-        val localMetadata = PanahonCoordinates("11.63", "122.49", municipality = "Batan", province = "Aklan")
-        val result = feed.toAlerts(batan, localMetadata, now, ::messageFor)
+        val batan = Location(city = "Batan", admin2 = "Aklan", countryCode = "PH", latitude = 11.63, longitude = 122.49)
+        val result = feed.toAlerts(batan, now, ::messageFor)
         result.alertList?.map { it.headline } shouldBe listOf("雷暴警报 · Batan", "雷暴关注 · 阿克兰省")
         result.alertList?.first()?.severity shouldBe AlertSeverity.MODERATE
     }
 
     @Test
-    fun usesGeometryWhenDashboardLocationIsMissingOrDoesNotMatch() {
+    fun usesMunicipalGeometryWhenSavedMunicipalityNameDoesNotMatch() {
         val batan = Location(
             city = "Batan",
             countryCode = "PH",
@@ -104,10 +109,9 @@ class PanahonAlertsTest {
             admin2 = "阿克兰省",
             admin3 = "Malinao"
         )
-        val unrelatedMetadata = PanahonCoordinates("14.6", "120.98", municipality = "Manila", province = "Metro Manila")
-        val result = feed.toAlerts(batan, unrelatedMetadata, now, ::messageFor)
-        result.alertList?.map { it.headline } shouldBe listOf("雷暴警报 · Batan")
-        val island = feed.toAlerts(boracay, unrelatedMetadata, now, ::messageFor)
+        val result = feed.toAlerts(batan, now, ::messageFor)
+        result.alertList?.map { it.headline } shouldBe listOf("雷暴警报 · Batan", "雷暴关注 · 阿克兰省")
+        val island = feed.toAlerts(boracay.copy(admin2 = null), now, ::messageFor)
         island.alertList shouldBe null
         (island.failedFeatures?.get(SourceFeature.ALERT) is InvalidOrIncompleteDataException) shouldBe true
     }
@@ -118,20 +122,18 @@ class PanahonAlertsTest {
         val watch = alerts[1]
         alerts[1] = watch.copy(areas = watch.areas!!.map { it.copy(provinceFallback = false) })
         val polygon = feed.copy(data = feed.data.copy(alerts = alerts))
-        polygon.toAlerts(boracay, metadata, now, ::messageFor).alertList shouldBe emptyList()
+        polygon.toAlerts(boracay, now, ::messageFor).alertList shouldBe emptyList()
     }
 
     @Test
     fun filtersOutUnissuedAndExpiredAlertsInPhilippineTime() {
         feed.toAlerts(
             boracay,
-            metadata,
             Instant.parse("2026-11-26T13:59:59Z").toEpochMilli(),
             ::messageFor
         ).alertList shouldBe emptyList()
         feed.toAlerts(
             boracay,
-            metadata,
             Instant.parse("2026-11-27T02:00:00Z").toEpochMilli(),
             ::messageFor
         ).alertList shouldBe emptyList()
@@ -147,7 +149,7 @@ class PanahonAlertsTest {
             areas = listOf(PanahonAlertArea(shape = JsonPrimitive("unrecognized geometry")))
         )
         val partial = feed.copy(data = response.copy(count = 4, alerts = records))
-        val result = partial.toAlerts(boracay, metadata, now, ::messageFor)
+        val result = partial.toAlerts(boracay, now, ::messageFor)
         result.alertList?.map { it.headline } shouldBe listOf("雷暴关注 · 阿克兰省")
         (result.failedFeatures?.get(SourceFeature.ALERT) is InvalidOrIncompleteDataException) shouldBe true
     }
@@ -155,55 +157,15 @@ class PanahonAlertsTest {
     @Test
     fun reportsIncompleteFeedOrUnresolvableAreaWithoutClearingCache() {
         val incomplete = PanahonAlertResponse(true, PanahonAlertData(1, emptyList()))
-        val truncated = incomplete.toAlerts(boracay, metadata, now, ::messageFor)
+        val truncated = incomplete.toAlerts(boracay, now, ::messageFor)
         truncated.alertList shouldBe null
         (truncated.failedFeatures?.get(SourceFeature.ALERT) is InvalidOrIncompleteDataException) shouldBe true
         val areas = listOf(PanahonAlertArea(shape = JsonPrimitive("not a polygon")))
         val warning = feed.data!!.alerts!![1].copy(areas = areas)
         val unresolved = PanahonAlertResponse(true, PanahonAlertData(1, listOf(warning)))
-            .toAlerts(boracay, metadata, now, ::messageFor)
+            .toAlerts(boracay, now, ::messageFor)
         unresolved.alertList shouldBe null
         (unresolved.failedFeatures?.get(SourceFeature.ALERT) is InvalidOrIncompleteDataException) shouldBe true
-    }
-
-    @Test
-    fun preservesLocalAlertsWhenForecastFailsValidation() {
-        val result = combinePanahonWeather(
-            Result.success(PanahonResponse(true, metadata)),
-            Result.success(feed),
-            listOf(SourceFeature.FORECAST, SourceFeature.CURRENT),
-            boracay,
-            now,
-            ::messageFor
-        )
-        result.alertList?.single()?.headline shouldBe "雷暴关注 · 阿克兰省"
-        result.failedFeatures?.keys shouldBe setOf(SourceFeature.FORECAST, SourceFeature.CURRENT)
-    }
-
-    @Test
-    fun preservesWeatherAndReportsAlertFailureWithoutReturningEmptyAlerts() {
-        val dashboard = PanahonResponse(
-            true,
-            metadata,
-            PanahonDashboard(
-                nc = PanahonHour(time = "4:00 AM", tmp = "28 °C"),
-                hc = listOf(PanahonHour(time = "4:00 AM", tmp = "28 °C")),
-                dc = listOf(PanahonDay(dt = "11/27", tmax = "33 °C"))
-            )
-        )
-        val networkError = IOException("Alert feed unavailable")
-        val result = combinePanahonWeather(
-            Result.success(dashboard),
-            Result.failure(networkError),
-            listOf(SourceFeature.FORECAST, SourceFeature.CURRENT),
-            boracay,
-            now,
-            ::messageFor
-        )
-        result.alertList shouldBe null
-        result.failedFeatures shouldBe mapOf(SourceFeature.ALERT to networkError)
-        result.dailyForecast?.size shouldBe 1
-        result.current?.temperature?.temperature?.inCelsius shouldBe 28.0
     }
 
     private fun messageFor(resourceId: Int) = when (resourceId) {

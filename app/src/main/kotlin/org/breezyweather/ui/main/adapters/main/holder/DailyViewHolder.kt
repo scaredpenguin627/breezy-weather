@@ -23,8 +23,8 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import breezyweather.domain.location.model.Location
-import com.google.android.material.chip.Chip
-import com.google.android.material.chip.ChipGroup
+import com.google.android.material.button.MaterialButton
+import com.google.android.material.button.MaterialButtonGroup
 import org.breezyweather.R
 import org.breezyweather.common.activities.BreezyActivity
 import org.breezyweather.common.extensions.getThemeColor
@@ -41,19 +41,15 @@ class DailyViewHolder(parent: ViewGroup) : AbstractMainCardViewHolder(
     LayoutInflater.from(parent.context).inflate(R.layout.container_main_daily_trend_card, parent, false)
 ) {
     private val subtitle: TextView = itemView.findViewById(R.id.daily_block_subtitle)
-    private val chipGroup: ChipGroup = itemView.findViewById(R.id.daily_block_button_group)
+    private val buttonGroup: MaterialButtonGroup = itemView.findViewById(R.id.daily_block_button_group)
     private val trendRecyclerView: TrendRecyclerView = itemView.findViewById(R.id.daily_block_trendRecyclerView)
     private val emptyState: TextView = itemView.findViewById(R.id.daily_block_empty)
     private val scrollBar = TrendRecyclerViewScrollBar()
-    private val chips = DailyTrendDisplay.entries.map { trend ->
-        val inflater = LayoutInflater.from(chipGroup.context)
-        val chip = inflater.inflate(R.layout.item_daily_trend_chip, chipGroup, false) as Chip
-        chip.setText(trend.nameId)
-        chipGroup.addView(chip)
-        chip
-    }
+    private var buttons = emptyMap<DailyTrendDisplay, MaterialButton>()
 
     init {
+        buttonGroup.findViewWithTag<MaterialButton>(MaterialButtonGroup.OVERFLOW_BUTTON_TAG)
+            ?.contentDescription = itemView.context.getString(R.string.action_more)
         trendRecyclerView.setHasFixedSize(true)
         trendRecyclerView.addItemDecoration(scrollBar)
     }
@@ -82,21 +78,34 @@ class DailyViewHolder(parent: ViewGroup) : AbstractMainCardViewHolder(
             bindData(location)
         }
         val available = DailyTrendDisplay.availableFor(location)
-        DailyTrendDisplay.entries.forEach { trend ->
-            val chip = chips[trend.ordinal]
-            chip.isVisible = trend in available
-            chip.setOnClickListener {
-                trendAdapter.selectedIndex = trend.ordinal
-                setSelectedTab(trend.id)
+        if (buttons.keys != available.toSet()) {
+            buttons.values.forEach(buttonGroup::removeView)
+            buttons = available.associateWith { trend ->
+                MaterialButton(
+                    buttonGroup.context,
+                    null,
+                    com.google.android.material.R.attr.materialButtonStyle
+                ).apply {
+                    setText(trend.nameId)
+                    isCheckable = true
+                    buttonGroup.addView(this)
+                }
             }
         }
         val selected = available.firstOrNull { it.id == selectedTab } ?: available.firstOrNull()
-        chipGroup.isVisible = selected != null
+        buttonGroup.isVisible = available.size > 1
         trendRecyclerView.isVisible = selected != null
         emptyState.isVisible = selected == null
         if (selected != null) {
-            chipGroup.check(chips[selected.ordinal].id)
             trendAdapter.selectedIndex = selected.ordinal
+        }
+        buttons.forEach { (trend, button) ->
+            button.isChecked = trend == selected
+            button.setOnClickListener {
+                trendAdapter.selectedIndex = trend.ordinal
+                buttons.forEach { (item, view) -> view.isChecked = item == trend }
+                setSelectedTab(trend.id)
+            }
         }
         trendRecyclerView.layoutManager = DailyTrendLayoutManager(context)
         trendRecyclerView.setLineColor(

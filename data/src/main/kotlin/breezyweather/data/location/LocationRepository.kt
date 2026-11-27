@@ -245,8 +245,8 @@ class LocationRepository(
         clearAlerts: Boolean = false,
         preserveWeatherSourcePreferences: Boolean = false,
         clearWeather: Boolean = false,
-        clearForecastWind: Boolean = false,
-        clearCurrentWind: Boolean = false,
+        clearForecast: Boolean = false,
+        clearCurrent: Boolean = false,
     ): Boolean {
         return try {
             handler.await(inTransaction = true) {
@@ -266,13 +266,13 @@ class LocationRepository(
                     alertsQueries.deleteAlertListForLocationId(location.formattedId)
                     weathersQueries.clearAlertsUpdateTime(location.formattedId)
                 }
-                if (clearForecastWind && !clearWeather) {
+                if (clearForecast && !clearWeather) {
                     forecast_wind_samplesQueries.deleteForLocation(location.formattedId)
-                    hourlysQueries.clearWind(location.formattedId)
-                    dailysQueries.clearWind(location.formattedId)
-                    weathersQueries.clearForecastUpdateTime(location.formattedId)
-                    if (clearCurrentWind) weathersQueries.clearCurrentWind(location.formattedId)
+                    hourlysQueries.deleteHourlyListForLocationId(location.formattedId)
+                    dailysQueries.deleteDailyListForLocationId(location.formattedId)
+                    weathersQueries.clearForecastUpdateTimes(location.formattedId)
                 }
+                if (clearCurrent && !clearWeather) weathersQueries.clearCurrentConditions(location.formattedId)
                 locationsQueries.update(
                     formattedId = location.formattedId,
                     cityId = location.cityId,

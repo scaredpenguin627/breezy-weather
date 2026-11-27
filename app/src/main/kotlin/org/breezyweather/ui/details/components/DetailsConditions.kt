@@ -101,12 +101,9 @@ import org.breezyweather.unit.formatting.UnitWidth
 import org.breezyweather.unit.ratio.Ratio
 import org.breezyweather.unit.temperature.Temperature
 import org.breezyweather.unit.temperature.Temperature.Companion.celsius
-import org.breezyweather.unit.temperature.Temperature.Companion.deciCelsius
 import org.breezyweather.unit.temperature.TemperatureUnit
 import org.breezyweather.unit.temperature.toTemperature
 import java.util.Date
-import kotlin.math.max
-import kotlin.math.min
 
 @Composable
 fun DetailsConditions(
@@ -124,20 +121,19 @@ fun DetailsConditions(
     val mappedValues = remember(hourlyList, selectedChart) {
         buildMap(hourlyList.size) {
             hourlyList.forEach { hourly ->
-                val isValid = hourly.temperature?.temperature != null &&
-                    if (selectedChart != DetailScreen.TAG_FEELS_LIKE) {
-                        true
-                    } else {
-                        hourly.temperature?.feelsLikeTemperature != null
-                    }
+                val isValid = if (selectedChart == DetailScreen.TAG_FEELS_LIKE) {
+                    hourly.temperature?.feelsLikeTemperature != null
+                } else {
+                    hourly.temperature?.temperature != null
+                }
                 if (isValid) {
                     put(hourly.date.time, hourly)
                 }
             }
         }.toImmutableMap()
     }
-    var activeItem: Pair<Date, Hourly>? by remember { mutableStateOf(null) }
-    val markerVisibilityListener = remember {
+    var activeItem: Pair<Date, Hourly>? by remember(mappedValues) { mutableStateOf(null) }
+    val markerVisibilityListener = remember(mappedValues) {
         object : CartesianMarkerVisibilityListener {
             override fun onShown(marker: CartesianMarker, targets: List<CartesianMarker.Target>) {
                 activeItem = targets.firstOrNull()?.let { target ->
@@ -682,51 +678,38 @@ private fun TemperatureChart(
 
     val provider = ResourcesProviderFactory.newInstance
     val step = temperatureUnit.chartStep
-    val minY = remember(mappedValues, showRealTemp) {
-        if (showRealTemp) {
-            mappedValues.values.minOf { it.temperature!!.temperature!!.inDeciCelsius }
-        } else {
-            min(
-                mappedValues.values.minOf { it.temperature!!.temperature!!.inDeciCelsius },
-                mappedValues.values.minOf { it.temperature!!.feelsLikeTemperature!!.inDeciCelsius }
-            )
-        }.deciCelsius.toDouble(temperatureUnit).roundDownToNearestMultiplier(step)
+    val primary = remember(mappedValues, showRealTemp, temperatureUnit) {
+        mappedValues.mapValues { (_, hourly) ->
+            val temperature = if (showRealTemp) {
+                hourly.temperature?.temperature
+            } else {
+                hourly.temperature?.feelsLikeTemperature
+            }
+            requireNotNull(temperature).toDouble(temperatureUnit)
+        }
     }
-    val maxY = remember(mappedValues, showRealTemp) {
+    val reference = remember(mappedValues, showRealTemp, temperatureUnit) {
         if (showRealTemp) {
-            mappedValues.values.maxOf { it.temperature!!.temperature!!.inDeciCelsius }
+            emptyMap()
         } else {
-            max(
-                mappedValues.values.maxOf { it.temperature!!.temperature!!.inDeciCelsius },
-                mappedValues.values.maxOf { it.temperature!!.feelsLikeTemperature!!.inDeciCelsius }
-            )
-        }.deciCelsius.toDouble(temperatureUnit).roundUpToNearestMultiplier(step)
+            buildMap {
+                mappedValues.forEach { (time, hourly) ->
+                    hourly.temperature?.temperature?.let { put(time, it.toDouble(temperatureUnit)) }
+                }
+            }
+        }
     }
-
+    val temperatures = primary.values + reference.values
+    val minY = temperatures.min().roundDownToNearestMultiplier(step)
+    val maxY = temperatures.max().roundUpToNearestMultiplier(step).coerceAtLeast(minY + step)
     val modelProducer = remember { CartesianChartModelProducer() }
     val iconSizePx = with(LocalDensity.current) { IconCartesianMarker.DEFAULT_ICON_SIZE.roundToPx() }
 
-    LaunchedEffect(mappedValues, showRealTemp) {
+    LaunchedEffect(primary, reference) {
         modelProducer.runTransaction {
             lineModel {
-                series(
-                    x = mappedValues.keys,
-                    y = mappedValues.values.map {
-                        if (showRealTemp) {
-                            it.temperature!!.temperature!!
-                        } else {
-                            it.temperature!!.feelsLikeTemperature!!
-                        }.toDouble(temperatureUnit)
-                    }
-                )
-                if (!showRealTemp) {
-                    series(
-                        x = mappedValues.keys,
-                        y = mappedValues.values.map {
-                            it.temperature!!.temperature!!.toDouble(temperatureUnit)
-                        }
-                    )
-                }
+                series(x = primary.keys, y = primary.values)
+                if (reference.isNotEmpty()) series(x = reference.keys, y = reference.values)
             }
         }
     }

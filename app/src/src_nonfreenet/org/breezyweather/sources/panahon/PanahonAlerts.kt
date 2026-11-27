@@ -79,7 +79,6 @@ private val alertDateFormat = DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss",
 
 internal fun PanahonAlertResponse.toAlerts(
     location: Location,
-    metadata: PanahonCoordinates?,
     now: Long,
     getString: (Int) -> String,
 ): WeatherWrapper {
@@ -89,14 +88,12 @@ internal fun PanahonAlertResponse.toAlerts(
     val records = received.filterNot { it.event.equals("NOTE", ignoreCase = true) }
     var incomplete = data.count != null && data.count != records.size
 
-    val areaMetadata = metadata?.takeIf { it.matches(location.latitude, location.longitude) }
-    val province = areaMetadata?.province.provinceKey()
-        ?: areaMetadata?.region.provinceKey()?.takeIf { it == "metromanila" }
-    val municipality = areaMetadata?.municipality.municipalityKey()
+    val provinces = setOfNotNull(location.admin1.provinceKey(), location.admin2.provinceKey())
+    val municipality = location.admin3.municipalityKey() ?: location.city.municipalityKey()
     val point = LatLng(location.latitude, location.longitude)
     val alerts = records.mapNotNull { record ->
         try {
-            record.toAlert(point, province, municipality, now, getString)
+            record.toAlert(point, provinces, municipality, now, getString)
         } catch (_: InvalidOrIncompleteDataException) {
             incomplete = true
             null
@@ -111,7 +108,7 @@ internal fun PanahonAlertResponse.toAlerts(
 
 private fun PanahonAlert.toAlert(
     point: LatLng,
-    province: String?,
+    provinces: Set<String>,
     municipality: String?,
     now: Long,
     getString: (Int) -> String,
@@ -124,7 +121,7 @@ private fun PanahonAlert.toAlert(
     if (now < start || now >= end) return null
 
     val publishedAreas = areas?.takeIf { it.isNotEmpty() } ?: throw InvalidOrIncompleteDataException()
-    val matches = publishedAreas.map { it to it.matches(point, province, municipality) }
+    val matches = publishedAreas.map { it to it.matches(point, provinces, municipality) }
     val area = matches.filter { it.second == true }
         .map { it.first }
         .maxByOrNull { it.severity(kind).id }
@@ -182,7 +179,7 @@ private fun String?.provinceKey(): String? {
     val key = this?.trim()?.lowercase(Locale.ROOT)?.removePrefix("province of ")
         ?.filter { it.isLetterOrDigit() }?.takeIf { it.isNotEmpty() }
     return when (key) {
-        "nationalcapitalregion", "ncr" -> "metromanila"
+        "nationalcapitalregion", "ncr", "大马尼拉", "大馬尼拉", "国家首都区", "國家首都區" -> "metromanila"
         "阿克兰", "阿克兰省", "阿克蘭", "阿克蘭省" -> "aklan"
         else -> key
     }
@@ -192,17 +189,19 @@ private fun String?.municipalityKey(): String? = this?.trim()?.lowercase(Locale.
     ?.removePrefix("city of ")?.removePrefix("municipality of ")?.removeSuffix(" city")
     ?.filter { it.isLetterOrDigit() }?.takeIf { it.isNotEmpty() }
 
-private fun PanahonAlertArea.matches(point: LatLng, provinceKey: String?, municipalityKey: String?): Boolean? {
+private fun PanahonAlertArea.matches(point: LatLng, provinces: Set<String>, municipalityKey: String?): Boolean? {
     val areaProvince = province.provinceKey()
     val areaMunicipality = municipality.municipalityKey()
     if (areaProvince != null && areaMunicipality == null && (provinceFallback || shape == null)) {
         // The province boundaries distributed by PANaHON may omit outlying islands such as Boracay.
-        return provinceKey?.let { it == areaProvince } ?: shape.containsPoint(point)?.takeIf { it }
+        if (areaProvince in provinces || shape.containsPoint(point) == true) return true
+        return false.takeIf { provinces.isNotEmpty() }
     }
-    if (areaMunicipality != null && areaProvince != null && provinceKey != null && municipalityKey != null) {
-        return areaProvince == provinceKey && areaMunicipality == municipalityKey
+    shape.containsPoint(point)?.let { return it }
+    if (areaMunicipality != null && areaProvince != null && provinces.isNotEmpty() && municipalityKey != null) {
+        return areaProvince in provinces && areaMunicipality == municipalityKey
     }
-    return shape.containsPoint(point)
+    return null
 }
 
 private fun PanahonAlertArea.severity(subtype: String?): AlertSeverity = when (subtype) {

@@ -17,7 +17,6 @@
 package org.breezyweather.sources.panahon
 
 import io.reactivex.rxjava3.core.Observable
-import kotlinx.serialization.Serializable
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.GET
@@ -26,14 +25,8 @@ import retrofit2.http.Headers
 import retrofit2.http.Query
 
 internal interface PanahonApi {
-    @GET("api/v1/nowcast/dashboard")
-    fun getDashboard(
-        @Query("lat") latitude: Double,
-        @Query("lon") longitude: Double,
-    ): Observable<PanahonResponse>
-
     @Headers("Accept: application/json")
-    @GET("https://www.panahon.gov.ph/api/v1/cap-alerts")
+    @GET("api/v1/cap-alerts")
     fun getAlerts(): Observable<PanahonAlertResponse>
 }
 
@@ -42,53 +35,21 @@ internal interface PanahonMapApi {
     fun getMap(): Observable<Response<ResponseBody>>
 
     @GET("/api/v1/tiles/point/forecast?model=ecmwf")
-    fun getForecastWind(
+    fun getPointForecast(
         @Query("lat") latitude: Double,
         @Query("lon") longitude: Double,
         @Query("init") initialization: String,
         @Query("token") token: String,
         @Header("Cookie") cookie: String?,
-    ): Observable<PanahonWindReport>
+    ): Observable<PanahonPointReport>
+
+    @GET("/api/v1/tiles/point?url=temp&model=ecmwf")
+    fun getTemperature(
+        @Query("lat") latitude: Double,
+        @Query("lon") longitude: Double,
+        @Query("t") localTime: String,
+        @Query("init") initialization: String,
+        @Query("token") token: String,
+        @Header("Cookie") cookie: String?,
+    ): Observable<PanahonMapValue>
 }
-
-@Serializable
-internal data class PanahonResponse(
-    val success: Boolean,
-    val meta: PanahonCoordinates? = null,
-    val data: PanahonDashboard? = null,
-)
-
-@Serializable
-internal data class PanahonCoordinates(
-    val lat: String? = null,
-    val lon: String? = null,
-    val municipality: String? = null,
-    val province: String? = null,
-    val region: String? = null,
-)
-
-@Serializable
-internal data class PanahonDashboard(
-    val nc: PanahonHour? = null,
-    val hc: List<PanahonHour>? = null,
-    val dc: List<PanahonDay>? = null,
-)
-
-@Serializable
-internal data class PanahonHour(
-    val time: String? = null,
-    val desc: String? = null,
-    val tmp: String? = null,
-    val hindex: String? = null,
-    val tprecip: String? = null,
-)
-
-@Serializable
-internal data class PanahonDay(
-    val dt: String? = null,
-    val desc: String? = null,
-    val tmax: String? = null,
-    val tmin: String? = null,
-    val hmax: String? = null,
-    val hmin: String? = null,
-)

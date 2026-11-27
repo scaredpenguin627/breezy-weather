@@ -24,31 +24,38 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import okhttp3.CookieJar
+import okhttp3.Dispatcher
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import org.breezyweather.common.exceptions.InvalidLocationException
 import org.breezyweather.common.extensions.currentLocale
 import org.breezyweather.common.extensions.getStringByLocale
 import retrofit2.Retrofit
+import java.io.File
+import java.time.Instant
+import java.time.temporal.ChronoUnit
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Named
 
 class PanahonService @Inject constructor(
-    @ApplicationContext context: Context,
+    @ApplicationContext private val applicationContext: Context,
     @Named("JsonClient") client: Retrofit.Builder,
-) : PanahonServiceStub(context) {
+) : PanahonServiceStub() {
 
-    private val retrofit by lazy { client.baseUrl("https://api.mobile.panahon.gov.ph/").build() }
+    private val retrofit by lazy { client.baseUrl("https://panahon.gov.ph/").build() }
+    private val temperatures by lazy {
+        PanahonTemperatureCache.forDirectory(File(applicationContext.cacheDir, "panahon-temperature"))
+    }
     private val api by lazy { retrofit.create(PanahonApi::class.java) }
     private val mapApi by lazy {
         // The map's guest token and cookies must stay off disk, out of logs and on this origin.
         val mapClient = (retrofit.callFactory() as OkHttpClient).newBuilder().apply {
             interceptors().removeAll { it is HttpLoggingInterceptor }
             networkInterceptors().removeAll { it is HttpLoggingInterceptor }
-        }.cache(null).cookieJar(CookieJar.NO_COOKIES).followRedirects(false).build()
-        retrofit.newBuilder().baseUrl("https://panahon.gov.ph/").client(mapClient).build()
-            .create(PanahonMapApi::class.java)
+        }.dispatcher(Dispatcher().apply { maxRequestsPerHost = 4 })
+            .cache(null).cookieJar(CookieJar.NO_COOKIES).followRedirects(false).build()
+        retrofit.newBuilder().client(mapClient).build().create(PanahonMapApi::class.java)
     }
 
     override fun requestWeather(
@@ -60,71 +67,66 @@ class PanahonService @Inject constructor(
         if (features.isEmpty()) return Observable.just(WeatherWrapper())
         if (!location.countryCode.equals("PH", ignoreCase = true)) return Observable.error(InvalidLocationException())
 
-        val dashboard = api.getDashboard(location.latitude, location.longitude).map {
-            if (it.success && !it.meta.matches(location.latitude, location.longitude)) throw InvalidLocationException()
-            it
-        }
-        val weather = if (SourceFeature.ALERT !in features) {
-            dashboard.map { it.toWeather(features, System.currentTimeMillis()) }
+        val locale = context.currentLocale
+        val weatherFeatures = features.filterNot { it == SourceFeature.ALERT }
+        val alerts = if (SourceFeature.ALERT in features) {
+            api.getAlerts().map { response ->
+                response.toAlerts(location, System.currentTimeMillis()) { context.getStringByLocale(it, locale) }
+            }.onErrorReturn { WeatherWrapper(failedFeatures = mapOf(SourceFeature.ALERT to it)) }
         } else {
-            val weatherFeatures = features.filterNot { it == SourceFeature.ALERT }
-            val locale = context.currentLocale
-            Observable.zip(dashboard.asResult(), api.getAlerts().asResult()) { weatherResult, alertResult ->
-                combinePanahonWeather(
-                    weatherResult,
-                    alertResult,
-                    weatherFeatures,
-                    location,
-                    System.currentTimeMillis()
-                ) { context.getStringByLocale(it, locale) }
-            }
+            Observable.just(WeatherWrapper())
         }
-        if (SourceFeature.FORECAST !in features) return weather
-
-        val wind = mapApi.getMap()
-            .flatMap { response ->
-                val session = response.toPanahonWindSession()
-                mapApi.getForecastWind(
-                    location.latitude,
-                    location.longitude,
-                    session.initialization.toString(),
-                    session.token,
-                    session.cookie
-                ).map { it to session.initialization }
-            }
+        if (weatherFeatures.isEmpty()) return alerts
+        val weather = mapApi.getMap()
             .timeout(12, TimeUnit.SECONDS)
-            .asResult()
-        return Observable.zip(weather.subscribeOn(Schedulers.io()), wind) { native, result ->
-            result.getOrNull()?.let { (report, initialization) -> native.withForecastWind(report, initialization) }
-                ?: native
+            .map { it.toPanahonMapSession() }
+            .flatMap { session -> requestPointWeather(session, location, weatherFeatures) }
+            .onErrorReturn { error -> WeatherWrapper(failedFeatures = weatherFeatures.associateWith { error }) }
+        if (SourceFeature.ALERT !in features) return weather
+        return Observable.zip(weather.subscribeOn(Schedulers.io()), alerts.subscribeOn(Schedulers.io())) {
+                result,
+                cap,
+            ->
+            result.copy(
+                alertList = cap.alertList,
+                failedFeatures =
+                result.failedFeatures.orEmpty() + cap.failedFeatures.orEmpty()
+            )
         }
     }
-}
-
-private fun <T : Any> Observable<T>.asResult(): Observable<Result<T>> =
-    subscribeOn(Schedulers.io()).map { Result.success(it) }.onErrorReturn { Result.failure(it) }
-
-internal fun combinePanahonWeather(
-    dashboard: Result<PanahonResponse>,
-    feed: Result<PanahonAlertResponse>,
-    weatherFeatures: List<SourceFeature>,
-    location: Location,
-    now: Long,
-    getString: (Int) -> String,
-): WeatherWrapper {
-    val weather = if (weatherFeatures.isEmpty()) {
-        WeatherWrapper()
-    } else {
-        dashboard.mapCatching { it.toWeather(weatherFeatures, now) }.getOrElse { error ->
-            WeatherWrapper(failedFeatures = weatherFeatures.associateWith { error })
-        }
+    private fun requestPointWeather(
+        session: PanahonMapSession,
+        location: Location,
+        features: List<SourceFeature>,
+    ): Observable<WeatherWrapper> {
+        return mapApi.getPointForecast(
+            location.latitude,
+            location.longitude,
+            session.initialization.toString(),
+            session.token,
+            session.cookie
+        ).timeout(12, TimeUnit.SECONDS)
+            .map { Result.success(it.toPointHours(session.initialization, System.currentTimeMillis())) }
+            .onErrorReturn { Result.failure(it) }
+            .flatMap { point ->
+                val hours = point.getOrNull().orEmpty()
+                val times = mutableSetOf<Long>()
+                if (SourceFeature.FORECAST in features) hours.forEach { times.add(it.date.time) }
+                if (SourceFeature.CURRENT in features) {
+                    val hour = Instant.now().truncatedTo(ChronoUnit.HOURS)
+                    val lead = ChronoUnit.HOURS.between(session.initialization, hour)
+                    if (lead in 0L..144L && (lead <= 90 || lead % 3 == 0L)) times.add(hour.toEpochMilli())
+                }
+                temperatures.get(mapApi, session, location.latitude, location.longitude, times)
+                    .map { actual ->
+                        val result = hours.toWeather(actual, features, System.currentTimeMillis())
+                        val error = point.exceptionOrNull()
+                        if (error != null) {
+                            result.copy(failedFeatures = result.failedFeatures.orEmpty().mapValues { error })
+                        } else {
+                            result
+                        }
+                    }
+            }
     }
-    val metadata = dashboard.getOrNull()?.takeIf { it.success }?.meta
-    val alerts = feed.mapCatching { it.toAlerts(location, metadata, now, getString) }.getOrElse {
-        WeatherWrapper(failedFeatures = mapOf(SourceFeature.ALERT to it))
-    }
-    return weather.copy(
-        alertList = alerts.alertList,
-        failedFeatures = weather.failedFeatures.orEmpty() + alerts.failedFeatures.orEmpty()
-    )
 }

@@ -372,7 +372,7 @@ class RefreshHelper @Inject constructor(
         // STEP 5 - Update the saved location and invalidate AQI for a station left behind.
         val moved =
             locationWithTimeZone.latitude != location.latitude || locationWithTimeZone.longitude != location.longitude
-        val point = locationWithTimeZone.withoutMovedPanahonWind(moved)
+        val point = locationWithTimeZone.withoutMovedPanahonWeather(moved)
         val movedAlertLocation = point.alertSource == "panahon" && moved
         val changedWeatherSource = location.isCurrentPosition && location.forecastOrCurrentSourceChanged(point)
         val updatedLocation = if (changedWeatherSource) {
@@ -393,8 +393,8 @@ class RefreshHelper @Inject constructor(
                 clearAlerts = movedAlertLocation,
                 preserveWeatherSourcePreferences = location.isCurrentPosition,
                 clearWeather = changedWeatherSource,
-                clearForecastWind = moved && point.forecastSource == "panahon",
-                clearCurrentWind = moved && point.usesPanahonCurrentWind
+                clearForecast = moved && point.forecastSource == Location.PANAHON_SOURCE,
+                clearCurrent = moved && point.usesPanahonCurrentConditions
             )
         }
 
@@ -560,7 +560,7 @@ class RefreshHelper @Inject constructor(
         coordinatesChanged: Boolean,
         ignoreCaching: Boolean = false,
     ): WeatherResult {
-        val location = resolvedLocation.withoutUncoveredEmbAirQuality().withoutMovedPanahonWind(coordinatesChanged)
+        val location = resolvedLocation.withoutUncoveredEmbAirQuality().withoutMovedPanahonWeather(coordinatesChanged)
         try {
             if (!location.isUsable || location.needsGeocodeRefresh) {
                 return WeatherResult(
@@ -945,7 +945,8 @@ class RefreshHelper @Inject constructor(
 
             // 2) Computes as many data as possible (weather code, weather text, dew point, feels like temp., etc)
             val hourlyComputedMissingData = computeMissingHourlyData(
-                weatherWrapperCompleted.hourlyForecast
+                weatherWrapperCompleted.hourlyForecast,
+                deriveConditions = location.forecastSource != Location.PANAHON_SOURCE
             ) ?: emptyList()
 
             // 3) Create the daily object with air quality/pollen data + computes missing data

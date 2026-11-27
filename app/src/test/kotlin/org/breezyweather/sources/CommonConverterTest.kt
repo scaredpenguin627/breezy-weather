@@ -9,12 +9,15 @@ import breezyweather.domain.weather.model.HalfDay
 import breezyweather.domain.weather.model.Hourly
 import breezyweather.domain.weather.model.Weather
 import breezyweather.domain.weather.model.Wind
+import breezyweather.domain.weather.wrappers.CurrentWrapper
 import breezyweather.domain.weather.wrappers.DailyWrapper
 import breezyweather.domain.weather.wrappers.HourlyWrapper
+import breezyweather.domain.weather.wrappers.TemperatureWrapper
 import breezyweather.domain.weather.wrappers.WeatherWrapper
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.runTest
 import org.breezyweather.unit.speed.Speed.Companion.metersPerSecond
+import org.breezyweather.unit.temperature.Temperature.Companion.celsius
 import org.junit.jupiter.api.Test
 import java.util.Date
 
@@ -24,7 +27,23 @@ import java.util.Date
 class CommonConverterTest {
 
     @Test
-    fun movingAPanahonLocationInvalidatesOnlyItsCoordinateDependentWind() {
+    fun keepsOfficialHeatIndexWithoutAnAirTemperatureOrConditionIcon() {
+        val forecast = HourlyWrapper(date = Date(0), wind = Wind(speed = 20.metersPerSecond))
+        val hour = computeMissingHourlyData(listOf(forecast), deriveConditions = false)!!.single()
+        hour.weatherCode shouldBe null
+        val current = completeCurrentFromHourlyData(
+            CurrentWrapper(temperature = TemperatureWrapper(feelsLike = 36.celsius)),
+            hour,
+            null,
+            null,
+            Location(latitude = 14.5995, longitude = 120.9842, countryCode = "PH")
+        )
+        current.temperature?.temperature shouldBe null
+        current.temperature?.sourceFeelsLike shouldBe 36.celsius
+    }
+
+    @Test
+    fun movingAPanahonLocationInvalidatesItsForecastAndPreservesIndependentSources() {
         val time = Date(3_600_000)
         val wind = Wind(degree = 90.0, speed = 4.metersPerSecond)
         val day = HalfDay(weatherText = "Clear", wind = wind)
@@ -37,17 +56,20 @@ class CommonConverterTest {
         )
         val location =
             Location(weather = prior, forecastSourcePreference = "panahon", currentSourcePreference = "panahon")
-        val moved = location.withoutMovedPanahonWind(true).weather!!
+        val moved = location.withoutMovedPanahonWeather(true).weather!!
         moved.forecastWindSamples.isEmpty() shouldBe true
-        moved.base shouldBe prior.base.copy(forecastUpdateTime = null)
-        moved.dailyForecast.single().day shouldBe day.copy(wind = null)
-        moved.dailyForecast.single().night shouldBe day.copy(wind = null)
-        moved.hourlyForecast.single() shouldBe prior.hourlyForecast.single().copy(wind = null)
-        moved.current shouldBe prior.current!!.copy(wind = null)
-        location.withoutMovedPanahonWind(false).weather shouldBe prior
-        location.copy(currentSourcePreference = "pagasa").withoutMovedPanahonWind(true).weather?.current shouldBe
+        moved.base shouldBe prior.base.copy(forecastUpdateTime = null, currentUpdateTime = null)
+        moved.dailyForecast.isEmpty() shouldBe true
+        moved.hourlyForecast.isEmpty() shouldBe true
+        moved.current shouldBe null
+        location.withoutMovedPanahonWeather(false).weather shouldBe prior
+        location.copy(currentSourcePreference = "pagasa").withoutMovedPanahonWeather(true).weather?.current shouldBe
             prior.current
-        location.copy(forecastSourcePreference = "pagasa").withoutMovedPanahonWind(true).weather shouldBe prior
+        val currentOnly = location.copy(forecastSourcePreference = "pagasa").withoutMovedPanahonWeather(true).weather!!
+        currentOnly.dailyForecast shouldBe prior.dailyForecast
+        currentOnly.current shouldBe null
+        location.copy(forecastSourcePreference = "pagasa", currentSourcePreference = "pagasa")
+            .withoutMovedPanahonWeather(true).weather shouldBe prior
     }
 
     @Test
@@ -82,7 +104,7 @@ class CommonConverterTest {
         val rows = listOf(first, future)
         rows.hourForCurrentConditions(3_599_999, "panahon")?.wind shouldBe wind
         rows.hourForCurrentConditions(3_600_000, "panahon")?.wind shouldBe null
-        rows.hourForCurrentConditions(7_200_000, "panahon") shouldBe future.copy(wind = null)
+        rows.hourForCurrentConditions(7_200_000, "panahon") shouldBe null
         rows.hourForCurrentConditions(7_200_000, "pagasa") shouldBe future
         rows.hourForCurrentConditions(10_800_000, "panahon")?.wind shouldBe wind
 

@@ -117,9 +117,14 @@ WHERE location_formatted_id = :locationFormattedId;
 deleteAllWeathers:
 DELETE FROM weathers;
 
-clearForecastUpdateTime:
-UPDATE weathers SET main_update_time = NULL WHERE location_formatted_id = :locationFormattedId;
+clearForecastUpdateTimes:
+UPDATE weathers SET main_update_time = NULL, air_quality_update_time = NULL, pollen_update_time = NULL
+WHERE location_formatted_id = :locationFormattedId;
 
-clearCurrentWind:
-UPDATE weathers SET wind_speed = NULL, wind_degree = NULL, wind_gusts = NULL
+clearCurrentConditions:
+UPDATE weathers SET current_update_time = NULL, weather_text = NULL, weather_code = NULL,
+    temperature = NULL, temperature_source_feels_like = NULL, temperature_apparent = NULL,
+    temperature_wind_chill = NULL, humidex = NULL, wind_speed = NULL, wind_degree = NULL, wind_gusts = NULL,
+    uv_index = NULL, relative_humidity = NULL, dew_point = NULL, pressure = NULL, visibility = NULL,
+    cloud_cover = NULL, ceiling = NULL, daily_forecast = NULL, hourly_forecast = NULL
 WHERE location_formatted_id = :locationFormattedId;

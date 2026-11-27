@@ -123,13 +123,16 @@ class WeatherRepository(
                     location.formattedId,
                     LocationMapper(location.automaticPhSource)::mapLocation
                 ).executeAsOneOrNull() ?: return@await false
-                val panahonForecast = location.forecastSource == "panahon" || saved.forecastSource == "panahon"
+                val usesPanahon = location.forecastSource == Location.PANAHON_SOURCE ||
+                    saved.forecastSource == Location.PANAHON_SOURCE ||
+                    location.currentSource == Location.PANAHON_SOURCE ||
+                    saved.currentSource == Location.PANAHON_SOURCE
                 val pointOrSourceChanged = location.latitude != saved.latitude ||
                     location.longitude != saved.longitude ||
                     location.forecastSourcePreference != saved.forecastSourcePreference ||
                     location.currentSourcePreference != saved.currentSourcePreference ||
                     location.forecastSource != saved.forecastSource || location.currentSource != saved.currentSource
-                if (panahonForecast && pointOrSourceChanged) {
+                if (usesPanahon && pointOrSourceChanged) {
                     return@await false
                 }
             }

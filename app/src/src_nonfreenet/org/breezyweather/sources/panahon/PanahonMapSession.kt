@@ -26,12 +26,12 @@ import java.io.IOException
 import java.time.Instant
 
 // Deliberately not a data class: session values should never appear in a diagnostic string.
-internal class PanahonWindSession(val initialization: Instant, val token: String, val cookie: String?)
+internal class PanahonMapSession(val initialization: Instant, val token: String, val cookie: String?)
 
 private val metaTag = Regex("""<meta\s+[^>]*>""", RegexOption.IGNORE_CASE)
 private val attribute = Regex("""\b(name|content)\s*=\s*(["'])(.*?)\2""", RegexOption.IGNORE_CASE)
 
-internal fun Response<ResponseBody>.toPanahonWindSession(): PanahonWindSession {
+internal fun Response<ResponseBody>.toPanahonMapSession(): PanahonMapSession {
     if (!isSuccessful) {
         errorBody()?.close()
         throw IOException("PANaHON map unavailable")
@@ -53,5 +53,5 @@ internal fun Response<ResponseBody>.toPanahonWindSession(): PanahonWindSession {
     val cookies = Cookie.parseAll(mapUrl, headers())
         .filter { it.matches(forecastUrl) && it.expiresAt > System.currentTimeMillis() }
         .joinToString("; ") { "${it.name}=${it.value}" }
-    return PanahonWindSession(Instant.parse(initialization), token, cookies.ifEmpty { null })
+    return PanahonMapSession(Instant.parse(initialization), token, cookies.ifEmpty { null })
 }

@@ -249,6 +249,7 @@ internal fun convertDailyWrapperToDailyList(
  */
 internal fun computeMissingHourlyData(
     hourlyList: List<HourlyWrapper>?,
+    deriveConditions: Boolean = true,
 ): List<Hourly>? {
     return hourlyList?.map { hourly ->
         val temp = hourly.temperature?.temperature?.toValidOrNull()
@@ -270,14 +271,18 @@ internal fun computeMissingHourlyData(
         )
         val cloudCover = hourly.cloudCover?.toValidRangeOrNull()
         val visibility = hourly.visibility?.toValidOrNull()
-        val weatherCode = hourly.weatherCode ?: getHalfDayWeatherCodeFromHourlyList(
-            listOf(hourly.toHourly()),
-            precipitation,
-            precipitationProbability,
-            wind,
-            cloudCover,
-            visibility
-        )
+        val weatherCode = if (hourly.weatherCode != null || !deriveConditions) {
+            hourly.weatherCode
+        } else {
+            getHalfDayWeatherCodeFromHourlyList(
+                listOf(hourly.toHourly()),
+                precipitation,
+                precipitationProbability,
+                wind,
+                cloudCover,
+                visibility
+            )
+        }
         val relativeHumidity = hourly.relativeHumidity?.toValidRangeOrNull()
             ?: computeRelativeHumidity(temp, hourly.dewPoint?.toValidOrNull())
         val dewPoint = hourly.dewPoint?.toValidOrNull()
@@ -400,17 +405,21 @@ internal fun completeDailyListFromHourlyList(
     val hourlyListByHalfDay = getHourlyListByHalfDay(hourlyList, location)
     val hourlyListByDay = hourlyList.groupBy { it.date.getIsoFormattedDate(location) }
     val todayFormatted = Date().getIsoFormattedDate(location)
+    // PANaHON supplies period totals only when all component intervals are accounted for.
+    val derivePeriodValues = location.forecastSource != Location.PANAHON_SOURCE
     return dailyList.map { daily ->
         val theDayFormatted = daily.date.getIsoFormattedDate(location)
         val newDay = completeHalfDayFromHourlyList(
             initialHalfDay = daily.day,
             halfDayHourlyList = hourlyListByHalfDay.getOrElse(theDayFormatted) { null }?.get("day"),
-            isDay = true
+            isDay = true,
+            derivePeriodValues = derivePeriodValues
         )
         val newNight = completeHalfDayFromHourlyList(
             initialHalfDay = daily.night,
             halfDayHourlyList = hourlyListByHalfDay.getOrElse(theDayFormatted) { null }?.get("night"),
-            isDay = false
+            isDay = false,
+            derivePeriodValues = derivePeriodValues
         )
 
         val newSun = getCalculatedAstroSun(daily.date, location.longitude, location.latitude)
@@ -695,6 +704,7 @@ private fun completeHalfDayFromHourlyList(
     initialHalfDay: HalfDay? = null,
     halfDayHourlyList: List<Hourly>? = null,
     isDay: Boolean,
+    derivePeriodValues: Boolean,
 ): HalfDay? {
     if (halfDayHourlyList.isNullOrEmpty()) return initialHalfDay
 
@@ -704,7 +714,9 @@ private fun completeHalfDayFromHourlyList(
         temperature = newHalfDay.temperature?.temperature?.toValidOrNull(),
         sourceFeelsLike = newHalfDay.temperature?.sourceFeelsLike?.toValidOrNull()
     )
-    val extremeTemperature = if (initialTemperature.temperature == null || initialTemperature.sourceFeelsLike == null) {
+    val extremeTemperature = if (derivePeriodValues &&
+        (initialTemperature.temperature == null || initialTemperature.sourceFeelsLike == null)
+    ) {
         getHalfDayTemperatureFromHourlyList(initialTemperature, halfDayHourlyList, isDay)
     } else {
         // No need to compute alternative feels like if real temp. and source feels like are there
@@ -718,7 +730,7 @@ private fun completeHalfDayFromHourlyList(
         snow = newHalfDay.precipitation!!.snow?.toValidHalfDayOrNull(),
         ice = newHalfDay.precipitation!!.ice?.toValidHalfDayOrNull()
     )
-    val totalPrecipitation = if (initialPrecipitation?.total == null) {
+    val totalPrecipitation = if (derivePeriodValues && initialPrecipitation?.total == null) {
         getHalfDayPrecipitationFromHourlyList(halfDayHourlyList)
     } else {
         initialPrecipitation
@@ -752,14 +764,18 @@ private fun completeHalfDayFromHourlyList(
         initialWind
     }
 
-    val halfDayWeatherCode = newHalfDay.weatherCode ?: getHalfDayWeatherCodeFromHourlyList(
-        halfDayHourlyList,
-        totalPrecipitation,
-        maxPrecipitationProbability,
-        maxWind,
-        getHalfDayCloudCoverFromHourlyList(halfDayHourlyList),
-        getHalfDayAvgVisibilityFromHourlyList(halfDayHourlyList)
-    )
+    val halfDayWeatherCode = if (newHalfDay.weatherCode != null || !derivePeriodValues) {
+        newHalfDay.weatherCode
+    } else {
+        getHalfDayWeatherCodeFromHourlyList(
+            halfDayHourlyList,
+            totalPrecipitation,
+            maxPrecipitationProbability,
+            maxWind,
+            getHalfDayCloudCoverFromHourlyList(halfDayHourlyList),
+            getHalfDayAvgVisibilityFromHourlyList(halfDayHourlyList)
+        )
+    }
     /*if (BreezyWeather.instance.debugMode) {
         LogHelper.log(msg = "code $halfDayWeatherCode when\n" +
                 "p: ${totalPrecipitation.total}, pop: ${maxPrecipitationProbability.total}, " +
@@ -1377,17 +1393,30 @@ internal fun Current.toCachedCurrentWrapper(location: Location): CurrentWrapper 
     return if (location.usesPanahonCurrentWind) cached.copy(wind = null) else cached
 }
 
-internal fun Location.withoutMovedPanahonWind(moved: Boolean): Location {
+internal val Location.usesPanahonCurrentConditions: Boolean
+    get() = currentSource == Location.PANAHON_SOURCE ||
+        (currentSource.isNullOrEmpty() && forecastSource == Location.PANAHON_SOURCE)
+
+internal fun Location.withoutMovedPanahonWeather(moved: Boolean): Location {
     val previous = weather ?: return this
-    if (!moved || forecastSource != "panahon") return this
+    val clearForecast = forecastSource == Location.PANAHON_SOURCE
+    val clearCurrent = usesPanahonCurrentConditions
+    if (!moved || (!clearForecast && !clearCurrent)) return this
     return copy(
         weather = previous.copy(
-            base = previous.base.copy(forecastUpdateTime = null),
-            forecastWindSamples = emptyMap(),
-            current = if (usesPanahonCurrentWind) previous.current?.copy(wind = null) else previous.current,
-            hourlyForecast = previous.hourlyForecast.map { it.copy(wind = null) },
-            dailyForecast = previous.dailyForecast.map { day ->
-                day.copy(day = day.day?.copy(wind = null), night = day.night?.copy(wind = null))
+            base = previous.base.copy(
+                forecastUpdateTime = previous.base.forecastUpdateTime.takeUnless { clearForecast },
+                currentUpdateTime = previous.base.currentUpdateTime.takeUnless { clearCurrent },
+                airQualityUpdateTime = previous.base.airQualityUpdateTime.takeUnless { clearForecast },
+                pollenUpdateTime = previous.base.pollenUpdateTime.takeUnless { clearForecast }
+            ),
+            forecastWindSamples = if (clearForecast) emptyMap() else previous.forecastWindSamples,
+            dailyForecast = if (clearForecast) emptyList() else previous.dailyForecast,
+            hourlyForecast = if (clearForecast) emptyList() else previous.hourlyForecast,
+            current = if (clearCurrent) {
+                previous.current?.airQuality?.let { Current(airQuality = it) }
+            } else {
+                previous.current
             }
         )
     )
@@ -1395,11 +1424,11 @@ internal fun Location.withoutMovedPanahonWind(moved: Boolean): Location {
 
 internal fun List<Hourly>.hourForCurrentConditions(now: Long, forecastSource: String): Hourly? {
     val hour = 1.hours.inWholeMilliseconds
-    val first = firstOrNull { it.date.time >= now - hour } ?: return null
-    if (forecastSource != "panahon") return first
-    // Philippine time has whole-hour UTC offsets. A later official forecast must leave a gap here.
-    val currentWind = lastOrNull { it.date.time in (now - now % hour)..now }?.wind
-    return if (currentWind == first.wind) first else first.copy(wind = currentWind)
+    if (forecastSource == Location.PANAHON_SOURCE) {
+        // The map timestamps are on the hour in Asia/Manila.
+        return lastOrNull { it.date.time == now - now % hour }
+    }
+    return firstOrNull { it.date.time >= now - hour }
 }
 
 internal fun Map<Date, AirQuality>.currentHourAirQuality(now: Long): AirQuality? =
@@ -1517,7 +1546,11 @@ private fun completeCurrentTemperatureFromHourly(
     relativeHumidity: Ratio?,
     dewPoint: Temperature?,
 ): breezyweather.domain.weather.model.Temperature? {
-    if (initialTemp == null) return hourlyTemperature
+    if (initialTemp == null) {
+        if (initialFeelsLike == null) return hourlyTemperature
+        return (hourlyTemperature ?: breezyweather.domain.weather.model.Temperature())
+            .copy(sourceFeelsLike = initialFeelsLike)
+    }
 
     return breezyweather.domain.weather.model.Temperature(
         temperature = initialTemp,
