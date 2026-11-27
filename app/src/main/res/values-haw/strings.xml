@@ -51,11 +51,6 @@
     <string name="temperature_degree_day_cooling">Lā kekelē hoʻoluʻu</string>
     <string name="temperature_degree_day_cooling_explanation">ʻO ka ʻokoʻa ma waena o ka mahana o waho a me kahi mahana ʻoluʻolu i hoʻohana ʻia e kuhi i nā koi ikehu hoʻoluʻu</string>
     <string name="temperature_average_short">Waena</string>
-    <string name="temperature_normal_short">Maʻamau</string>
-    <string name="temperature_normals">Nā mahana maʻamau</string>
-    <string name="temperature_normals_deviation">Kaʻaleʻa</string>
-    <string name="temperature_normals_deviation_explanation_maximum">Ka ʻokoʻa mai ka awelika o ka mahana kiʻekiʻe loa %s no kēia wahi</string>
-    <string name="temperature_normals_deviation_explanation_minimum">Ka ʻokoʻa mai ka awelika o ka mahana haʻahaʻa loa ma %s no kēia wahi</string>
     <string name="precipitation">Ua</string>
     <string name="precipitation_total_day">Ka ua i ke ao</string>
     <string name="precipitation_total_night">Ka ua i ka pō</string>

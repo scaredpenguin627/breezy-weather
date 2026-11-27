@@ -33,8 +33,6 @@
     <string name="temperature_degree_day_heating">Varmegradsdag</string>
     <string name="temperature_degree_day_cooling">Kuldegradsdag</string>
     <string name="temperature_average_short">Snitt</string>
-    <string name="temperature_normal_short">Normal</string>
-    <string name="temperature_normals">Normaltemperatur</string>
     <string name="precipitation">Nedbør</string>
     <string name="precipitation_probability">Nedbørssannsynlighet</string>
     <string name="precipitation_thunderstorm">Tordenvær</string>

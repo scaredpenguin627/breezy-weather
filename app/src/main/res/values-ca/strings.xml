@@ -233,8 +233,6 @@
     <string name="uv_index_8_10">Molt alt</string>
     <string name="wind_direction_S_short">S</string>
     <string name="temperature_average_short">Mitj</string>
-    <string name="temperature_normal_short">Normal</string>
-    <string name="temperature_normals">Normals de temperatura</string>
     <string name="wind_direction_variable">Variable</string>
     <string name="wind_direction_W_short">O</string>
     <string name="precipitation_between_time">Precipitació de %1$s a %2$s</string>
@@ -591,9 +589,6 @@
     <string name="temperature_feels_like_details">Sensació tèrmica com a resultat de la humitat, el vent i/o la llum solar.</string>
     <string name="temperature_degree_day_heating_explanation">Diferència entre la temperatura exterior i una temperatura còmoda de referència utilitzada per a calcular les necessitats energètiques de calefacció</string>
     <string name="temperature_degree_day_cooling_explanation">Diferència entre la temperatura exterior i una temperatura còmoda de referència utilitzada per a calcular les necessitats energètiques de refrigeració</string>
-    <string name="temperature_normals_deviation">Desviació</string>
-    <string name="temperature_normals_deviation_explanation_maximum">Desviació de la temperatura màxima mitjana de %s per a aquesta ubicació</string>
-    <string name="temperature_normals_deviation_explanation_minimum">Desviació de la temperatura mínima mitjana de %s per a aquesta ubicació</string>
     <string name="precipitation_total_day">Precipitació de dia</string>
     <string name="precipitation_total_night">Precipitació de nit</string>
     <string name="precipitation_rain_total_day">Pluja de dia</string>

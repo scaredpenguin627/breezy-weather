@@ -144,10 +144,6 @@ class DailySunshineAdapter(
 
     override fun getItemCount() = location.weather!!.dailyForecast.size
 
-    override fun isValid(location: Location) = location.weather!!.dailyForecast.any {
-        (it.sunshineDuration?.inWholeMinutes ?: 0) > 0
-    }
-
     override fun getDisplayName(context: Context) = context.getString(R.string.tag_sunshine)
 
     override fun bindBackgroundForHost(host: TrendRecyclerView) {

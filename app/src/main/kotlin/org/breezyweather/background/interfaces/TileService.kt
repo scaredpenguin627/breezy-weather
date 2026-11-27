@@ -23,7 +23,6 @@ import android.content.Intent
 import android.os.Build
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
-import androidx.annotation.RequiresApi
 import breezyweather.data.location.LocationRepository
 import breezyweather.data.weather.WeatherRepository
 import dagger.hilt.android.AndroidEntryPoint
@@ -96,8 +95,7 @@ class TileService : TileService(), CoroutineScope {
                     withDaily = true, // isDaylight
                     withHourly = false,
                     withMinutely = false,
-                    withAlerts = false,
-                    withNormals = false
+                    withAlerts = false
                 )
             )
             locationRefreshed.weather?.current?.let { current ->

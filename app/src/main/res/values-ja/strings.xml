@@ -398,8 +398,6 @@
     <string name="weather_message_unsupported_feature">情報源は要求された機能の一部に対応していません</string>
     <string name="settings_location_access_background_summaryOn">有効です。バックグラウンドで現在地の気象データを更新できます。</string>
     <string name="settings_icon_packs_weather_adaptive_icon">天気のアイコン</string>
-    <string name="temperature_normal_short">標準温度</string>
-    <string name="temperature_normals">常温</string>
     <string name="air_quality_co_full">一酸化炭素（%s）</string>
     <string name="location_search_no_results">%1$sが%2$sを見つけられません</string>
     <string name="message_network_unavailable">ネットワークが利用できません</string>
@@ -723,9 +721,6 @@
     <string name="clock">時計</string>
     <string name="temperature_degree_day_heating_explanation">暖房のエネルギーの必要量の見積もりに使用される、外気温と基準快適温度との差</string>
     <string name="temperature_degree_day_cooling_explanation">冷房のエネルギーの必要量の見積もりに使用される、外気温と基準快適温度との差</string>
-    <string name="temperature_normals_deviation">偏差</string>
-    <string name="temperature_normals_deviation_explanation_maximum">この場所での%sの平均最高気温との偏差</string>
-    <string name="temperature_normals_deviation_explanation_minimum">この場所での%sの平均最低気温との偏差</string>
     <string name="precipitation_total_day">日中の降水量</string>
     <string name="precipitation_total_night">夜間の降水量</string>
     <string name="precipitation_rain_total_day">日中の雨</string>

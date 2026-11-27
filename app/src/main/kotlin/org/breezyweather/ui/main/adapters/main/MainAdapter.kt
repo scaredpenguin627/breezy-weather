@@ -24,6 +24,7 @@ import androidx.recyclerview.widget.RecyclerView
 import breezyweather.domain.location.model.Location
 import org.breezyweather.common.extensions.toCalendarWithTimeZone
 import org.breezyweather.common.options.appearance.CardDisplay
+import org.breezyweather.common.options.appearance.DailyTrendDisplay
 import org.breezyweather.domain.settings.SettingsManager
 import org.breezyweather.domain.weather.model.hasMinutelyPrecipitation
 import org.breezyweather.domain.weather.model.isIndexValid
@@ -103,7 +104,8 @@ class MainAdapter(
         mListAnimationEnabled = listAnimationEnabled
         mItemAnimationEnabled = itemAnimationEnabled
         location?.weather?.let { weather ->
-            val cardDisplayList = SettingsManager.getInstance(activity).cardDisplayList
+            val settings = SettingsManager.getInstance(activity)
+            val cardDisplayList = settings.cardDisplayList
             mViewTypeList.add(ViewType.HEADER)
             if (location.weather?.alertList?.any { it.endDate == null || it.endDate!!.time > Date().time } == true) {
                 mViewTypeList.add(ViewType.ALERT)
@@ -114,8 +116,10 @@ class MainAdapter(
                 ) {
                     continue
                 }
-                if (c === CardDisplay.CARD_DAILY_FORECAST && weather.dailyForecast.isEmpty()) {
-                    continue
+                if (c === CardDisplay.CARD_DAILY_FORECAST) {
+                    val hasSummary = !weather.current?.dailyForecast.isNullOrEmpty()
+                    val trends = DailyTrendDisplay.availableFor(location, settings.dailyTrendDisplayList)
+                    if (weather.dailyForecast.isEmpty() || (trends.isEmpty() && !hasSummary)) continue
                 }
                 if (c === CardDisplay.CARD_HOURLY_FORECAST && weather.nextHourlyForecast.isEmpty()) {
                     continue

@@ -28,6 +28,7 @@ import org.breezyweather.common.activities.BreezyActivity
 import org.breezyweather.common.extensions.formatMeasure
 import org.breezyweather.common.extensions.formatPercent
 import org.breezyweather.common.extensions.getThemeColor
+import org.breezyweather.common.extensions.localizedWeatherText
 import org.breezyweather.common.options.appearance.DetailScreen
 import org.breezyweather.ui.common.widgets.trend.TrendRecyclerView
 import org.breezyweather.ui.common.widgets.trend.chart.PolylineAndHistogramView
@@ -76,7 +77,7 @@ class DailyTemperatureAdapter(
                         .append(activity.getString(org.breezyweather.unit.R.string.locale_separator))
                 }
                 if (!day.weatherText.isNullOrEmpty()) {
-                    talkBackBuilder.append(day.weatherText)
+                    talkBackBuilder.append(day.weatherText.localizedWeatherText(activity))
                 }
                 if (showPrecipitationProbability) {
                     day.precipitationProbability?.total?.let { p ->
@@ -96,7 +97,7 @@ class DailyTemperatureAdapter(
                         .append(activity.getString(org.breezyweather.unit.R.string.locale_separator))
                 }
                 if (!night.weatherText.isNullOrEmpty()) {
-                    talkBackBuilder.append(night.weatherText)
+                    talkBackBuilder.append(night.weatherText.localizedWeatherText(activity))
                 }
                 if (showPrecipitationProbability) {
                     night.precipitationProbability?.total?.let { p ->
@@ -263,9 +264,6 @@ class DailyTemperatureAdapter(
     }
 
     override fun getItemCount() = location.weather!!.dailyForecast.size
-
-    // FIXME
-    override fun isValid(location: Location) = true
 
     override fun getDisplayName(context: Context) = context.getString(R.string.tag_temperature)
 

@@ -57,8 +57,7 @@ class WidgetMaterialYouCurrentProvider : AppWidgetProvider() {
                             withDaily = true, // isDaylight
                             withHourly = false,
                             withMinutely = false,
-                            withAlerts = false,
-                            withNormals = false
+                            withAlerts = false
                         )
                     )
                 )

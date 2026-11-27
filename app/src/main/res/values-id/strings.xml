@@ -245,8 +245,6 @@
     <string name="air_quality_level_2">Cukup</string>
     <string name="air_quality_level_2_description">Kualitas udara pada umumnya dapat diterima oleh sebagian besar individu. Namun, kelompok yang sensitif dapat mengalami gejala ringan hingga sedang akibat paparan jangka panjang.</string>
     <string name="temperature_average_short">Rata-rata</string>
-    <string name="temperature_normal_short">Normal</string>
-    <string name="temperature_normals">Suhu normal</string>
     <string name="wind_direction_W_short">B</string>
     <string name="uv_index_11">Ekstrem</string>
     <string name="air_quality_level_1">Sempurna</string>
@@ -764,9 +762,6 @@
     <string name="action_pull_down_to_refresh">Tarik ke bawah untuk menyegarkan</string>
     <string name="action_translate">Terjemahkan</string>
     <string name="action_translate_no_app">Tidak ada aplikasi terjemahan yang ditemukan</string>
-    <string name="temperature_normals_deviation">Deviasi</string>
-    <string name="temperature_normals_deviation_explanation_maximum">Deviasi dari suhu maksimum rata-rata %s untuk lokasi ini</string>
-    <string name="temperature_normals_deviation_explanation_minimum">Deviasi dari suhu minimum rata-rata %s untuk lokasi ini</string>
     <string name="precipitation_total_day">Presipitasi siang hari</string>
     <string name="precipitation_total_night">Presipitasi malam hari</string>
     <string name="precipitation_rain_total_day">Hujan siang hari</string>

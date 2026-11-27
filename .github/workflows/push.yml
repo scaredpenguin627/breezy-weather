@@ -105,7 +105,7 @@ jobs:
 
       - name: Test and assemble the Philippine fork
         if: github.repository == 'scaredpenguin627/breezy-weather'
-        run: ./gradlew :app:testBasicDebugUnitTest :app:assembleBasicDebug
+        run: ./gradlew :app:testBasicDebugUnitTest :app:assembleBasicDebug :app:compileFreenetDebugKotlin
 
       - name: Save the tested fork APK
         if: github.repository == 'scaredpenguin627/breezy-weather'

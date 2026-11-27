@@ -22,7 +22,6 @@ import org.breezyweather.sources.namem.json.NamemAirQualityResult
 import org.breezyweather.sources.namem.json.NamemCurrentResult
 import org.breezyweather.sources.namem.json.NamemDailyResult
 import org.breezyweather.sources.namem.json.NamemHourlyResult
-import org.breezyweather.sources.namem.json.NamemNormalsResult
 import org.breezyweather.sources.namem.json.NamemStationsResult
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -50,12 +49,6 @@ interface NamemApi {
     fun getDaily(
         @Body body: RequestBody,
     ): Observable<NamemDailyResult>
-
-    @Headers("Origin: $ORIGIN_URL")
-    @POST("api/get/forecast/monthly")
-    fun getNormals(
-        @Body body: RequestBody,
-    ): Observable<NamemNormalsResult>
 
     @Headers("Origin: $ORIGIN_URL")
     @POST("api/get/agaar/multi")

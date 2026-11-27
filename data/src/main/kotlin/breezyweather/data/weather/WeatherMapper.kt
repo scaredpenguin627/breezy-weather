@@ -32,7 +32,6 @@ import breezyweather.domain.weather.model.HalfDay
 import breezyweather.domain.weather.model.Hourly
 import breezyweather.domain.weather.model.Minutely
 import breezyweather.domain.weather.model.MoonPhase
-import breezyweather.domain.weather.model.Normals
 import breezyweather.domain.weather.model.Pollen
 import breezyweather.domain.weather.model.PrecipitationDuration
 import breezyweather.domain.weather.model.PrecipitationProbability
@@ -40,7 +39,6 @@ import breezyweather.domain.weather.model.UV
 import breezyweather.domain.weather.model.Weather
 import breezyweather.domain.weather.model.Wind
 import breezyweather.domain.weather.reference.AlertSeverity
-import breezyweather.domain.weather.reference.Month
 import breezyweather.domain.weather.reference.WeatherCode
 import org.breezyweather.unit.distance.Distance
 import org.breezyweather.unit.pollen.PollenConcentration
@@ -63,9 +61,6 @@ object WeatherMapper {
         pollenUpdateTime: Long?,
         minutelyUpdateTime: Long?,
         alertsUpdateTime: Long?,
-        normalsUpdateTime: Long?,
-        normalsUpdateLatitude: Double,
-        normalsUpdateLongitude: Double,
         weatherText: String?,
         weatherCode: WeatherCode?,
         temperature: Temperature?,
@@ -102,10 +97,7 @@ object WeatherMapper {
             airQualityUpdateTime?.let { Date(it) },
             pollenUpdateTime?.let { Date(it) },
             minutelyUpdateTime?.let { Date(it) },
-            alertsUpdateTime?.let { Date(it) },
-            normalsUpdateTime?.let { Date(it) },
-            normalsUpdateLatitude,
-            normalsUpdateLongitude
+            alertsUpdateTime?.let { Date(it) }
         ),
         Current(
             weatherText,
@@ -507,16 +499,5 @@ object WeatherMapper {
         Date(date),
         minuteInterval.toInt(),
         intensity
-    )
-
-    fun mapNormals(
-        month: Long,
-        daytimeTemperature: Temperature?,
-        nighttimeTemperature: Temperature?,
-    ): Map<Month, Normals> = mapOf(
-        Month.of(month.toInt()) to Normals(
-            daytimeTemperature,
-            nighttimeTemperature
-        )
     )
 }

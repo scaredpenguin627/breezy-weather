@@ -34,7 +34,6 @@
     <string name="air_quality_index">वायु गुणवत्ता सूचकांक</string>
     <string name="wind_strength_0">प्रशान्त</string>
     <string name="wind_strength_4">अल्पबल समीर</string>
-    <string name="temperature_normals">तापमान सामान्य</string>
     <string name="pollen">पोलेन</string>
     <string name="precipitation_intensity_light">हल्की</string>
     <string name="precipitation">वर्षा</string>
@@ -46,7 +45,6 @@
     <string name="wind_strength_11">तीव्र तूफान</string>
     <string name="ephemeris">सूर्य और चंद्रमा</string>
     <string name="air_quality_level_3">ख़राब</string>
-    <string name="temperature_normal_short">सामान्य</string>
     <string name="air_quality_level_6">खतरनाक</string>
     <string name="wind_direction_SW_short">द प</string>
     <string name="precipitation_duration">वर्षा की अवधि</string>

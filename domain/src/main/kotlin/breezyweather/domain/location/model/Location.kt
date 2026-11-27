@@ -54,7 +54,6 @@ data class Location(
     val pollenSource: String? = null,
     val minutelySource: String? = null,
     val alertSource: String? = null,
-    val normalsSource: String? = null,
     val reverseGeocodingSource: String? = null,
 
     val isCurrentPosition: Boolean = false,
@@ -109,7 +108,7 @@ data class Location(
         parcel.writeString(pollenSource)
         parcel.writeString(minutelySource)
         parcel.writeString(alertSource)
-        parcel.writeString(normalsSource)
+        parcel.writeString(null) // Reserved slot in the location parcel
         parcel.writeString(reverseGeocodingSource)
         parcel.writeByte(if (isCurrentPosition) 1 else 0)
         parcel.writeByte(if (needsGeocodeRefresh) 1 else 0)
@@ -141,8 +140,10 @@ data class Location(
         pollenSource = parcel.readString(),
         minutelySource = parcel.readString(),
         alertSource = parcel.readString(),
-        normalsSource = parcel.readString(),
-        reverseGeocodingSource = parcel.readString(),
+        reverseGeocodingSource = parcel.run {
+            readString() // Skip the retired source slot in older location parcels
+            readString()
+        },
         isCurrentPosition = parcel.readByte() != 0.toByte(),
         needsGeocodeRefresh = parcel.readByte() != 0.toByte()
     )
@@ -188,10 +189,6 @@ data class Location(
         }
 
         if (alertSource != other.alertSource) {
-            return false
-        }
-
-        if (normalsSource != other.normalsSource) {
             return false
         }
 

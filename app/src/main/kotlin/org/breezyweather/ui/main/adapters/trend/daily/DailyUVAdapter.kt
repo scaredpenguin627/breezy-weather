@@ -123,10 +123,6 @@ class DailyUVAdapter(
 
     override fun getItemCount() = location.weather!!.dailyForecast.size
 
-    override fun isValid(location: Location) = location.weather!!.dailyForecast.any {
-        it.uV?.index != null
-    }
-
     override fun getDisplayName(context: Context) = context.getString(R.string.tag_uv)
 
     override fun bindBackgroundForHost(host: TrendRecyclerView) {

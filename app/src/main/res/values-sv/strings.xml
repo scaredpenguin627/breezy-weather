@@ -118,7 +118,6 @@
     <string name="action_back">Tillbaka</string>
     <string name="pressure">Lufttryck</string>
     <string name="common_weather_text_fog">Dimma</string>
-    <string name="temperature_normal_short">Normal</string>
     <string name="settings_background_updates_section_troubleshoot">Problemlösning</string>
     <string name="settings_units">Enheter</string>
     <string name="widget_clock_font_sans_serif">Sans Serif</string>
@@ -227,7 +226,6 @@
     <string name="air_quality_level_5_description">Känsliga grupper kan omedelbart påverkas och bör undvika utomhusaktiviteter. Även friska personer kan få andningssvårigheter och irritation i halsen och bör överväga att stanna inomhus eller planera om sina utomhusaktiviteter.</string>
     <string name="air_quality_level_6">Farlig</string>
     <string name="air_quality_level_6_description">Även några minuters exponering för utomhusluften kan medföra allvarliga hälsorisker för alla. Undvik utomhusaktiviteter.</string>
-    <string name="temperature_normals">Temperaturnormaler</string>
     <string name="temperature_degree_day_heating">Uppvärmningsgraddagar</string>
     <string name="temperature_degree_day_cooling">Kylgraddagar</string>
     <string name="temperature_apparent">Upplevd</string>
@@ -645,9 +643,6 @@
     <string name="temperature_real">Faktisk</string>
     <string name="temperature_real_details">Den faktiska temperaturen.</string>
     <string name="temperature_feels_like_details">Hur temperaturen upplevs utifrån luftfuktighet, vind och/eller solljus.</string>
-    <string name="temperature_normals_deviation">Avvikelse</string>
-    <string name="temperature_normals_deviation_explanation_maximum">Avvikelse från %s månads genomsnittliga högsta temperatur för denna plats</string>
-    <string name="temperature_normals_deviation_explanation_minimum">Avvikelse från %s månads genomsnittliga lägsta temperatur för denna plats</string>
     <string name="precipitation_total_day">Nederbörd dagtid</string>
     <string name="precipitation_total_night">Nederbörd nattetid</string>
     <string name="precipitation_rain_total_day">Regn dagtid</string>

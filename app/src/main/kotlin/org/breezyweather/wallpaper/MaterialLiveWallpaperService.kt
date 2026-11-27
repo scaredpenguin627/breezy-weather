@@ -97,8 +97,7 @@ class MaterialLiveWallpaperService : WallpaperService() {
                         withDaily = true, // For day/night
                         withHourly = false,
                         withMinutely = false,
-                        withAlerts = false,
-                        withNormals = false
+                        withAlerts = false
                     )
                 )
             }
@@ -328,8 +327,7 @@ class MaterialLiveWallpaperService : WallpaperService() {
                     weather = location.weather?.copy(
                         hourlyForecast = emptyList(),
                         minutelyForecast = emptyList(),
-                        alertList = emptyList(),
-                        normals = emptyMap()
+                        alertList = emptyList()
                     )
                 )
             )

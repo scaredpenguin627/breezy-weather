@@ -66,8 +66,7 @@ class AlertViewModel @Inject constructor(
                 withDaily = true,
                 withHourly = false,
                 withMinutely = false,
-                withAlerts = true,
-                withNormals = false
+                withAlerts = true
             )
 
             _uiState.value = AlertUiState(

@@ -132,9 +132,6 @@ From top to bottom:
 - Weather condition of nighttime (icon)
 - Maximum precipitation probability for daytime + nighttime (bar + text)
 
-If weather source has normals data, it will show two lines with maximum and minimum temperature normals for the month of the first day in forecast. If normals are not available, it will fallback to use a median maximum and minimum temperature for the daily forecast period.
-
-
 #### Air quality trends
 
 Each column shows the maximum air quality index for the day (bar + text) from 00:00 to 23:59. More details about air quality index can be read in Air quality block section.
@@ -223,9 +220,6 @@ From top to bottom:
 - Minimum feels like temperature of nighttime (graph)
 - Weather condition of nighttime (icon)
 - Maximum precipitation probability for daytime + nighttime (bar + text)
-
-If weather source has normals data, it will show two lines with maximum and minimum temperature normals for the month of the first day in forecast. If normals are not available, it will fallback to use a median maximum and minimum temperature for the daily forecast period.
-
 
 ### Hourly forecast
 

@@ -229,8 +229,6 @@
     <string name="settings_appearance_dark_mode_locations_title">Hely alapú sötét mód</string>
     <string name="temperature_degree_day_heating">Fűtési foknap</string>
     <string name="temperature_degree_day_cooling">Hűtési foknap</string>
-    <string name="temperature_normal_short">Normál</string>
-    <string name="temperature_normals">Hőmérsékleti normák</string>
     <string name="air_quality_level_4_description">Az egészségügyi hatások az érzékeny csoportok számára azonnal érezhetők. Az egészséges egyének légzési nehézséget és torokirritációt tapasztalhatnak hosszabb kitettség esetén. Korlátozza a szabadtéri tevékenységeit.</string>
     <string name="precipitation_none">Nincs csapadék</string>
     <string name="precipitation_between_time">Várhatóan %1$s és %2$s között esni fog</string>
@@ -733,9 +731,6 @@
     <string name="daytime_short">Nappal</string>
     <string name="nighttime_short">Éjszaka</string>
     <string name="air_quality_short">Levegőminőség</string>
-    <string name="temperature_normals_deviation">Eltérés</string>
-    <string name="temperature_normals_deviation_explanation_maximum">Eltérés az erre a helyre vonatkozó %s hónapi átlagos legmagasabb hőmérséklettől</string>
-    <string name="temperature_normals_deviation_explanation_minimum">Eltérés a(z) %s hónapra vonatkozó legalacsonyabb, átlagos hőmérséklettől ezen a helyen</string>
     <string name="widget_custom_subtitle_help_content_description">Egyéni súgófelirat-kulcsszavak megjelenítése</string>
     <string name="widget_custom_subtitle_alert_box_title">Egyéni segédfelirat</string>
     <string name="settings_appearance_dark_mode_locations_day_night">Napszaktól függ</string>

@@ -173,10 +173,6 @@ class DailyWindAdapter(
 
     override fun getItemCount() = location.weather!!.dailyForecast.size
 
-    override fun isValid(location: Location) = location.weather!!.dailyForecast.any {
-        it.day?.wind?.speed != null || it.night?.wind?.speed != null
-    }
-
     override fun getDisplayName(context: Context) = context.getString(R.string.tag_wind)
 
     override fun bindBackgroundForHost(host: TrendRecyclerView) {

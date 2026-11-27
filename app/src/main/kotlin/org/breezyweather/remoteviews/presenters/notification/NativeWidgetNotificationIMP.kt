@@ -26,6 +26,7 @@ import org.breezyweather.common.extensions.formatMeasure
 import org.breezyweather.common.extensions.getFormattedMediumDayAndMonthInAdditionalCalendar
 import org.breezyweather.common.extensions.getFormattedTime
 import org.breezyweather.common.extensions.is12Hour
+import org.breezyweather.common.extensions.localizedWeatherText
 import org.breezyweather.common.extensions.notificationBuilder
 import org.breezyweather.common.extensions.notify
 import org.breezyweather.common.extensions.toBitmap
@@ -80,7 +81,7 @@ object NativeWidgetNotificationIMP : AbstractRemoteViewsPresenter() {
         }
         if (!current.weatherText.isNullOrEmpty()) {
             if (contentTitle.toString().isNotEmpty()) contentTitle.append(" – ")
-            contentTitle.append(current.weatherText)
+            contentTitle.append(current.weatherText.localizedWeatherText(context))
         }
 
         val notification = context.notificationBuilder(Notifications.CHANNEL_WIDGET).apply {

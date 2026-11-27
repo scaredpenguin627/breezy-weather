@@ -26,6 +26,7 @@ import breezyweather.domain.weather.reference.WeatherCode
 import org.breezyweather.R
 import org.breezyweather.common.extensions.cancelNotification
 import org.breezyweather.common.extensions.formatMeasure
+import org.breezyweather.common.extensions.localizedWeatherText
 import org.breezyweather.common.extensions.notificationBuilder
 import org.breezyweather.common.extensions.notify
 import org.breezyweather.common.extensions.toBitmap
@@ -174,7 +175,7 @@ class ForecastNotificationNotifier(
                 valueWidth = UnitWidth.NARROW
             ) +
             context.getString(R.string.dot_separator) +
-            daily.day?.weatherText
+            daily.day?.weatherText.localizedWeatherText(context)
 
     private fun getNightString(daily: Daily, temperatureUnit: TemperatureUnit) =
         context.getString(R.string.nighttime) +
@@ -185,5 +186,5 @@ class ForecastNotificationNotifier(
                 valueWidth = UnitWidth.NARROW
             ) +
             context.getString(R.string.dot_separator) +
-            daily.night?.weatherText
+            daily.night?.weatherText.localizedWeatherText(context)
 }

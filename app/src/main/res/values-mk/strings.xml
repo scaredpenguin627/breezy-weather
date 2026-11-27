@@ -7,8 +7,6 @@
     <string name="daily_tomorrow_short">Утр</string>
     <string name="temperature_feels_like">Се чувствува како</string>
     <string name="temperature_feels_like_with_unit">Се чувствува како %s</string>
-    <string name="temperature_normal_short">Нормална</string>
-    <string name="temperature_normals">Нормали на температура</string>
     <string name="precipitation_rain">Дожд</string>
     <string name="precipitation_snow">Снег</string>
     <string name="precipitation_ice">Мраз</string>

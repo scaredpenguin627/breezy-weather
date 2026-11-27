@@ -93,7 +93,6 @@
     <string name="temperature_wind_chill">Адчуваецца пры ветры</string>
     <string name="temperature_degree_day_cooling">Градуса-дзень ахаладжальнага сезона</string>
     <string name="temperature_average_short">Сярэдняя</string>
-    <string name="temperature_normals">Тэмпературныя нормы</string>
     <string name="precipitation">Ападкі</string>
     <string name="precipitation_probability">Імавернасць ападкаў</string>
     <string name="precipitation_rain">Дождж</string>
@@ -204,7 +203,6 @@
     <string name="alerts">Абвесткі</string>
     <string name="temperature_degree_day">Градуса-дзень</string>
     <string name="temperature_degree_day_heating">Градуса-дзень ацяпляльнага перыяду</string>
-    <string name="temperature_normal_short">Норма</string>
     <string name="precipitation_intensity_light">Слабыя</string>
     <string name="precipitation_duration">Працягласць ападкаў</string>
     <string name="precipitation_thunderstorm">Навальніца</string>
@@ -726,9 +724,6 @@
     <string name="precipitation_snow_total_day">Снег удзень</string>
     <string name="precipitation_snow_total_night">Снег уначы</string>
     <string name="ephemeris_dawn_at">Світанне ў %s</string>
-    <string name="temperature_normals_deviation">Адхіленне</string>
-    <string name="temperature_normals_deviation_explanation_maximum">Адхіленне ад сярэдняй максімальнай тэмпературы %s для гэтага месца</string>
-    <string name="temperature_normals_deviation_explanation_minimum">Адхіленне ад сярэдняга мінімуму тэмпературы %s для гэтага месца</string>
     <string name="widget_custom_subtitle_help_content_description">Паказаць даведку для ўласных подпісаў</string>
     <string name="widget_custom_subtitle_alert_box_title">Даведка для ўласных подпісаў</string>
     <string name="air_quality_no2_index">Шкала якасці паветра для %s</string>

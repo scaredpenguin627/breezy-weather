@@ -23,9 +23,7 @@
     <string name="precipitation_probability">Nedbørssandsynlighed</string>
     <string name="hourly_forecast">Timeudsigt</string>
     <string name="wind_strength_0">Vindstille</string>
-    <string name="temperature_normals">Temperatur normaler</string>
     <string name="precipitation">Nedbør</string>
-    <string name="temperature_normal_short">Normal</string>
     <string name="wind_direction_SW_short">SV</string>
     <string name="precipitation_duration">Nedbørsvarighed</string>
     <string name="temperature_degree_day_heating">Varmesum</string>
@@ -632,8 +630,6 @@
     <string name="temperature_feels_like_details">Hvordan temperaturen føles, som resultat af luftfugtighed, vind og/eller sollys.</string>
     <string name="temperature_degree_day_heating_explanation">Forskellen imellem den udendørs temperatur og en komfortabel referencetemperatur, brugt til at estimere energiforbrug på opvarmning</string>
     <string name="temperature_degree_day_cooling_explanation">Forskellen imellem den udendørs temperatur og en komfortabel referencetemperatur, brugt til at estimere energiforbrug på nedkøling</string>
-    <string name="temperature_normals_deviation_explanation_maximum">Afvigelse fra den gennemsnitlige maksimumtemperatur i %s for denne lokation</string>
-    <string name="temperature_normals_deviation_explanation_minimum">Afvigelse fra den gnnemsnitlige minimumtemperatur i %s for denne lokation.</string>
     <string name="precipitation_total_day">Nedbør i dagtimerne</string>
     <string name="precipitation_total_night">Nedbør i nattetimerne</string>
     <string name="precipitation_rain_total_day">Regn i dagtimerne</string>
@@ -775,6 +771,5 @@
     <string name="common_weather_text_tornado">Tornado</string>
     <string name="pressure_about_description1">Det atmosfæriske tryk er det nedadgående tryk, der udøves af jordens atmosfære. Denne app bruger gennemsnits havniveautryk (MSLP) til at gøre det lettere at sammenligne tryk fra steder med forskellige højder.</string>
     <string name="pressure_about_description2">Væsentlige, hurtige ændringer i tryk bruges til at forudsige ændringer i vejret. For eksempel kan et fald i tryk betyde, at regn eller sne er på vej, og stigende tryk kan betyde, at vejret vil forbedre. Abnormal atmosfærisk tryk kan forårsage hovedpine, ledsmerter, træthed og andre virkninger.</string>
-    <string name="temperature_normals_deviation">Deviation</string>
     <string name="common_weather_text_squall">Kastevind</string>
 </resources>

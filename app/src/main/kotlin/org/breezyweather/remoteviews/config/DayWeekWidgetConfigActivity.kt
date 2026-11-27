@@ -52,8 +52,7 @@ class DayWeekWidgetConfigActivity : AbstractWidgetConfigActivity() {
                 withDaily = true,
                 withHourly = false,
                 withMinutely = false,
-                withAlerts = true, // Custom subtitle
-                withNormals = false
+                withAlerts = true // Custom subtitle
             )
         )
     }

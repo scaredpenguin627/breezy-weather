@@ -30,7 +30,6 @@
     <string name="daily_yesterday_short">เมื่อวาน</string>
     <string name="temperature_apparent">ปรากฏ</string>
     <string name="precipitation_duration">ระยะเวลาการเกิดหยาดน้ำฟ้า</string>
-    <string name="temperature_normal_short">ทั่วไป</string>
     <string name="temperature_average_short">เฉลี่ย</string>
     <string name="precipitation">หยาดน้ำฟ้า</string>
     <string name="precipitation_probability">ความเป็นไปได้ของการเกิดหยาดน้ำฟ้า</string>
@@ -183,7 +182,6 @@
     <string name="temperature_degree_day">องศาวัน</string>
     <string name="temperature_degree_day_heating">องศาวันความร้อน</string>
     <string name="temperature_degree_day_cooling">องศาวันความเย็น</string>
-    <string name="temperature_normals">ค่าอุณหภูมิปกติ</string>
     <string name="air_quality_no2_full">ไนโตรเจนไดออกไซด์ (%s)</string>
     <string name="air_quality_so2_full">ซัลเฟอร์ไดออกไซด์ (%s)</string>
     <string name="pollen_tree">ต้นไม้</string>
@@ -774,9 +772,6 @@
     <string name="ephemeris_polar_day">โพลาร์เดย์</string>
     <string name="ephemeris_polar_night">โพลาร์ไนต์</string>
     <string name="clock">นาฬิกา</string>
-    <string name="temperature_normals_deviation">ค่าเบี่ยงเบน</string>
-    <string name="temperature_normals_deviation_explanation_maximum">ค่าเบี่ยงเบนจากค่าเฉลี่ยอุณหภูมิสูงสุดเดือน%s ในสถานที่นี้</string>
-    <string name="temperature_normals_deviation_explanation_minimum">ค่าเบี่ยงเบนจากค่าเฉลี่ยอุณหภูมิต่ำสุดเดือน%s ในสถานที่นี้</string>
     <string name="precipitation_total_day">หยาดน้ำฟ้า เวลากลางวัน</string>
     <string name="precipitation_total_night">หยาดน้ำฟ้า เวลากลางคืน</string>
     <string name="precipitation_rain_total_day">ฝน เวลากลางวัน</string>

@@ -28,6 +28,7 @@ import org.breezyweather.common.activities.BreezyActivity
 import org.breezyweather.common.extensions.formatMeasure
 import org.breezyweather.common.extensions.formatPercent
 import org.breezyweather.common.extensions.getThemeColor
+import org.breezyweather.common.extensions.localizedWeatherText
 import org.breezyweather.common.options.appearance.DetailScreen
 import org.breezyweather.ui.common.widgets.trend.TrendRecyclerView
 import org.breezyweather.ui.common.widgets.trend.chart.PolylineAndHistogramView
@@ -75,7 +76,7 @@ class DailyFeelsLikeAdapter(
                     talkBackBuilder.append(it.formatMeasure(activity, temperatureUnit, unitWidth = UnitWidth.LONG))
                 }
                 if (!day.weatherText.isNullOrEmpty()) {
-                    talkBackBuilder.append(day.weatherText)
+                    talkBackBuilder.append(day.weatherText.localizedWeatherText(activity))
                 }
                 if (showPrecipitationProbability) {
                     day.precipitationProbability?.total?.let { p ->
@@ -94,7 +95,7 @@ class DailyFeelsLikeAdapter(
                     talkBackBuilder.append(it.formatMeasure(activity, temperatureUnit, unitWidth = UnitWidth.LONG))
                 }
                 if (!night.weatherText.isNullOrEmpty()) {
-                    talkBackBuilder.append(night.weatherText)
+                    talkBackBuilder.append(night.weatherText.localizedWeatherText(activity))
                 }
                 if (showPrecipitationProbability) {
                     night.precipitationProbability?.total?.let { p ->
@@ -265,12 +266,6 @@ class DailyFeelsLikeAdapter(
     }
 
     override fun getItemCount() = location.weather!!.dailyForecast.size
-
-    override fun isValid(location: Location): Boolean {
-        return location.weather?.dailyForecast?.any {
-            it.day?.temperature?.feelsLikeTemperature != null || it.night?.temperature?.feelsLikeTemperature != null
-        } == true
-    }
 
     override fun getDisplayName(context: Context) = context.getString(R.string.tag_feels_like)
 

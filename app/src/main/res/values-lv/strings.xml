@@ -251,8 +251,6 @@
     <string name="settings_modules_monochrome_icons_title">Vienkrāsainas ikonas</string>
     <string name="settings_modules_notification_feels_like_switch">Izmantot šķietamo temperatūru</string>
     <string name="temperature_average_short">Vid.</string>
-    <string name="temperature_normal_short">Normāls</string>
-    <string name="temperature_normals">Temperatūras normas</string>
     <string name="wind_strength_5">Mēreni stiprs vējš</string>
     <string name="wind_strength_6">Stiprs vējš</string>
     <string name="wind_strength_7">Ļoti stiprs vējš</string>
@@ -701,9 +699,6 @@
     <string name="air_quality_health_information">Veselības informācija</string>
     <string name="air_quality_pm25_full">Smalko putekļu daļiņas (&lt; %s)</string>
     <string name="air_quality_pm10_full">Ieelpojamās putekļu daļiņas (&lt; %s)</string>
-    <string name="temperature_normals_deviation_explanation_minimum">Novirze no %s vidējās šīs atrašanās vietas mazākās temperatūras</string>
-    <string name="temperature_normals_deviation_explanation_maximum">Novirze no %s vidējās šīs atrašanās vietas lielākās temperatūras</string>
-    <string name="temperature_normals_deviation">Novirze</string>
     <string name="air_quality_pm_sources">Galvenie avoti ir sadegšana (piem., spēkstacijas, iekštelpu apkure, transporta izplūde, meža ugunsgrēki), mehāniskas norises (piem., būvniecība, minerālu putekļi, lauksaimniecība) un bioloģiskas daļiņas (piem., putekšņi, pelējums, baktērijas, vīrusi).</string>
     <string name="air_quality_so2_sources">Galvenie avoti ir sēru saturošas degvielas sadedzināšana rūpniecībā, transportā un spēkstacijās.</string>
     <string name="air_quality_no2_sources">Galvenie avoti ir degvielas sadedzināšana, piemēram, tāda, kas tiek izmantot rūpniecībā vai transportā.</string>

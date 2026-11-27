@@ -161,7 +161,6 @@
     <string name="uv_index_short">UV-indeks</string>
     <string name="visibility_short">Vidljivost</string>
     <string name="pressure_short">Tlak</string>
-    <string name="temperature_normal_short">Normalna</string>
     <string name="pollen_betula">Breza</string>
     <string name="pollen_carpinus">Gaber</string>
     <string name="pollen_olea">Oljka</string>
@@ -204,7 +203,6 @@
     <string name="temperature_wind_chill">Občutek mraza zaradi vetra</string>
     <string name="wind_direction_S_short">J</string>
     <string name="temperature_average_short">Povp</string>
-    <string name="temperature_normals">Temperaturne normale</string>
     <string name="uv_index_6_7">Visok</string>
     <string name="uv_index_3_5">Zmeren</string>
     <string name="uv_index_11">Ekstremen</string>
@@ -445,7 +443,6 @@
     <string name="ephemeris_polar_night">Polarna noč</string>
     <string name="clock">Ura</string>
     <string name="temperature_real_details">Dejanska temperatura.</string>
-    <string name="temperature_normals_deviation">Odstopanje</string>
     <string name="precipitation_total_day">Dnevne padavine</string>
     <string name="precipitation_total_night">Nočne padavine</string>
     <string name="wind_speed_about_description">Hitrost vetra se meri s povprečjem hitrosti vetra v določenem časovnem obdobju. Pih je nenaden sunek vetra, ki običajno traja manj kot 20 sekund.</string>
@@ -465,8 +462,6 @@
     <string name="temperature_degree_day_heating_explanation">Razlika med zunanjo temperaturo in referenčno temperaturo, ki zagotavlja toplotno ugodje in se uporablja za ocenjevanje potreb po energiji za ogrevanje</string>
     <string name="temperature_degree_day_cooling">Hladilni stopinjski dan</string>
     <string name="temperature_degree_day_cooling_explanation">Razlika med zunanjo temperaturo in referenčno temperaturo, ki zagotavlja toplotno ugodje in se uporablja za ocenjevanje potreb po energiji za hlajenje</string>
-    <string name="temperature_normals_deviation_explanation_maximum">Odstopanje od povprečne najvišje temperature za %s na tej lokaciji</string>
-    <string name="temperature_normals_deviation_explanation_minimum">Odstopanje od povprečne najnižje temperature za %s na tej lokaciji</string>
     <string name="precipitation_rain_total_day">Dnevni dež</string>
     <string name="precipitation_rain_total_night">Nočni dež</string>
     <string name="precipitation_snow_total_day">Dnevno sneženje</string>

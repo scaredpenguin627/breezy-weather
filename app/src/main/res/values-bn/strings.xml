@@ -30,8 +30,6 @@
     <string name="air_quality_level_4_description">সংবেদনশীল গো‌ষ্ঠীর মানুষরা স্বা‌স্থ্যের ওপরে প্রভাবগুলি অবিলম্বে অনুভব করতে পারেন। সু‌স্থ মানুষরা দী‌র্ঘকাল সংস্পর্শে থাকলে শ্বাসকষ্ট ও গলায় অস্বস্তিতে ভুগতে পারেন। ঘরের বাইরের কাজকর্মকে সীমিত করুন।</string>
     <string name="air_quality_level_5_description">সংবেদনশীল গো‌ষ্ঠীর মানুষরা স্বা‌স্থ্যের ওপরে প্রভাবগুলি অবিলম্বে অনুভব করবেন এবং তাদের ঘরের বাইরের কাজকর্ম এড়িয়ে চলা উচিত। সু‌স্থ মানুষদের শ্বাসকষ্ট ও গলায় অস্বস্তিতে ভোগার সম্ভাবনা আছে; ঘরের ভিতরে থাকা এবং ঘরের বাইরের কাজকর্মগুলির সময়সূচি পরিবর্তন করার কথা বিবেচনা করুন।</string>
     <string name="daily_tomorrow_short">আ.কা.</string>
-    <string name="temperature_normal_short">স্বাভাবিক</string>
-    <string name="temperature_normals">স্বাভাবিক তাপমাত্রা</string>
     <string name="precipitation_probability">অধঃক্ষেপণের সম্ভাবনা</string>
     <string name="precipitation_duration">অধঃক্ষেপণের সময়কাল</string>
     <string name="precipitation_thunderstorm">বজ্রবিদ্যুতসহ বৃষ্টিপাত</string>
@@ -259,9 +257,6 @@
     <string name="precipitation_rain_total_night">রাতের বেলায় বৃষ্টিপাত</string>
     <string name="precipitation_snow_total_day">দিনের বেলায় তুষারপাত</string>
     <string name="precipitation_snow_total_night">রাতের বেলায় তুষারপাত</string>
-    <string name="temperature_normals_deviation">স্বাভাবিকের থেকে কম-বেশি</string>
-    <string name="temperature_normals_deviation_explanation_maximum">%s তে এই অঞ্চলের সর্বোচ্চ স্বাভাবিক তাপমাত্রার থেকে চ্যুতি</string>
-    <string name="temperature_normals_deviation_explanation_minimum">%s তে এই অঞ্চলের সর্বনিম্ন স্বাভাবিক তাপমাত্রার থেকে চ্যুতি</string>
     <string name="wind_speed_about">হাওয়া ও প্রবল দমকা হাওয়ার গতি সম্পর্কে</string>
     <string name="uv_index_about">UV সূচক সম্পর্কে</string>
     <string name="uv_index_about_description">UV সূচক সূর্যের অতিবেগুনী রশ্মির শক্তি নির্দেশ করে। এর মান যত বেশী হবে, তত বেশী করে এবং দ্রুত হারে ত্বক পুড়ে যেতে পারে, ত্বকের ক্যান্সার এবং চোখের ক্ষতি হতে পারে।</string>

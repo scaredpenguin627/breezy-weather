@@ -47,8 +47,7 @@ abstract class AemetServiceStub(context: Context) :
     protected val weatherAttribution = "Agencia Estatal de Meteorología"
     override val supportedFeatures = mapOf(
         SourceFeature.FORECAST to weatherAttribution,
-        SourceFeature.CURRENT to weatherAttribution,
-        SourceFeature.NORMALS to weatherAttribution
+        SourceFeature.CURRENT to weatherAttribution
     )
 
     override fun isFeatureSupportedForLocation(

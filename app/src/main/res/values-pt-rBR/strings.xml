@@ -447,8 +447,6 @@
     <string name="settings_weather_sources_per_location_summary">Personalizar as fontes de dados meteorológicos usadas para esta localização</string>
     <string name="precipitation_nowcasting">Previsão imediata de precipitação</string>
     <string name="about_privacy_policy">Política de privacidade</string>
-    <string name="temperature_normals">Temperatura comum</string>
-    <string name="temperature_normal_short">Normal</string>
     <string name="temperature_average_short">Méd.</string>
     <string name="settings_main_threshold_lines_on_charts">Linhas de limite nos gráficos</string>
     <string name="settings_modules_broadcast_send_data_title">Enviar dados do %s</string>
@@ -784,12 +782,9 @@
     <string name="ephemeris_polar_day">Dia polar</string>
     <string name="ephemeris_polar_night">Noite polar</string>
     <string name="clock">Relógio</string>
-    <string name="temperature_normals_deviation">Desvio</string>
-    <string name="temperature_normals_deviation_explanation_maximum">O desvio da média da temperatura máxima de %s para esta localização</string>
     <string name="precipitation_total_day">Precipitação de dia</string>
     <string name="daytime_short">Dia</string>
     <string name="nighttime_short">Noite</string>
-    <string name="temperature_normals_deviation_explanation_minimum">O desvio da média da temperatura mínima de %s para esta localização</string>
     <string name="precipitation_total_night">Precipitação de noite</string>
     <string name="precipitation_rain_total_day">Chuva de dia</string>
     <string name="precipitation_rain_total_night">Chuva de noite</string>

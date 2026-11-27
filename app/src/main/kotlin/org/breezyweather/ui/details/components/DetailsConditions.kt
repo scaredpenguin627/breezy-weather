@@ -63,7 +63,6 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.isTraversalGroup
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import breezyweather.domain.location.model.Location
 import breezyweather.domain.weather.model.Daily
@@ -86,6 +85,7 @@ import org.breezyweather.common.extensions.formatMeasure
 import org.breezyweather.common.extensions.getFormattedTime
 import org.breezyweather.common.extensions.is12Hour
 import org.breezyweather.common.extensions.isLandscape
+import org.breezyweather.common.extensions.localizedWeatherText
 import org.breezyweather.common.extensions.roundDownToNearestMultiplier
 import org.breezyweather.common.extensions.roundUpToNearestMultiplier
 import org.breezyweather.common.extensions.toBitmap
@@ -606,6 +606,7 @@ fun WeatherCondition(
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
+    val displayText = weatherText.localizedWeatherText(context).orEmpty()
 
     val tooltipState = rememberTooltipState(isPersistent = true)
     val coroutineScope = rememberCoroutineScope()
@@ -647,13 +648,13 @@ fun WeatherCondition(
             positionProvider = TooltipDefaults.rememberTooltipPositionProvider(TooltipAnchorPosition.Above),
             tooltip = {
                 PlainTooltip {
-                    Text(weatherText ?: "")
+                    Text(displayText)
                 }
             },
             state = tooltipState
         ) {
             TextFixedHeight(
-                text = weatherText ?: "",
+                text = displayText,
                 color = MaterialTheme.colorScheme.onSurface,
                 fontWeight = FontWeight.Bold,
                 maxLines = 2,

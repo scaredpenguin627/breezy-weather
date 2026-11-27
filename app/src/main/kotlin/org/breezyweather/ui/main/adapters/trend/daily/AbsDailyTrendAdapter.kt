@@ -93,7 +93,6 @@ abstract class AbsDailyTrendAdapter(
     }
 
     val key: String = javaClass.name
-    abstract fun isValid(location: Location): Boolean
     abstract fun getDisplayName(context: Context): String
     abstract fun bindBackgroundForHost(host: TrendRecyclerView)
 }

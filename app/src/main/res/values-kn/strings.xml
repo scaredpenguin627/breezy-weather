@@ -51,11 +51,6 @@
     <string name="temperature_degree_day_cooling">ಶಿಥಿಲ ಡಿಗ್ರೀ ದಿನ</string>
     <string name="temperature_degree_day_cooling_explanation">ಶಿಥಿಲಕ್ಕೆ ಬೇಕಾದ ಶಕ್ತಿಯ ಅಗತ್ಯವನ್ನು ಅಂದಾಜಿಸಲು ಬಳಸುವ ಹೊರಗಿನ ತಾಪಮಾನ ಮತ್ತು ಆರಾಮದಾಯಕ ಮಾನದಂಡ ತಾಪಮಾನದ ನಡುವಿನ ವ್ಯತ್ಯಾಸ</string>
     <string name="temperature_average_short">ಸರಾ.</string>
-    <string name="temperature_normal_short">ಸಾಮಾನ್ಯ</string>
-    <string name="temperature_normals">ಸಾಮಾನ್ಯ ತಾಪಮಾನಗಳು</string>
-    <string name="temperature_normals_deviation">ವಿಚಲನ</string>
-    <string name="temperature_normals_deviation_explanation_maximum">ಈ ಸ್ಥಳದ %s ಸರಾಸರಿ ಗರಿಷ್ಠ ತಾಪಮಾನದಿಂದಾದ ವಿಚಲನ</string>
-    <string name="temperature_normals_deviation_explanation_minimum">ಈ ಸ್ಥಳದ %s ಸರಾಸರಿ ಕನಿಷ್ಠ ತಾಪಮಾನದಿಂದಾದ ವಿಚಲನ</string>
     <string name="precipitation">ಅವಕ್ಷೇಪಣ</string>
     <string name="precipitation_total_day">ಹಗಲ ಅವಕ್ಷೇಪಣ</string>
     <string name="precipitation_total_night">ಇರುಳ ಅವಕ್ಷೇಪಣ</string>

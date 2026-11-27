@@ -30,6 +30,7 @@ import breezyweather.domain.location.model.Location
 import org.breezyweather.R
 import org.breezyweather.common.extensions.currentLocale
 import org.breezyweather.common.extensions.formatMeasure
+import org.breezyweather.common.extensions.localizedWeatherText
 import org.breezyweather.domain.settings.SettingsManager
 import org.breezyweather.domain.weather.model.getTemperatureRangeSummary
 import org.breezyweather.ui.common.widgets.NumberAnimTextView
@@ -75,7 +76,7 @@ class HeaderViewHolder(parent: ViewGroup) : AbstractMainViewHolder(
         location.weather?.current?.let { current ->
             if (!current.weatherText.isNullOrEmpty()) {
                 mWeatherText.visibility = View.VISIBLE
-                mWeatherText.text = current.weatherText
+                mWeatherText.text = current.weatherText.localizedWeatherText(context)
             } else {
                 mWeatherText.visibility = View.GONE
             }

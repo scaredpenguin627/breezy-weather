@@ -20,6 +20,7 @@ import android.content.Context
 import android.text.TextPaint
 import breezyweather.domain.weather.model.Weather
 import org.breezyweather.common.extensions.formatMeasure
+import org.breezyweather.common.extensions.localizedWeatherText
 import org.breezyweather.unit.formatting.UnitWidth
 import org.breezyweather.unit.temperature.TemperatureUnit
 
@@ -106,7 +107,7 @@ object Widgets {
 
     fun buildWidgetDayStyleText(context: Context, weather: Weather, temperatureUnit: TemperatureUnit): Array<String> {
         val texts = arrayOf(
-            weather.current?.weatherText ?: "",
+            weather.current?.weatherText.localizedWeatherText(context) ?: "",
             weather.current?.temperature?.temperature?.formatMeasure(
                 context,
                 temperatureUnit,

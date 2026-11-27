@@ -36,8 +36,7 @@ abstract class InfoplazaServiceStub :
     override val supportedFeatures = mapOf(
         SourceFeature.FORECAST to name,
         SourceFeature.CURRENT to name,
-        SourceFeature.MINUTELY to name,
-        SourceFeature.NORMALS to name
+        SourceFeature.MINUTELY to name
     )
 
     override val isRestricted = false

@@ -383,8 +383,6 @@
     <string name="settings_notifications_forecast_time_today_title">Dienos prognozės pranešimo laikas</string>
     <string name="settings_notifications_forecast_time_tomorrow_title">Kitos dienos prognozės pranešimo laikas</string>
     <string name="temperature_average_short">Vid.</string>
-    <string name="temperature_normal_short">Normalus</string>
-    <string name="temperature_normals">Temperatūros normos</string>
     <string name="settings_units_speed">Greičio vienetas</string>
     <string name="settings_main_background_animation_disabled">Išjungta</string>
     <string name="settings_notifications_forecast_tomorrow_title">Kitos dienos prognozės pranešimas</string>
@@ -640,7 +638,6 @@
     <string name="chart_average">Vidurkis</string>
     <string name="chart_maximum_value">Maksimali reikšmė</string>
     <string name="conditions">Sąlygos</string>
-    <string name="temperature_normals_deviation">Nuokrypis</string>
     <string name="precipitation_total_day">Dienos krituliai</string>
     <string name="precipitation_total_night">Nakties krituliai</string>
     <string name="precipitation_rain_total_day">Dienos lietus</string>

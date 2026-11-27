@@ -444,13 +444,11 @@
     <string name="common_weather_text_drizzle_freezing">Chuviscos gelados</string>
     <string name="common_weather_text_rain_freezing">Chuva congelante</string>
     <string name="common_weather_text_rain_snow_mixed_light">Chuva leve com neve</string>
-    <string name="temperature_normals">Valores normais de temperatura</string>
     <string name="settings_color_app">Seguir a app</string>
     <string name="common_weather_text_rain_snow_mixed_showers">Chuva e aguaceiros misturados com neve</string>
     <string name="common_weather_text_rain_light">Chuva fraca</string>
     <string name="settings_weather_sources_per_location_summary">Personalizar fontes de dados meteorológicos usadas para este local</string>
     <string name="settings_modules_broadcast_send_data_title">Enviar dados meteorológicos para %s</string>
-    <string name="temperature_normal_short">Normal</string>
     <string name="settings_appearance_dark_mode_locations_title">Modo escuro baseado na localização</string>
     <string name="common_weather_text_snow_showers_heavy">Aguaceiros fortes de neve</string>
     <string name="temperature_degree_day_heating">Grau-dia de aquecimento</string>
@@ -703,9 +701,6 @@
     <string name="temperature_feels_like_details">A sensação térmica, resultante da humidade, do vento e/ou da luz solar.</string>
     <string name="temperature_degree_day_heating_explanation">Diferença entre a temperatura exterior e uma temperatura de referência de conforto utilizada para estimar as necessidades energéticas de aquecimento</string>
     <string name="temperature_degree_day_cooling_explanation">Diferença entre a temperatura exterior e uma temperatura de referência de conforto utilizada para estimar as necessidades energéticas de refrigeração</string>
-    <string name="temperature_normals_deviation">Desvio</string>
-    <string name="temperature_normals_deviation_explanation_maximum">Desvio da temperatura média máxima de %s para este local</string>
-    <string name="temperature_normals_deviation_explanation_minimum">Desvio da temperatura mínima média de %s para este local</string>
     <string name="wind_speed_about">Sobre a velocidade do vento e as rajadas</string>
     <string name="wind_speed_about_description">A velocidade do vento é medida através da média das velocidades do vento registadas ao longo de um determinado período de tempo. As rajadas são surtos repentinos de vento que, normalmente, duram menos de 20 segundos.</string>
     <string name="wind_gusts_short">Rajadas</string>

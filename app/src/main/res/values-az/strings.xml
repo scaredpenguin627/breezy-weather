@@ -51,11 +51,6 @@
     <string name="temperature_degree_day_cooling">Soyutma dərəcə günü</string>
     <string name="temperature_degree_day_cooling_explanation">Soyutma enerjisinə olan tələbatı hesablamaq üçün istifadə edilən, xarici temperatur ilə rahatlıq temperaturu arasındakı fərq</string>
     <string name="temperature_average_short">Ort</string>
-    <string name="temperature_normal_short">Normal</string>
-    <string name="temperature_normals">Temperatur normaları</string>
-    <string name="temperature_normals_deviation">Kənaraçıxma</string>
-    <string name="temperature_normals_deviation_explanation_maximum">Bu məkan üçün %s orta minimum temperaturdan kənaraçıxma</string>
-    <string name="temperature_normals_deviation_explanation_minimum">Bu məkan üçün %s orta minimum temperatur kənaraçıxması</string>
     <string name="precipitation">Yağıntı</string>
     <string name="precipitation_total_day">Gündüz yağıntısı</string>
     <string name="precipitation_total_night">Gecə yağıntısı</string>

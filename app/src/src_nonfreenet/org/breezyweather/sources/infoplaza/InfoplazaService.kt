@@ -24,12 +24,10 @@ import breezyweather.domain.weather.model.DailyDewPoint
 import breezyweather.domain.weather.model.DailyPressure
 import breezyweather.domain.weather.model.DailyRelativeHumidity
 import breezyweather.domain.weather.model.Minutely
-import breezyweather.domain.weather.model.Normals
 import breezyweather.domain.weather.model.Precipitation
 import breezyweather.domain.weather.model.PrecipitationProbability
 import breezyweather.domain.weather.model.UV
 import breezyweather.domain.weather.model.Wind
-import breezyweather.domain.weather.reference.Month
 import breezyweather.domain.weather.reference.WeatherCode
 import breezyweather.domain.weather.wrappers.CurrentWrapper
 import breezyweather.domain.weather.wrappers.DailyWrapper
@@ -48,8 +46,6 @@ import org.breezyweather.common.extensions.toDateNoHour
 import org.breezyweather.common.preference.EditTextPreference
 import org.breezyweather.common.preference.Preference
 import org.breezyweather.domain.settings.SourceConfigStore
-import org.breezyweather.sources.infoplaza.json.InfoplazaClimate
-import org.breezyweather.sources.infoplaza.json.InfoplazaClimateResult
 import org.breezyweather.sources.infoplaza.json.InfoplazaCurrently
 import org.breezyweather.sources.infoplaza.json.InfoplazaDaily
 import org.breezyweather.sources.infoplaza.json.InfoplazaForecastResult
@@ -101,13 +97,7 @@ class InfoplazaService @Inject constructor(
             Observable.just(InfoplazaForecastResult())
         }
 
-        val climate = if (SourceFeature.NORMALS in requestedFeatures) {
-            mApi.getClimate(location.latitude, location.longitude, apiKey)
-        } else {
-            Observable.just(InfoplazaClimateResult())
-        }
-
-        return Observable.zip(forecast, climate) { forecastResult, climateResult ->
+        return forecast.map { forecastResult ->
             WeatherWrapper(
                 dailyForecast = if (SourceFeature.FORECAST in requestedFeatures) {
                     getDailyForecast(location, forecastResult.daily, forecastResult.hourly)
@@ -126,11 +116,6 @@ class InfoplazaService @Inject constructor(
                 },
                 minutelyForecast = if (SourceFeature.MINUTELY in requestedFeatures) {
                     getMinutelyForecast(forecastResult.minutely)
-                } else {
-                    null
-                },
-                normals = if (SourceFeature.NORMALS in requestedFeatures && climateResult.period == "month") {
-                    getNormals(climateResult.climate)
                 } else {
                     null
                 }
@@ -281,15 +266,6 @@ class InfoplazaService @Inject constructor(
                 date = result.time.seconds.inWholeMilliseconds.toDate(),
                 minuteInterval = 5,
                 precipitationIntensity = result.precipIntensity?.millimeters
-            )
-        }
-    }
-
-    private fun getNormals(climateResult: List<InfoplazaClimate>?): Map<Month, Normals>? {
-        return climateResult?.filter { it.month != null }?.associate { result ->
-            Month.of(result.month!!) to Normals(
-                daytimeTemperature = result.temperatureHigh?.celsius,
-                nighttimeTemperature = result.temperatureLow?.celsius
             )
         }
     }

@@ -35,6 +35,7 @@ import org.breezyweather.common.extensions.getFormattedTime
 import org.breezyweather.common.extensions.getShortWeekdayDayMonth
 import org.breezyweather.common.extensions.getWeek
 import org.breezyweather.common.extensions.is12Hour
+import org.breezyweather.common.extensions.localizedWeatherText
 import org.breezyweather.common.extensions.spToPx
 import org.breezyweather.common.options.NotificationTextColor
 import org.breezyweather.common.source.PollenIndexSource
@@ -481,7 +482,7 @@ object ClockDayVerticalWidgetIMP : AbstractRemoteViewsPresenter() {
             "vertical", "tile" -> weather.current?.let { current ->
                 val stringBuilder = StringBuilder()
                 if (!current.weatherText.isNullOrEmpty()) {
-                    stringBuilder.append(current.weatherText)
+                    stringBuilder.append(current.weatherText.localizedWeatherText(context))
                 }
                 current.temperature?.temperature?.let {
                     if (stringBuilder.isNotEmpty()) {
@@ -498,7 +499,7 @@ object ClockDayVerticalWidgetIMP : AbstractRemoteViewsPresenter() {
                 }
                 stringBuilder.toString()
             }
-            "mini" -> weather.current?.weatherText
+            "mini" -> weather.current?.weatherText.localizedWeatherText(context)
             "temp" -> weather.current?.temperature?.temperature?.formatMeasure(
                 context,
                 temperatureUnit,
@@ -520,7 +521,7 @@ object ClockDayVerticalWidgetIMP : AbstractRemoteViewsPresenter() {
             "symmetry" -> weather.current?.let { current ->
                 val stringBuilder = StringBuilder()
                 if (!current.weatherText.isNullOrEmpty()) {
-                    stringBuilder.append(current.weatherText)
+                    stringBuilder.append(current.weatherText.localizedWeatherText(context))
                 }
                 if (weather.dailyForecast.isNotEmpty() &&
                     weather.today?.day?.temperature?.temperature != null &&

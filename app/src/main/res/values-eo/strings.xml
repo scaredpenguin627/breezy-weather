@@ -32,8 +32,6 @@
     <string name="temperature_degree_day_cooling">Malvarmigo grado-tago</string>
     <!-- It’s actually a median, but the word “Average” is probably easier to understand -->
     <string name="temperature_average_short">Mez</string>
-    <string name="temperature_normal_short">Norm</string>
-    <string name="temperature_normals">Normalna temperaturo</string>
     <!-- Precipitation -->
     <string name="precipitation">Precipitaĵo</string>
     <string name="precipitation_probability">Probableco de precipitaĵo</string>
@@ -761,9 +759,6 @@
     <string name="ephemeris_polar_day">Polusa tago</string>
     <string name="ephemeris_polar_night">Polusa nokto</string>
     <string name="clock">Horloĝo</string>
-    <string name="temperature_normals_deviation">Dekliniĝo</string>
-    <string name="temperature_normals_deviation_explanation_maximum">Dekliniĝo de %s mezuma maksimuma temperaturo por ĉi tiu loko</string>
-    <string name="temperature_normals_deviation_explanation_minimum">Dekliniĝo de %s mezuma minimuma temperaturo por ĉi tiu loko</string>
     <string name="precipitation_total_day">Tagtempa precipitaĵo</string>
     <string name="precipitation_total_night">Noktotempa precipitaĵo</string>
     <string name="precipitation_rain_total_day">Tagtempa pluvo</string>

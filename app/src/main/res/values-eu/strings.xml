@@ -24,7 +24,6 @@
     <string name="precipitation">Prezipitazioa</string>
     <string name="precipitation_probability">Prezipitazio-probabilitatea</string>
     <string name="precipitation_duration">Prezipitazioaren iraupena</string>
-    <string name="temperature_normal_short">Normal</string>
     <string name="precipitation_intensity_heavy">Euri-jasa</string>
     <string name="precipitation_none">Prezipitaziorik gabe</string>
     <string name="precipitation_between_time">Prezipitazioak %1$s eta %2$s artean</string>
@@ -294,7 +293,6 @@
     <string name="weather_kind_thunder">Trumoia</string>
     <string name="weather_kind_thunderstorm">Trumoi ekaitza</string>
     <string name="weather_kind_wind">Haizea</string>
-    <string name="temperature_normals">Tenperatura-parametroak</string>
     <string name="temperature_degree_day_cooling">Hozte egun-gradu</string>
     <string name="air_quality_level_2_description">Airearen kalitatea onargarria da pertsona gehienentzat. Hala ere, talde sentikorrek sintoma arinak edo moderatuak izan ditzakete esposizio luze baten aurrean.</string>
     <string name="air_quality_level_3_description">Airea kutsadura-maila handira iritsi da, eta osasungaitza da talde sentikorrentzat. Murriztu aire zabalean igarotzen duzun denbora, arnasa hartzeko zailtasun edo eztarriko narritadura gisako sintomak sentitzen badituzu.</string>

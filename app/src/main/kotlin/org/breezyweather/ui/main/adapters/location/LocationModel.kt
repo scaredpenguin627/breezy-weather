@@ -22,6 +22,7 @@ import breezyweather.domain.weather.reference.WeatherCode
 import org.breezyweather.R
 import org.breezyweather.common.extensions.currentLocale
 import org.breezyweather.common.extensions.getRelativeTime
+import org.breezyweather.common.extensions.localizedWeatherText
 import org.breezyweather.common.extensions.uncapitalize
 import org.breezyweather.domain.location.model.getPlace
 import org.breezyweather.domain.settings.SettingsManager
@@ -43,7 +44,7 @@ class LocationModel(
     init {
         location.weather?.let { weather ->
             weatherCode = weather.current?.weatherCode
-            weatherText = weather.current?.weatherText
+            weatherText = weather.current?.weatherText.localizedWeatherText(context)
             alerts = weather.currentAlertList.size
         }
         body = getWeatherText(context)

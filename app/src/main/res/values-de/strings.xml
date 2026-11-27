@@ -461,8 +461,6 @@
     <string name="settings_appearance_dark_mode_locations_title">Ortsbasiertes dunkles Design</string>
     <string name="weather_message_unsupported_feature">Quelle unterstützt eines der gewünschten Features nicht</string>
     <string name="about_contribution_designer">Logo-Designer</string>
-    <string name="temperature_normals">Temperatur-Normalwerte</string>
-    <string name="temperature_normal_short">Normalwert</string>
     <string name="settings_main_threshold_lines_on_charts">Grenzlinien in Diagrammen</string>
     <string name="temperature_average_short">Ø</string>
     <string name="settings_modules_broadcast_send_data_title">Wetterdaten an %s senden</string>
@@ -740,9 +738,6 @@
     <string name="precipitation_rain_total_night">Regen nachts</string>
     <string name="daytime_short">Tag</string>
     <string name="nighttime_short">Nacht</string>
-    <string name="temperature_normals_deviation">Abweichung</string>
-    <string name="temperature_normals_deviation_explanation_maximum">Abweichung von der durchschnittlichen Maximaltemperatur im %s für diesen Ort</string>
-    <string name="temperature_normals_deviation_explanation_minimum">Abweichung von der durchschnittlichen Minimaltemperatur im %s für diesen Ort</string>
     <string name="widget_custom_subtitle_alert_box_title">Hilfe zu benutzerdefiniertem Untertitel</string>
     <string name="widget_custom_subtitle_help_content_description">Zeigt Schlüsselwörter für benutzerdefinierte Untertitel als Hilfe an</string>
     <string name="action_open_in_other_app_no_app">Keine Maps-App gefunden</string>

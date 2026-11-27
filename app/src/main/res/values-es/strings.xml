@@ -348,10 +348,8 @@
     <string name="pollen_level_4">Alto</string>
     <string name="ephemeris_sunrise_at">Amanece a las %s</string>
     <string name="temperature_average_short">Prom.</string>
-    <string name="temperature_normal_short">Normal</string>
     <string name="weather_message_unsupported_feature">La fuente no admite una de las funciones solicitadas</string>
     <string name="weather_message_invalid_location">Ubicación no válida, elimínala y añádela de nuevo</string>
-    <string name="temperature_normals">Temperaturas normales</string>
     <string name="pollen_level_5">Muy alto</string>
     <string name="ephemeris_moonset_at">Puesta lunar a las %s</string>
     <string name="ephemeris_sunset_at">Atardecer a las %s</string>
@@ -689,9 +687,6 @@
     <string name="temperature_feels_like_details">Es la sensación de temperatura percibida como resultado de la humedad, el viento y/o el sol.</string>
     <string name="temperature_degree_day_heating_explanation">Diferencia entre la temperatura exterior y una temperatura agradable de referencia usada para calcular requerimientos energéticos</string>
     <string name="temperature_degree_day_cooling_explanation">Diferencia entre la temperatura exterior y una temperatura agradable de referencia usada para calcular requerimientos energéticos de enfriamiento</string>
-    <string name="temperature_normals_deviation">Desviación</string>
-    <string name="temperature_normals_deviation_explanation_maximum">Desviación del promedio de temperatura máxima en %s para esta ubicación</string>
-    <string name="temperature_normals_deviation_explanation_minimum">Desviación del promedio de temperatura mínima en %s para está ubicación</string>
     <string name="precipitation_total_day">Precipitaciones en el día</string>
     <string name="precipitation_total_night">Precipitaciones por la noche</string>
     <string name="precipitation_rain_total_day">Lluvia por el día</string>

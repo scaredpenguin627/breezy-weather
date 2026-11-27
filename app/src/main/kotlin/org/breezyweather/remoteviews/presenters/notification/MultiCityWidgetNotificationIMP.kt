@@ -26,6 +26,7 @@ import breezyweather.domain.location.model.Location
 import org.breezyweather.R
 import org.breezyweather.common.extensions.formatMeasure
 import org.breezyweather.common.extensions.getFormattedMediumDayAndMonthInAdditionalCalendar
+import org.breezyweather.common.extensions.localizedWeatherText
 import org.breezyweather.common.extensions.notificationBuilder
 import org.breezyweather.common.extensions.notify
 import org.breezyweather.common.options.NotificationTextColor
@@ -191,7 +192,7 @@ object MultiCityWidgetNotificationIMP : AbstractRemoteViewsPresenter() {
             if (!current.weatherText.isNullOrEmpty()) {
                 setTextViewText(
                     R.id.notification_base_weather,
-                    current.weatherText
+                    current.weatherText.localizedWeatherText(context)
                 )
             }
             setTextViewText(R.id.notification_base_time, timeStr.toString())

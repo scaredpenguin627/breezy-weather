@@ -51,11 +51,6 @@
     <string name="temperature_degree_day_cooling">Da days you gotta turn on da cooler kine</string>
     <string name="temperature_degree_day_cooling_explanation">Da gap between how hot outside stay and da comfy temp where you gotta blast da cooler</string>
     <string name="temperature_average_short">Da middle kine number</string>
-    <string name="temperature_normal_short">Da usual kine</string>
-    <string name="temperature_normals">Da usual weather temperatures</string>
-    <string name="temperature_normals_deviation">How much stay off</string>
-    <string name="temperature_normals_deviation_explanation_maximum">How much %s da hottest temp stay off from da usual average for dis place</string>
-    <string name="temperature_normals_deviation_explanation_minimum">How much da %s coldest temp stay off from da usual average for dis place</string>
     <string name="precipitation">Da wet kine stuff</string>
     <string name="precipitation_total_day">Da wet kine stuff when da sun stay up</string>
     <string name="precipitation_total_night">Dark time rain kine</string>

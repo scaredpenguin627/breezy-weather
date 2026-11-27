@@ -437,10 +437,8 @@
     <string name="uv_index_short">Indice UV</string>
     <string name="visibility_short">Vizibilitate</string>
     <string name="pressure_short">Presiune</string>
-    <string name="temperature_normal_short">Normal</string>
     <string name="precipitation_nowcasting">Prognoza imediată a precipitațiilor</string>
     <string name="temperature_average_short">Mediu</string>
-    <string name="temperature_normals">Norme de temperatură</string>
     <string name="about_privacy_policy">Politica de confidențialitate</string>
     <string name="widget_label_show_widget_card_alpha">Opacitate</string>
     <string name="common_weather_text_rain_freezing_heavy">Ploaie înghețată puternică</string>
@@ -683,9 +681,6 @@
     <string name="ephemeris_about_dawn">Zorii zilei sunt momentul când apare prima lumină vizibilă înainte de răsăritul soarelui.</string>
     <string name="temperature_degree_day_heating_explanation">Diferența dintre temperatura exterioară și o temperatură de referință considerată confortabilă folosită pentru a estima necesarul de energie pentru încălzire.</string>
     <string name="temperature_degree_day_cooling_explanation">Diferența dintre temperatura exterioară și o temperatură de referință considerată confortabilă folosită pentru a estima necesarul de energie pentru răcire</string>
-    <string name="temperature_normals_deviation">Abatere</string>
-    <string name="temperature_normals_deviation_explanation_maximum">Abaterea față de media maximelor de temperatură din %s pentru această locație</string>
-    <string name="temperature_normals_deviation_explanation_minimum">Abaterea față de media minimelor de temperatură din %s pentru această locație</string>
     <string name="precipitation_total_day">Precipitații ziua</string>
     <string name="precipitation_total_night">Precipitații noaptea</string>
     <string name="precipitation_rain_total_day">Ploaie ziua</string>

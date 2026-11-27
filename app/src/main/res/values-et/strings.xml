@@ -91,8 +91,6 @@
     <string name="temperature_degree_day_heating">Kütte kraadpäev</string>
     <string name="temperature_degree_day_cooling">Jahutuse kraadpäev</string>
     <string name="temperature_average_short">Keskmine</string>
-    <string name="temperature_normal_short">Norm</string>
-    <string name="temperature_normals">Temperatuuri normid</string>
     <string name="uv_alert_level">Hoiatus</string>
     <string name="air_quality_pm25">PM2,5</string>
     <string name="wind_direction_N_short">N</string>
@@ -651,9 +649,6 @@
     <string name="temperature_feels_like_details">Milline temperatuur tundub niiskuse, tuule ja/või päikesevalguse tõttu.</string>
     <string name="temperature_degree_day_heating_explanation">Välistemperatuuri ja kütteenergia vajaduse hindamiseks kasutatava mugavustemperatuuri erinevus</string>
     <string name="temperature_degree_day_cooling_explanation">Välistemperatuuri ja jahutusenergia vajaduse hindamiseks kasutatava mugavustemperatuuri erinevus</string>
-    <string name="temperature_normals_deviation">Kõrvalekalle</string>
-    <string name="temperature_normals_deviation_explanation_maximum">Kõrvalekalle selle asukoha keskmisest maksimumtemperatuurist: (%s)</string>
-    <string name="temperature_normals_deviation_explanation_minimum">Kõrvalekalle selle asukoha keskmisest miinimumtemperatuurist: (%s)</string>
     <string name="precipitation_total_day">Päevased sademed</string>
     <string name="precipitation_total_night">Öised sademed</string>
     <string name="precipitation_rain_total_day">Päevane vihm</string>

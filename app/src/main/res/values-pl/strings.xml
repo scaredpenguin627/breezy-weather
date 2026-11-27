@@ -446,8 +446,6 @@
     <string name="weather_message_unsupported_feature">Źródło nie obsługuje jednej z żądanych funkcji</string>
     <string name="common_weather_text_rain_heavy">Silne opady deszczu</string>
     <string name="temperature_average_short">Śr</string>
-    <string name="temperature_normal_short">Norma</string>
-    <string name="temperature_normals">Normy temperaturowe</string>
     <string name="settings_appearance_dark_mode_locations_title">Tryb ciemny oparty na lokalizacji</string>
     <string name="settings_main_threshold_lines_on_charts">Linie progów na wykresach</string>
     <string name="about_contribution_designer">Projektant logo</string>
@@ -740,9 +738,6 @@
     <string name="settings_appearance_section_regional">Język i region</string>
     <string name="settings_appearance_section_theme">Motyw</string>
     <string name="about_update_check_eol">Ta wersja Androida nie jest już wspierana</string>
-    <string name="temperature_normals_deviation">odchylenie</string>
-    <string name="temperature_normals_deviation_explanation_maximum">Odchylenie od średniej maksymalnej temperatury %s dla tej lokalizacji</string>
-    <string name="temperature_normals_deviation_explanation_minimum">Odchylenie od średniej minimalnej temperatury %s dla tej lokalizacji</string>
     <string name="widget_custom_subtitle_help_content_description">Pokaż pomoc dotyczącą niestandardowych słów kluczowych napisów</string>
     <string name="widget_custom_subtitle_alert_box_title">Pomoc dotycząca niestandardowych napisów</string>
     <string name="air_quality_pm25_about">O drobnych cząstkach stałych (%s)</string>

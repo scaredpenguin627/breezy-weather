@@ -1,0 +1,5 @@
+DROP TABLE normals;
+ALTER TABLE locations DROP COLUMN normals_source;
+ALTER TABLE weathers DROP COLUMN normals_update_time;
+ALTER TABLE weathers DROP COLUMN normals_update_latitude;
+ALTER TABLE weathers DROP COLUMN normals_update_longitude;

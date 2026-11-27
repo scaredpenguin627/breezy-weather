@@ -29,6 +29,7 @@ import org.breezyweather.R
 import org.breezyweather.background.receiver.widget.WidgetMaterialYouForecastProvider
 import org.breezyweather.common.extensions.formatMeasure
 import org.breezyweather.common.extensions.getHour
+import org.breezyweather.common.extensions.localizedWeatherText
 import org.breezyweather.common.options.NotificationTextColor
 import org.breezyweather.domain.location.model.getPlace
 import org.breezyweather.domain.location.model.isDaylight
@@ -186,7 +187,7 @@ private fun buildRemoteViews(
         )
         setTextViewText(
             R.id.widget_material_you_forecast_weatherText,
-            weather.current?.weatherText
+            weather.current?.weatherText.localizedWeatherText(context)
         )
     }
 

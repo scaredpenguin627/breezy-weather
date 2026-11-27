@@ -49,8 +49,6 @@
     <string name="temperature_feels_like">असे वाटते</string>
     <string name="temperature_feels_like_with_unit">असे वाटते %s</string>
     <string name="temperature_average_short">सरासरी</string>
-    <string name="temperature_normals">तापमान सामान्य</string>
-    <string name="temperature_normal_short">सामान्य</string>
     <string name="precipitation">वर्षाव</string>
     <string name="precipitation_probability">पर्जन्यवृष्टीची शक्यता</string>
     <string name="precipitation_duration">पर्जन्य कालावधी</string>

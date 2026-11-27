@@ -543,8 +543,6 @@
     <string name="settings_modules_live_wallpaper_summary">הגדר אנימציית מזג אוויר כטפט</string>
     <string name="settings_follow_system">עקוב אחרי המערכת</string>
     <string name="settings_debug_dump_crash_logs_summary">שומר יומן שגיאות אל תוך קובץ לשיתוף עם המפתחים</string>
-    <string name="temperature_normal_short">נורמל</string>
-    <string name="temperature_normals">נורמלי טמפרטורה</string>
     <string name="settings_modules_notification_feels_like_switch">השתמש בטמפרטורה ”המרגישה כמו‌”</string>
     <string name="settings_modules_broadcast_send_data_summary_empty">לא נמצאו חבילות תואמות</string>
     <string name="settings_debug">ניפוי שגיאות</string>
@@ -584,9 +582,6 @@
     <string name="temperature_real">בפועל</string>
     <string name="temperature_real_details">הטמפרטורה בפועל.</string>
     <string name="temperature_feels_like_details">איך מרגישה הטמפרטורה בשקלול הלחות, הרוח ו/או השמש.</string>
-    <string name="temperature_normals_deviation">סטייה</string>
-    <string name="temperature_normals_deviation_explanation_maximum">סטייה מהטמפרטורה הממוצעת המרבית לאזור זה %s</string>
-    <string name="temperature_normals_deviation_explanation_minimum">סטייה מהטמפרטורה הממוצעת המינימלית לאזור זה %s</string>
     <string name="precipitation_total_day">משקעים ביום</string>
     <string name="precipitation_total_night">משקעים בלילה</string>
     <string name="precipitation_rain_total_day">גשם ביום</string>

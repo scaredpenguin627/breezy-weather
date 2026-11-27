@@ -16,8 +16,6 @@
     <string name="precipitation_rain">Choiva</string>
     <string name="precipitation_snow">Neve</string>
     <string name="precipitation_ice">Resío</string>
-    <string name="temperature_normal_short">Normal</string>
-    <string name="temperature_normals">Temperaturas normais</string>
     <string name="precipitation_none">Sen precipitacións</string>
     <string name="wind">Vento</string>
     <string name="precipitation_intensity_medium">Media</string>
@@ -321,9 +319,6 @@
     <string name="temperature_degree_day_heating_explanation">Diferenza entre a temperatura exterior e unha temperatura de referencia cómoda utilizada para estimar as necesidades de enerxía de calefacción</string>
     <string name="temperature_degree_day_cooling">Obxectivo enfriamento diario para refrixeración</string>
     <string name="temperature_degree_day_cooling_explanation">Diferenza entre a temperatura exterior e unha temperatura de referencia cómoda utilizada para estimar as necesidades de enerxía de refrixeración</string>
-    <string name="temperature_normals_deviation">Desviación</string>
-    <string name="temperature_normals_deviation_explanation_maximum">Desviación da temperatura máxima media en %s para esta localización</string>
-    <string name="temperature_normals_deviation_explanation_minimum">Desviación da temperatura mínima media en %s para esta localización</string>
     <string name="wind_speed_about">En canto á velocidade do vento e os refachos</string>
     <string name="wind_speed_about_description">A velocidade do vento mídese calculando a media das velocidades do vento durante un período de tempo. As refachos son vagas súbitas de vento que normalmente duran menos de 20 segundos.</string>
     <string name="wind_gusts_short">Refachos</string>

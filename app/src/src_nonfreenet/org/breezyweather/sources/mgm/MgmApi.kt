@@ -22,7 +22,6 @@ import org.breezyweather.sources.mgm.json.MgmCurrentResult
 import org.breezyweather.sources.mgm.json.MgmDailyForecastResult
 import org.breezyweather.sources.mgm.json.MgmHourlyForecastResult
 import org.breezyweather.sources.mgm.json.MgmLocationResult
-import org.breezyweather.sources.mgm.json.MgmNormalsResult
 import retrofit2.http.GET
 import retrofit2.http.Headers
 import retrofit2.http.Path
@@ -59,14 +58,6 @@ interface MgmApi {
     fun getAlert(
         @Path("day") day: String,
     ): Observable<List<MgmAlertResult>>
-
-    @Headers("Origin: $ORIGIN_URL")
-    @GET("web/ucdegerler")
-    fun getNormals(
-        @Query("merkezid") station: String,
-        @Query("ay") month: Int,
-        @Query("gun") day: Int,
-    ): Observable<List<MgmNormalsResult>>
 
     companion object {
         const val ORIGIN_URL = "https://www.mgm.gov.tr"

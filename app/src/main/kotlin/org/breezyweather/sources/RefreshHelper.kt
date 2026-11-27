@@ -32,7 +32,6 @@ import breezyweather.domain.location.model.LocationAddressInfo
 import breezyweather.domain.source.SourceFeature
 import breezyweather.domain.weather.model.Base
 import breezyweather.domain.weather.model.Weather
-import breezyweather.domain.weather.reference.Month
 import breezyweather.domain.weather.reference.WeatherCode
 import breezyweather.domain.weather.wrappers.WeatherWrapper
 import com.google.maps.android.SphericalUtil
@@ -60,7 +59,6 @@ import org.breezyweather.common.extensions.locationManager
 import org.breezyweather.common.extensions.roundDecimals
 import org.breezyweather.common.extensions.shortcutManager
 import org.breezyweather.common.extensions.sizeInBytes
-import org.breezyweather.common.extensions.toCalendarWithTimeZone
 import org.breezyweather.common.extensions.toDateNoHour
 import org.breezyweather.common.source.AddressSource
 import org.breezyweather.common.source.BroadcastSource
@@ -563,8 +561,7 @@ class RefreshHelper @Inject constructor(
                     Pair(airQualitySource.takeUnless { isOutsideEmbAirQualityCoverage }, SourceFeature.AIR_QUALITY),
                     Pair(pollenSource, SourceFeature.POLLEN),
                     Pair(minutelySource, SourceFeature.MINUTELY),
-                    Pair(alertSource, SourceFeature.ALERT),
-                    Pair(normalsSource, SourceFeature.NORMALS)
+                    Pair(alertSource, SourceFeature.ALERT)
                 ).forEach {
                     if (!it.first.isNullOrEmpty()) {
                         if (featuresBySources.containsKey(it.first)) {
@@ -597,9 +594,6 @@ class RefreshHelper @Inject constructor(
             var pollenUpdateTime = base.pollenUpdateTime
             var minutelyUpdateTime = base.minutelyUpdateTime
             var alertsUpdateTime = base.alertsUpdateTime
-            var normalsUpdateTime = base.normalsUpdateTime
-            var normalsUpdateLatitude = base.normalsUpdateLatitude
-            var normalsUpdateLongitude = base.normalsUpdateLongitude
 
             // TODO: Debug source is not online, don't use this check in that case
             // Can't return from inside `async`
@@ -904,26 +898,6 @@ class RefreshHelper @Inject constructor(
                         } ?: location.weather?.toAlertsWrapper()
                     } else {
                         null
-                    },
-                    normals = if (!location.normalsSource.isNullOrEmpty()) {
-                        if (errors.any {
-                                it.feature == SourceFeature.NORMALS &&
-                                    it.source == location.normalsSource!!
-                            }
-                        ) {
-                            null
-                        } else {
-                            // Combine with previous stored months if not current location
-                            sourceCalls.getOrElse(location.normalsSource!!) { null }?.normals?.let {
-                                normalsUpdateTime = Date()
-                                normalsUpdateLatitude = location.latitude
-                                normalsUpdateLongitude = location.longitude
-                                ((if (!location.isCurrentPosition) location.weather?.normals else null) ?: emptyMap()) +
-                                    it
-                            }
-                        } ?: location.weather?.normals
-                    } else {
-                        null
                     }
                 )
             } else {
@@ -1001,10 +975,7 @@ class RefreshHelper @Inject constructor(
                     airQualityUpdateTime = airQualityUpdateTime,
                     pollenUpdateTime = pollenUpdateTime,
                     minutelyUpdateTime = minutelyUpdateTime,
-                    alertsUpdateTime = alertsUpdateTime,
-                    normalsUpdateTime = normalsUpdateTime,
-                    normalsUpdateLatitude = normalsUpdateLatitude,
-                    normalsUpdateLongitude = normalsUpdateLongitude
+                    alertsUpdateTime = alertsUpdateTime
                 ),
                 current = completeCurrentFromHourlyData(
                     weatherWrapperCompleted.current
@@ -1034,8 +1005,7 @@ class RefreshHelper @Inject constructor(
                 minutelyForecast = weatherWrapperCompleted.minutelyForecast
                     ?.mapNotNull { it.toValidOrNull() }
                     ?: emptyList(),
-                alertList = weatherWrapperCompleted.alertList ?: emptyList(),
-                normals = weatherWrapperCompleted.normals ?: emptyMap()
+                alertList = weatherWrapperCompleted.alertList ?: emptyList()
             )
             locationRepository.insertParameters(location.formattedId, locationParameters)
             weatherRepository.insert(location, weather)
@@ -1151,8 +1121,7 @@ class RefreshHelper @Inject constructor(
                         withDaily = true,
                         withHourly = i == 0, // Not needed in multi city
                         withMinutely = false,
-                        withAlerts = i == 0, // Not needed in multi city
-                        withNormals = false
+                        withAlerts = i == 0 // Not needed in multi city
                     )
                 )
             }
@@ -1176,8 +1145,7 @@ class RefreshHelper @Inject constructor(
                         withDaily = true,
                         withHourly = i == 0, // Not needed in multi city
                         withMinutely = false,
-                        withAlerts = i == 0, // Not needed in multi city
-                        withNormals = false
+                        withAlerts = i == 0 // Not needed in multi city
                     )
                 )
             }
@@ -1377,7 +1345,7 @@ class RefreshHelper @Inject constructor(
      * For a given location, will tell if data is still valid or needs a refresh
      * @param feature if null, will tell for main weather
      * @param isRestricted some sources will prefer a longer wait, make it true if that’s the case
-     * @param minimumTime if the last update was before this minimum time, it will be forced refreshed (except for normals)
+     * @param minimumTime if the last update was before this minimum time, it will be forced refreshed
      */
     private fun isWeatherDataStillValid(
         location: Location,
@@ -1433,31 +1401,6 @@ class RefreshHelper @Inject constructor(
                     },
                     minimumTime
                 )
-            }
-            SourceFeature.NORMALS -> {
-                val base = location.weather!!.base
-                if ((base.normalsUpdateTime ?: 0) == 0 ||
-                    base.normalsUpdateLongitude == 0.0 ||
-                    base.normalsUpdateLatitude == 0.0
-                ) {
-                    return false
-                }
-
-                if (location.isCurrentPosition) {
-                    val distance = SphericalUtil.computeDistanceBetween(
-                        LatLng(base.normalsUpdateLatitude, base.normalsUpdateLongitude),
-                        LatLng(location.latitude, location.longitude)
-                    )
-                    return distance <= CACHING_DISTANCE_LIMIT
-                } else {
-                    if (location.weather!!.normals.isEmpty()) return false
-                    val cal = Date().toCalendarWithTimeZone(location.timeZone)
-                    return location.weather!!.normals
-                        .getOrElse(Month.fromCalendarMonth(cal[Calendar.MONTH])) { null }
-                        ?.let {
-                            if (it.daytimeTemperature != null || it.nighttimeTemperature != null) it else null
-                        } != null
-                }
             }
             else -> {
                 return isUpdateStillValid(

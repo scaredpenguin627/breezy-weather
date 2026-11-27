@@ -102,12 +102,10 @@
     <string name="visibility">Viditeľnosť</string>
     <string name="ceiling">Výška mrakov</string>
     <string name="ephemeris_sunset_at">Západ slnka v %s</string>
-    <string name="temperature_normals">Teplotné normály</string>
     <string name="nighttime">Noc</string>
     <string name="notification_channel_forecast">Predpoveď</string>
     <string name="pollen_ambrosia">Ambrózia</string>
     <string name="pressure">Tlak</string>
-    <string name="temperature_normal_short">Normálna</string>
     <string name="notification_refreshed_at">Aktualizované</string>
     <string name="notification_channel_background_services">Služby na pozadí</string>
     <string name="cloud_cover">Pokrytie oblačnosťou</string>
@@ -655,9 +653,6 @@
     <string name="temperature_feels_like_details">Teplota ktorá sa vníma v dôsledku vlhkosti, vetra a/alebo slnečného žiarenia.</string>
     <string name="temperature_degree_day_heating_explanation">Rozdiel medzi vonkajšou teplotou a referenčnou komfortnou teplotou používanou na odhad potreby energie na vykurovanie</string>
     <string name="temperature_degree_day_cooling_explanation">Rozdiel medzi vonkajšou teplotou a referenčnou komfortnou teplotou používanou na odhad potreby energie na chladenie</string>
-    <string name="temperature_normals_deviation">Odchýlka</string>
-    <string name="temperature_normals_deviation_explanation_maximum">Odchýlka od priemernej maximálnej teploty %s pre toto miesto</string>
-    <string name="temperature_normals_deviation_explanation_minimum">Odchýlka od priemernej minimálnej teploty %s pre túto lokalitu</string>
     <string name="precipitation_total_day">Zrážky počas dňa</string>
     <string name="precipitation_total_night">Zrážky počas noci</string>
     <string name="precipitation_rain_total_day">Dážď počas dňa</string>

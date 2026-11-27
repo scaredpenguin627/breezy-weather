@@ -452,8 +452,6 @@
     <string name="settings_modules_broadcast_send_data_title">Gửi dữ liệu thời tiết cho %s</string>
     <string name="about_contribution_designer">Người thiết kế logo</string>
     <string name="common_weather_text_rain_showers_moderate">Mưa rào vừa phải</string>
-    <string name="temperature_normals">Nhiệt độ bình thường</string>
-    <string name="temperature_normal_short">Bình thường</string>
     <string name="temperature_average_short">T.bình</string>
     <string name="settings_appearance_dark_mode_locations_title">Chế độ Ngày / Đêm cho vị trí</string>
     <string name="common_weather_text_rain_showers_heavy">Mưa rào nặng hạt</string>
@@ -707,9 +705,6 @@
     <string name="temperature_feels_like_details">Nhiệt độ cảm nhận được, chịu ảnh hưởng của độ ẩm, gió và/hoặc ánh nắng mặt trời.</string>
     <string name="temperature_degree_day_heating_explanation">Chênh lệch giữa nhiệt độ ngoài trời và nhiệt độ tham chiếu để ước tính nhu cầu sưởi ấm</string>
     <string name="temperature_degree_day_cooling_explanation">Chênh lệch giữa nhiệt độ ngoài trời và nhiệt độ tham chiếu để ước tính nhu cầu làm mát</string>
-    <string name="temperature_normals_deviation">Chênh lệch</string>
-    <string name="temperature_normals_deviation_explanation_maximum">Chênh lệch so với nhiệt độ cao nhất trung bình của tháng %s tại địa điểm này</string>
-    <string name="temperature_normals_deviation_explanation_minimum">Chênh lệch so với nhiệt độ thấp nhất trung bình của tháng %s tại địa điểm này</string>
     <string name="precipitation_total_day">Lượng mưa ban ngày</string>
     <string name="precipitation_total_night">Lượng mưa ban đêm</string>
     <string name="precipitation_rain_total_day">Mưa ban ngày</string>

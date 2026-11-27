@@ -472,8 +472,6 @@
     <string name="common_weather_text_snow_grains">Neve a granelli</string>
     <string name="weather_message_unsupported_feature">La fonte non supporta una delle funzionalità richieste</string>
     <string name="settings_appearance_dark_mode_locations_title">Modalità scura basata sulla posizione</string>
-    <string name="temperature_normal_short">Norma</string>
-    <string name="temperature_normals">Norme di temperatura</string>
     <string name="temperature_average_short">Media</string>
     <string name="settings_main_threshold_lines_on_charts">Linee di soglia sui grafici</string>
     <string name="settings_modules_broadcast_send_data_title">Invia dati meteo a %s</string>
@@ -683,7 +681,6 @@
     <string name="action_add_as_location">Aggiungi come posizione</string>
     <string name="settings_appearance_dark_mode_custom">Modalità scura dalle %1$s alle %2$s</string>
     <string name="settings_appearance_dark_mode_locations_day_night">Segui giorno/notte</string>
-    <string name="temperature_normals_deviation">Deviazione</string>
     <string name="nighttime_short">Notte</string>
     <string name="daytime_short">Giorno</string>
     <string name="data_sources">Fonti dei dati</string>
@@ -752,8 +749,6 @@
     <string name="action_share_no_app">Nessuna app con cui condividere trovata</string>
     <string name="data_modified">Questo materiale è stato modificato dall’originale da %s principalmente per calcolare o estrapolare i dati mancanti.</string>
     <string name="action_pull_down_to_refresh">Trascina verso il basso per aggiornare</string>
-    <string name="temperature_normals_deviation_explanation_maximum">Deviazione dalla temperatura massima media di %s per questa località</string>
-    <string name="temperature_normals_deviation_explanation_minimum">Deviazione dalla temperatura minima media di %s per questa località</string>
     <string name="message_incompatible_times_title">Tempi di previsione incompatibili</string>
     <string name="settings_appearance_dark_mode_locations_dark">Sempre scuro quando l’app è in modalità scura</string>
     <string name="ephemeris_about_dawn">L’aurora è quando la prima luce visibile del giorno appare prima dell’alba.</string>

@@ -63,8 +63,7 @@ class WidgetDayWeekProvider : AppWidgetProvider() {
                             withDaily = true,
                             withHourly = false,
                             withMinutely = false,
-                            withAlerts = true, // Custom subtitle
-                            withNormals = false
+                            withAlerts = true // Custom subtitle
                         )
                     ),
                     location?.let { locationNow ->

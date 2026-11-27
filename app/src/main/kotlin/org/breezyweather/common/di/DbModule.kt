@@ -33,7 +33,6 @@ import breezyweather.data.DurationColumnAdapter
 import breezyweather.data.Hourlys
 import breezyweather.data.Locations
 import breezyweather.data.Minutelys
-import breezyweather.data.Normals
 import breezyweather.data.PollenConcentrationColumnAdapter
 import breezyweather.data.PollutantConcentrationColumnAdapter
 import breezyweather.data.PrecipitationColumnAdapter
@@ -66,8 +65,8 @@ class DbModule {
             schema = Database.Schema,
             context = context,
             name = "breezyweather.db",
-            factory = if (BuildConfig.DEBUG && Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                // Support database inspector in Android Studio
+            factory = if (BuildConfig.DEBUG && Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                // Support Database Inspector when framework SQLite can run DROP COLUMN migrations.
                 FrameworkSQLiteOpenHelperFactory()
             } else {
                 RequerySQLiteOpenHelperFactory()
@@ -247,10 +246,6 @@ class DbModule {
             ),
             alertsAdapter = Alerts.Adapter(
                 severityAdapter = AlertSeverityColumnAdapter
-            ),
-            normalsAdapter = Normals.Adapter(
-                temperature_max_averageAdapter = TemperatureColumnAdapter,
-                temperature_min_averageAdapter = TemperatureColumnAdapter
             )
         )
     }

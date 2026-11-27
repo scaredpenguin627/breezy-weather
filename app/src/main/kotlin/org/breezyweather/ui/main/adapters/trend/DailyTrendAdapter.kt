@@ -54,7 +54,8 @@ class DailyTrendAdapter(
         val provider = ResourcesProviderFactory.newInstance
         val tempUnit = SettingsManager.getInstance(activity).getTemperatureUnit(activity)
 
-        adapters = SettingsManager.getInstance(activity).dailyTrendDisplayList.map {
+        val configured = SettingsManager.getInstance(activity).dailyTrendDisplayList
+        adapters = DailyTrendDisplay.availableFor(location, configured).map {
             when (it) {
                 DailyTrendDisplay.TAG_TEMPERATURE -> DailyTemperatureAdapter(activity, location, provider, tempUnit)
                 DailyTrendDisplay.TAG_AIR_QUALITY -> DailyAirQualityAdapter(activity, location)
@@ -64,8 +65,6 @@ class DailyTrendAdapter(
                 DailyTrendDisplay.TAG_SUNSHINE -> DailySunshineAdapter(activity, location)
                 DailyTrendDisplay.TAG_FEELS_LIKE -> DailyFeelsLikeAdapter(activity, location, provider, tempUnit)
             }
-        }.filter {
-            it.isValid(location)
         }.toTypedArray()
         notifyDataSetChanged()
     }

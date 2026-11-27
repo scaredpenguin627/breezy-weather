@@ -332,7 +332,6 @@
     <string name="temperature_feels_like_with_unit">உணரும் வெப்பநிலை %s</string>
     <string name="temperature_degree_day_heating">வெப்பமூட்டும் டிகிரி நாள்</string>
     <string name="temperature_degree_day_cooling">குளிர்விக்கும் டிகிரி நாள்</string>
-    <string name="temperature_normal_short">சாதாரண</string>
     <string name="wind_direction_N_short">வ</string>
     <string name="wind_direction_NE_short">வகி</string>
     <string name="wind_direction_E_short">கி</string>
@@ -501,7 +500,6 @@
     <string name="weather_kind_thunderstorm">இடியுடன் கூடிய மழை</string>
     <string name="temperature_degree_day">டிகிரி நாள்</string>
     <string name="temperature_average_short">சரா</string>
-    <string name="temperature_normals">வெப்பநிலை இயல்புகள்</string>
     <string name="precipitation_rain">மழை</string>
     <string name="precipitation_snow">பனி</string>
     <string name="precipitation_ice">பனிக்கட்டி</string>
@@ -643,9 +641,6 @@
     <string name="temperature_feels_like_details">ஈரப்பதம், காற்று மற்றும்/அல்லது சூரிய ஒளியின் விளைவாக வெப்பநிலை எப்படி இருக்கும்.</string>
     <string name="temperature_degree_day_heating_explanation">வெளிப்புற வெப்பநிலைக்கும் வெப்ப ஆற்றல் தேவைகளை மதிப்பிடுவதற்குப் பயன்படுத்தப்படும் குறிப்பு வசதியான வெப்பநிலைக்கும் இடையிலான வேறுபாடு</string>
     <string name="temperature_degree_day_cooling_explanation">வெளிப்புற வெப்பநிலைக்கும் குளிரூட்டும் ஆற்றல் தேவைகளை மதிப்பிடுவதற்குப் பயன்படுத்தப்படும் குறிப்பு வசதியான வெப்பநிலைக்கும் இடையிலான வேறுபாடு</string>
-    <string name="temperature_normals_deviation">விலகல்</string>
-    <string name="temperature_normals_deviation_explanation_maximum">இந்த இடத்திற்கான சராசரி அதிகபட்ச வெப்பநிலையான %s இலிருந்து விலகல்</string>
-    <string name="temperature_normals_deviation_explanation_minimum">இந்த இடத்திற்கான சராசரி குறைந்தபட்ச வெப்பநிலையான %s இலிருந்து விலகல்</string>
     <string name="precipitation_total_day">பகல்நேர மழைப்பொழிவு</string>
     <string name="precipitation_total_night">இரவு நேர மழைப்பொழிவு</string>
     <string name="precipitation_rain_total_day">பகல்நேர மழை</string>

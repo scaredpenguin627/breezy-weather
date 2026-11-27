@@ -41,6 +41,7 @@ import org.breezyweather.common.extensions.getFormattedMediumDayAndMonthInAdditi
 import org.breezyweather.common.extensions.getFormattedTime
 import org.breezyweather.common.extensions.hasPermission
 import org.breezyweather.common.extensions.is12Hour
+import org.breezyweather.common.extensions.localizedWeatherText
 import org.breezyweather.common.options.NotificationTextColor
 import org.breezyweather.common.options.WidgetWeekIconMode
 import org.breezyweather.common.source.PollenIndexSource
@@ -274,7 +275,7 @@ abstract class AbstractRemoteViewsPresenter {
             var subtitle = subtitleP
                 .replace(
                     "\$cw$",
-                    weather.current?.weatherText
+                    weather.current?.weatherText.localizedWeatherText(context)
                         ?: context.getString(R.string.null_data_text)
                 ).replace(
                     "\$ct$",
@@ -449,11 +450,11 @@ abstract class AbstractRemoteViewsPresenter {
             for (i in 0 until SUBTITLE_DAILY_ITEM_LENGTH) {
                 subtitle = subtitle.replace(
                     "$" + i + "dw$",
-                    weather.dailyForecastStartingToday.getOrNull(i)?.day?.weatherText
+                    weather.dailyForecastStartingToday.getOrNull(i)?.day?.weatherText.localizedWeatherText(context)
                         ?: context.getString(R.string.null_data_text)
                 ).replace(
                     "$" + i + "nw$",
-                    weather.dailyForecastStartingToday.getOrNull(i)?.night?.weatherText
+                    weather.dailyForecastStartingToday.getOrNull(i)?.night?.weatherText.localizedWeatherText(context)
                         ?: context.getString(R.string.null_data_text)
                 ).replace(
                     "$" + i + "dt$",

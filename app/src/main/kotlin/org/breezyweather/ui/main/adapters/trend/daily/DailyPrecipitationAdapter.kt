@@ -150,10 +150,6 @@ class DailyPrecipitationAdapter(
 
     override fun getItemCount() = location.weather!!.dailyForecast.size
 
-    override fun isValid(location: Location) = location.weather!!.dailyForecast.any {
-        it.day?.precipitation?.total != null || it.night?.precipitation?.total != null
-    }
-
     override fun getDisplayName(context: Context) = context.getString(R.string.tag_precipitation)
 
     override fun bindBackgroundForHost(host: TrendRecyclerView) {

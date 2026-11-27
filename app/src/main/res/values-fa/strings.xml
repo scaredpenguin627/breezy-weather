@@ -33,7 +33,6 @@
     <string name="temperature_degree_day_cooling">گرمای لازم برای خنک نگه داشتن خانه</string>
     <string name="temperature_average_short">دمای میانگین</string>
     <string name="temperature_degree_day_heating">گرمای لازم برای گرم نگه داشتن خانه</string>
-    <string name="temperature_normal_short">معمولی</string>
     <string name="precipitation">بارش</string>
     <string name="precipitation_probability">احتمال بارش</string>
     <string name="precipitation_snow">برف</string>
@@ -151,7 +150,6 @@
     <string name="widget_label_clock_font">فونت ساعت</string>
     <string name="widget_label_text_color">رنگ نویسه</string>
     <string name="widget_label_text_size">اندازه متن</string>
-    <string name="temperature_normals">دمای معمول</string>
     <string name="locations">مکان ها</string>
     <string name="location_message_search_failed">جستجوی مکان انجام نشد</string>
     <string name="location_search_placeholder">جستجو برای یک مکان…</string>
@@ -720,9 +718,6 @@
     <string name="ephemeris_polar_night">شب مِخی</string>
     <string name="air_quality_short">کیفیت هوا</string>
     <string name="clock">ساعت</string>
-    <string name="temperature_normals_deviation">انحراف</string>
-    <string name="temperature_normals_deviation_explanation_maximum">انحراف از متوسط حداکثر دما از ماه %s برای این منطقه</string>
-    <string name="temperature_normals_deviation_explanation_minimum">انحراف از متوسط حداقل دما از ماه %s برای این منطقه</string>
     <string name="precipitation_total_day">بارش روزانه</string>
     <string name="precipitation_total_night">بارش شبانه</string>
     <string name="precipitation_rain_total_day">باران روزانه</string>

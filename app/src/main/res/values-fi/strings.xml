@@ -405,8 +405,6 @@
     <string name="common_weather_text_rain_freezing_light">Kevyttä jäätävää sadetta</string>
     <string name="wind_direction_S_short">E</string>
     <string name="wind_direction_W_short">L</string>
-    <string name="temperature_normals">Normaalilämpötila</string>
-    <string name="temperature_normal_short">Normaali</string>
     <string name="wind_direction_SW_short">Lo</string>
     <string name="wind_direction_variable">Vaihtuva</string>
     <string name="wind_direction_NE_short">Ko</string>
@@ -665,9 +663,6 @@
     <string name="temperature_feels_like_details">Miltä lämpötila tuntuu kosteuden, tuulen ja/tai auringonvalon seurauksena.</string>
     <string name="temperature_degree_day_heating_explanation">Ulkolämpötilan ja lämmitysenergian tarpeen arvioinnissa käytetyn vertailumukavuuslämpötilan välinen ero</string>
     <string name="temperature_degree_day_cooling_explanation">Ulkolämpötilan ja jäähdytysenergian tarpeen arviointiin käytetyn vertailumukavuuslämpötilan välinen ero</string>
-    <string name="temperature_normals_deviation">Poikkeama</string>
-    <string name="temperature_normals_deviation_explanation_maximum">Poikkeama %s:n keskimääräisestä maksimilämpötilasta tässä paikassa</string>
-    <string name="temperature_normals_deviation_explanation_minimum">Poikkeama %s:n keskimääräisestä alimmasta lämpötilasta tässä paikassa</string>
     <string name="precipitation_total_day">Päivän sademäärä</string>
     <string name="precipitation_total_night">Yön sademäärä</string>
     <string name="precipitation_rain_total_day">Päivän sade</string>

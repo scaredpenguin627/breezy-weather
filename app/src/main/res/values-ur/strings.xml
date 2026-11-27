@@ -51,11 +51,6 @@
     <string name="temperature_degree_day_cooling">ٹھنڈا درجہ دن</string>
     <string name="temperature_degree_day_cooling_explanation">ٹھنڈا ہونے کی ضروری اندازہ طاقت کے لئے بیرونی درجۂ حرارت اور اک آرام دہ درجۂ حرارت کے درمیان تفریق</string>
     <string name="temperature_average_short">وسطی</string>
-    <string name="temperature_normal_short">عام</string>
-    <string name="temperature_normals">درجۂ حرارت کے معمولات</string>
-    <string name="temperature_normals_deviation">کجروی</string>
-    <string name="temperature_normals_deviation_explanation_maximum">‫اس محل وقوع کے %s اوسط اغیار درجۂ حرارت میں کجروی</string>
-    <string name="temperature_normals_deviation_explanation_minimum">‫اس محل وقوع کے اوسط کم ترین درجۂ حرارت میں %s کجروی</string>
     <string name="precipitation">بارش</string>
     <string name="precipitation_total_day">دن کی بارش</string>
     <string name="precipitation_total_night">رات کی بارش</string>

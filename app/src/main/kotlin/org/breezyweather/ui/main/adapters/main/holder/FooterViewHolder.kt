@@ -169,7 +169,6 @@ class FooterViewHolder(
                 SourceFeature.POLLEN to location.pollenSource,
                 SourceFeature.MINUTELY to location.minutelySource,
                 SourceFeature.ALERT to location.alertSource,
-                SourceFeature.NORMALS to location.normalsSource,
                 SourceFeature.REVERSE_GEOCODING to location.reverseGeocodingSource
             ).filter { !it.value.isNullOrEmpty() }.mapNotNull {
                 (context as MainActivity).sourceManager.getFeatureSource(it.value!!)?.let { source ->

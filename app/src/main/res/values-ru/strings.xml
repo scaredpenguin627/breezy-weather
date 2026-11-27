@@ -471,8 +471,6 @@
     <string name="weather_message_unsupported_feature">Источник не поддерживает одну из запрошенных функций</string>
     <string name="about_contribution_designer">Дизайнер логотипа</string>
     <string name="temperature_average_short">Сред</string>
-    <string name="temperature_normals">Температурные нормы</string>
-    <string name="temperature_normal_short">Норма</string>
     <string name="settings_main_threshold_lines_on_charts">Пороговые линии на графиках</string>
     <string name="settings_modules_broadcast_send_data_title">Отправить данные о погоде в %s</string>
     <string name="settings_color_app">Как в приложении</string>
@@ -736,9 +734,6 @@
     <string name="precipitation_snow_total_night">Ночной снег</string>
     <string name="daytime_short">День</string>
     <string name="nighttime_short">Ночь</string>
-    <string name="temperature_normals_deviation">Отклонение</string>
-    <string name="temperature_normals_deviation_explanation_maximum">Отклонение от %s средней максимальной температуры для этого местоположения</string>
-    <string name="temperature_normals_deviation_explanation_minimum">Отклонение от %s средней минимальной температуры для этого местоположения</string>
     <string name="widget_custom_subtitle_help_content_description">Показать пользовательские ключевые слова для субтитров</string>
     <string name="widget_custom_subtitle_alert_box_title">Помощь с пользовательскими субтитрами</string>
     <string name="air_quality_pm25_about">О мелкодисперсных частицах (%s)</string>

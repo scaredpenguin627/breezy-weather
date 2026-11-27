@@ -465,9 +465,7 @@
     <string name="weather_message_unsupported_feature">Източникът не поддържа една от заявените функции</string>
     <string name="about_contribution_designer">Дизайнер на логото</string>
     <string name="temperature_average_short">Средно</string>
-    <string name="temperature_normal_short">Нормална</string>
     <string name="settings_main_threshold_lines_on_charts">Прагови линии на диаграмите</string>
-    <string name="temperature_normals">Температурни норми</string>
     <string name="settings_modules_broadcast_send_data_title">Изпращайте данни за времето до %s</string>
     <string name="settings_color_app">Следвай приложението</string>
     <string name="settings_debug_dump_crash_logs_saved">Журналите за сривове са запазени</string>
@@ -633,9 +631,6 @@
     <string name="temperature_feels_like_details">Какво е усещането за температура, в резултат на влажност, вятър и/или слънчева светлина.</string>
     <string name="temperature_degree_day_heating_explanation">Разлика между външната температура и референтната комфортна температура, използвана за оценка на нуждите от енергия за отопление</string>
     <string name="temperature_degree_day_cooling_explanation">Разлика между външната температура и референтната комфортна температура, използвана за оценка на нуждите от енергия за охлаждане</string>
-    <string name="temperature_normals_deviation">Отклонение</string>
-    <string name="temperature_normals_deviation_explanation_maximum">Отклонение на средна максимална температура от месец %s за това местоположение</string>
-    <string name="temperature_normals_deviation_explanation_minimum">Отклонение на средна минимална температура от месец %s за това местоположение</string>
     <string name="precipitation_total_day">Дневни валежи</string>
     <string name="precipitation_total_night">Нощни валежи</string>
     <string name="precipitation_rain_total_day">Дневен дъжд</string>

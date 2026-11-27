@@ -147,14 +147,6 @@ object Migrations {
                                                 source.id
                                             } else {
                                                 it.alertSource
-                                            },
-                                            normalsSource = if (it.normalsSource.isNullOrEmpty() &&
-                                                SourceFeature.NORMALS in source.supportedFeatures &&
-                                                source.isFeatureSupportedForLocation(it, SourceFeature.NORMALS)
-                                            ) {
-                                                source.id
-                                            } else {
-                                                it.normalsSource
                                             }
                                         )
                                     )

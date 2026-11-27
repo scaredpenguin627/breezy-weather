@@ -165,7 +165,6 @@
     <string name="widget_custom_subtitle_keyword_xdw_description">Dnevno vrijeme danas, sutra, …, 4 dana kasnije</string>
     <string name="wind_strength_4">Umjeren vjetar</string>
     <string name="settings_notifications_precipitations_title">Obavijesti o oborinama</string>
-    <string name="temperature_normals">Normalne temperature</string>
     <string name="pollen">Pelud</string>
     <string name="message_source_not_installed_error_title">Izvor više nije dostupan</string>
     <string name="location_dialog_failed_to_locate_action_select_source">Odaberite jednu drugu lokacijsku uslugu</string>
@@ -233,7 +232,6 @@
     <string name="message_tap_again_to_exit">Dodirnite ponovo za prekid</string>
     <string name="settings_modules_broadcast_send_data_title">Pošaljite podatke za %s</string>
     <string name="pressure">Tlak</string>
-    <string name="temperature_normal_short">Normalno</string>
     <string name="settings_appearance_dark_mode_locations_title">Tamni način na osnovi lokacije</string>
     <string name="settings_main_daily_trends_title">Dnevni trendovi</string>
     <string name="settings_background_updates_worker_info_summary">Zadnje pokretanje: %s</string>
@@ -695,9 +693,6 @@
     <string name="content_provider_permission_label">Pročitaj Breezy Weather podatke</string>
     <string name="content_provider_permission_description">nabavi vremenske podatke od Breezy Weathera, uključujući koordinate vaših lokacija, kao što je vaša trenutna lokacija ako ste je dodali</string>
     <string name="common_weather_text_mostly_cloudy">Pretežno oblačno</string>
-    <string name="temperature_normals_deviation">Odstupanje</string>
-    <string name="temperature_normals_deviation_explanation_maximum">Odstupanje od prosječne maksimalne temperature za mjesec %s za ovu lokaciju</string>
-    <string name="temperature_normals_deviation_explanation_minimum">Odstupanje od prosječne minimalne temperature za mjesec %s za ovu lokaciju</string>
     <string name="precipitation_total_day">Padavine danju</string>
     <string name="precipitation_total_night">Padavine noću</string>
     <string name="wind_origin">Iz smjera %s</string>

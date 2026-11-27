@@ -48,8 +48,7 @@ class HourlyTrendWidgetConfigActivity : AbstractWidgetConfigActivity() {
                 withDaily = true, // isDaylight
                 withHourly = true,
                 withMinutely = false,
-                withAlerts = false,
-                withNormals = true // Threshold lines
+                withAlerts = false
             )
         )
     }

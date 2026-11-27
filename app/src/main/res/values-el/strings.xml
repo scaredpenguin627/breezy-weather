@@ -213,11 +213,9 @@
     <string name="precipitation_none">Χωρίς υετό</string>
     <string name="air_quality_so2_voice">Διοξείδιο του θείου</string>
     <string name="air_quality_index">Δείκτης ποιότητας αέρα</string>
-    <string name="temperature_normals">Κανονική θερμοκρασία</string>
     <string name="air_quality_pm10_voice">ΣΥ δέκα</string>
     <string name="air_quality_o3_voice">Όζον</string>
     <string name="air_quality_pm25">ΣΥ2,5</string>
-    <string name="temperature_normal_short">Κανονική</string>
     <string name="wind_direction_SW_short">ΝΔ</string>
     <string name="air_quality_pm25_voice">ΣΥ δύο κόμμα πέντε</string>
     <string name="wind_direction_variable">Μεταβλητή</string>
@@ -653,9 +651,6 @@
     <string name="temperature_feels_like_details">Τι αίσθηση έχει η θερμοκρασία, ως αποτέλεσμα της υγρασίας, αέρα ή ηλιακού φωτός.</string>
     <string name="temperature_degree_day_heating_explanation">Η διαφορά μεταξύ της εξωτερικής θερμοκρασίας και μια άνετης θερμοκρασίας αναφοράς που χρησιμοποιείται για την εκτίμηση των απαιτήσεων θέρμανσης</string>
     <string name="temperature_degree_day_cooling_explanation">Η διαφορά μεταξύ της εξωτερικής θερμοκρασίας και μια άνετη θερμοκρασία αναφοράς που χρησιμοποιείται για την εκτίμηση των απαιτήσεων ψύξης</string>
-    <string name="temperature_normals_deviation">Απόκλιση</string>
-    <string name="temperature_normals_deviation_explanation_maximum">Απόκλιση απ’ την μέση μέγιστη θερμοκρασία %s για αυτή την τοποθεσία</string>
-    <string name="temperature_normals_deviation_explanation_minimum">Απόκλιση απ’ την μέση ελάχιστη θερμοκρασία %s γι’ αυτή την τοποθεσία</string>
     <string name="precipitation_total_day">Ημερίσιος υετός</string>
     <string name="precipitation_total_night">Νυχτερινός υετός</string>
     <string name="precipitation_rain_total_day">Ημερίσια βροχή</string>

@@ -128,10 +128,6 @@ class DailyAirQualityAdapter(
 
     override fun getItemCount() = location.weather!!.dailyForecast.size
 
-    override fun isValid(location: Location): Boolean {
-        return location.weather!!.dailyForecast.any { it.airQuality?.getIndex() != null }
-    }
-
     override fun getDisplayName(context: Context) = context.getString(R.string.tag_aqi)
 
     override fun bindBackgroundForHost(host: TrendRecyclerView) {

@@ -18,8 +18,12 @@ package org.breezyweather.common.options.appearance
 
 import android.content.Context
 import androidx.annotation.StringRes
+import breezyweather.domain.location.model.Location
 import org.breezyweather.R
+import org.breezyweather.common.extensions.toTimezoneSpecificHour
 import org.breezyweather.common.options.BaseEnum
+import org.breezyweather.domain.weather.model.getIndex
+import java.util.Date
 
 enum class DailyTrendDisplay(
     override val id: String,
@@ -48,6 +52,36 @@ enum class DailyTrendDisplay(
                 }
             } catch (e: Exception) {
                 entries.toMutableList()
+            }
+        }
+
+        internal fun availableFor(
+            location: Location,
+            configured: List<DailyTrendDisplay>,
+            now: Date = Date(),
+        ): List<DailyTrendDisplay> {
+            val days = location.weather?.dailyForecast.orEmpty()
+            if (days.isEmpty()) return emptyList()
+
+            // The chart initially scrolls to today. A cached reading from yesterday alone
+            // must not offer an empty forecast tab. Keep history accessible if the whole forecast is old.
+            val today = now.toTimezoneSpecificHour(location.timeZone)
+            val forecast = days.dropWhile { it.date < today }.ifEmpty { days }
+            return configured.filter { trend ->
+                when (trend) {
+                    TAG_TEMPERATURE -> true
+                    TAG_AIR_QUALITY -> forecast.any { it.airQuality?.getIndex() != null }
+                    TAG_WIND -> forecast.any { it.day?.wind?.speed != null || it.night?.wind?.speed != null }
+                    TAG_UV_INDEX -> forecast.any { it.uV?.index != null }
+                    TAG_PRECIPITATION -> forecast.any {
+                        it.day?.precipitation?.total != null || it.night?.precipitation?.total != null
+                    }
+                    TAG_SUNSHINE -> forecast.any { (it.sunshineDuration?.inWholeMinutes ?: 0) > 0 }
+                    TAG_FEELS_LIKE -> forecast.any {
+                        it.day?.temperature?.feelsLikeTemperature != null ||
+                            it.night?.temperature?.feelsLikeTemperature != null
+                    }
+                }
             }
         }
 

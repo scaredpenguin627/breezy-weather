@@ -35,13 +35,4 @@ interface FmiApi {
         @Query("request") request: String = "getFeature",
         @Query("storedquery_id") storedQueryId: String = "fmi::ef::stations",
     ): Observable<FmiStationsResult>
-
-    @GET("wfs")
-    fun getNormals(
-        @Query("service") service: String = "WFS",
-        @Query("version") version: String = "2.0.0",
-        @Query("request") request: String = "getFeature",
-        @Query("storedquery_id") storedQueryId: String = "fmi::observations::weather::monthly::30year::simple",
-        @Query("fmisid") fmisid: String,
-    ): Call<FmiSimpleResult>
 }

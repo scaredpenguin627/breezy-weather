@@ -36,6 +36,7 @@ import org.breezyweather.common.extensions.getLongWeekdayDayMonth
 import org.breezyweather.common.extensions.getWeek
 import org.breezyweather.common.extensions.is12Hour
 import org.breezyweather.common.extensions.isRtl
+import org.breezyweather.common.extensions.localizedWeatherText
 import org.breezyweather.common.source.PollenIndexSource
 import org.breezyweather.domain.location.model.getPlace
 import org.breezyweather.domain.location.model.isDaylight
@@ -348,7 +349,7 @@ object DayWidgetIMP : AbstractRemoteViewsPresenter() {
             "tile", "mini" -> weather.current?.let { current ->
                 val stringBuilder = StringBuilder()
                 if (!current.weatherText.isNullOrEmpty()) {
-                    stringBuilder.append(current.weatherText)
+                    stringBuilder.append(current.weatherText.localizedWeatherText(context))
                 }
                 current.temperature?.temperature?.let {
                     if (stringBuilder.toString().isNotEmpty()) {
@@ -397,7 +398,7 @@ object DayWidgetIMP : AbstractRemoteViewsPresenter() {
             "symmetry", "vertical" -> weather.current?.let { current ->
                 val stringBuilder = StringBuilder()
                 if (!current.weatherText.isNullOrEmpty()) {
-                    stringBuilder.append(current.weatherText)
+                    stringBuilder.append(current.weatherText.localizedWeatherText(context))
                 }
                 if (weather.dailyForecast.isNotEmpty() &&
                     weather.today?.day?.temperature?.temperature != null &&

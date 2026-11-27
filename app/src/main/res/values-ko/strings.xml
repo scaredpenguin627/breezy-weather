@@ -383,11 +383,9 @@
     <string name="pollen_olea">올리브나무</string>
     <string name="pollen_platanus">올리브 나무</string>
     <string name="temperature_average_short">평균</string>
-    <string name="temperature_normals">온도평년값</string>
     <string name="air_quality_so2_full">이산화황(%s)</string>
     <string name="air_quality_pm25">PM2.5</string>
     <string name="precipitation_nowcasting">강수 예보</string>
-    <string name="temperature_normal_short">보통</string>
     <string name="air_quality_no2_full">이산화질소(%s)</string>
     <string name="air_quality_index">대기질 지수</string>
     <string name="air_quality_o3_full">지상 오존(%s)</string>
@@ -500,9 +498,6 @@
     <string name="ephemeris_about">출몰시각 정보</string>
     <string name="temperature_degree_day_heating_explanation">난방 에너지 요구 사항을 추정하는 데 사용되는 외부 온도와 기준 쾌적 온도의 차이</string>
     <string name="temperature_degree_day_cooling_explanation">냉방 에너지 요구 사항을 추정하는 데 사용되는 외부 온도와 기준 쾌적 온도의 차이</string>
-    <string name="temperature_normals_deviation">편차</string>
-    <string name="temperature_normals_deviation_explanation_maximum">이 위치의 %s 월 평균 최고 기온과의 편차</string>
-    <string name="temperature_normals_deviation_explanation_minimum">이 위치의 %s 평균 최저 기온과의 편차</string>
     <string name="precipitation_total_day">낮 강수량</string>
     <string name="precipitation_total_night">밤 강수량</string>
     <string name="precipitation_rain_total_day">낮 시간대의 비</string>

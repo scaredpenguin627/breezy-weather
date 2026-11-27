@@ -33,6 +33,7 @@ import org.breezyweather.common.extensions.getFormattedMediumDayAndMonthInAdditi
 import org.breezyweather.common.extensions.getFormattedTime
 import org.breezyweather.common.extensions.getLongWeekdayDayMonth
 import org.breezyweather.common.extensions.is12Hour
+import org.breezyweather.common.extensions.localizedWeatherText
 import org.breezyweather.common.extensions.spToPx
 import org.breezyweather.common.source.PollenIndexSource
 import org.breezyweather.domain.location.model.isDaylight
@@ -122,7 +123,8 @@ object TextWidgetIMP : AbstractRemoteViewsPresenter() {
                 setViewVisibility(R.id.widget_text_temperature, View.VISIBLE)
                 setTextViewText(
                     R.id.widget_text_weather,
-                    weather.current?.weatherText ?: context.getString(R.string.null_data_text)
+                    weather.current?.weatherText.localizedWeatherText(context)
+                        ?: context.getString(R.string.null_data_text)
                 )
                 setTextViewText(
                     R.id.widget_text_temperature,

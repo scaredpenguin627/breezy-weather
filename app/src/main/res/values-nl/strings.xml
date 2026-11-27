@@ -221,8 +221,6 @@
     <string name="dialog_permissions_notification_title">Op de hoogte blijven</string>
     <string name="dialog_permissions_notification_content">Tik hier om meldingen over weerwaarschuwingen in te schakelen, of beslis later in Instellingen.</string>
     <string name="temperature_average_short">Gem.</string>
-    <string name="temperature_normal_short">Normaal</string>
-    <string name="temperature_normals">Temperatuurnormaal</string>
     <string name="uv_index_0_2">Laag</string>
     <string name="uv_index_8_10">Zeer hoog</string>
     <string name="uv_index_11">Extreem</string>
@@ -667,9 +665,6 @@
     <string name="temperature_feels_like_details">Hoe de temperatuur aanvoelt, als gevolg van vochtigheid, wind en/of zonlicht.</string>
     <string name="temperature_degree_day_heating_explanation">Verschil tussen de buitentemperatuur en een comfortabele referentietemperatuur die wordt gebruikt om de behoefte aan verwarmingsenergie te schatten</string>
     <string name="temperature_degree_day_cooling_explanation">Verschil tussen de buitentemperatuur en een comfortabele referentietemperatuur die wordt gebruikt om de koelenergiebehoefte te schatten</string>
-    <string name="temperature_normals_deviation">Afwijking</string>
-    <string name="temperature_normals_deviation_explanation_maximum">Afwijking van de gemiddelde maximumtemperatuur in %s voor deze locatie</string>
-    <string name="temperature_normals_deviation_explanation_minimum">Afwijking van de gemiddelde minimumtemperatuur in %s voor deze locatie</string>
     <string name="precipitation_total_day">Neerslag overdag</string>
     <string name="precipitation_total_night">Neerslag ’s nachts</string>
     <string name="precipitation_rain_total_day">Regen overdag</string>
