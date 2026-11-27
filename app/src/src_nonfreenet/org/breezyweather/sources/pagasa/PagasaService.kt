@@ -181,7 +181,7 @@ class PagasaService @Inject constructor(
                     speed = it.windSpeed?.substringBefore(" ")?.toDoubleOrNull()?.kilometersPerHour
                 ),
                 relativeHumidity = it.humidity?.substringBefore(" ")?.toDoubleOrNull()?.percent,
-                pressure = it.pressure?.toDoubleOrNull()?.hectopascals
+                pressure = it.pressureHpa?.hectopascals
             )
         }
     }

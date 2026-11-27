@@ -18,15 +18,22 @@ package org.breezyweather.sources.pagasa.json
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.doubleOrNull
 
 @Serializable
 data class PagasaCurrentResult(
     val datetime: String,
     val temperature: String?,
     val humidity: String?,
-    val pressure: String?,
+    @SerialName("pressure") private val rawPressure: JsonElement? = null,
     @SerialName("wind_speed") val windSpeed: String?,
     @SerialName("wind_direction") val windDirection: String?,
     val latitude: String,
     val longitude: String,
-)
+) {
+    // NearestAWS mixes JSON numbers, quoted readings and "--" in the same station list.
+    val pressureHpa: Double?
+        get() = (rawPressure as? JsonPrimitive)?.doubleOrNull?.takeIf { it.isFinite() && it > 0 }
+}
