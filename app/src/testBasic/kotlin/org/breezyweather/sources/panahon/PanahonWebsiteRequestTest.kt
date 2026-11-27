@@ -74,7 +74,7 @@ class PanahonWebsiteRequestTest {
             mapApi.getPointForecast(location.latitude, location.longitude, init.toString(), "guest-test", "guest=abc")
         } returns
             Observable.just(report)
-        every { mapApi.getTemperature(any(), any(), any(), any(), any(), any()) } returns
+        every { mapApi.getPointValue(any(), any(), any(), any(), any(), any(), any()) } returns
             Observable.error(IOException())
         every { api.getAlerts() } returns Observable.just(PanahonAlertResponse(true, PanahonAlertData(count = 0)))
         mockkStatic("org.breezyweather.common.extensions.LanguageExtensionsKt") {
@@ -91,7 +91,7 @@ class PanahonWebsiteRequestTest {
             weather.current?.temperature shouldBe null
             weather.hourlyForecast?.single()?.weatherCode shouldBe WeatherCode.CLOUDY
             weather.alertList shouldBe null
-            verify(exactly = 1) { mapApi.getTemperature(any(), any(), any(), any(), any(), any()) }
+            verify(exactly = 2) { mapApi.getPointValue(any(), any(), any(), any(), any(), any(), any()) }
             mapClient.captured.interceptors.any { it is HttpLoggingInterceptor } shouldBe false
             mapClient.captured.cache shouldBe null
             mapClient.captured.followRedirects shouldBe false

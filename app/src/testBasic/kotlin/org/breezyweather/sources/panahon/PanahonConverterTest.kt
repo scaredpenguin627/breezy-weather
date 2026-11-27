@@ -50,7 +50,7 @@ class PanahonConverterTest {
     )
 
     private fun PanahonPointReport.toWeather(init: Instant, features: List<SourceFeature>, now: Long) =
-        toPointHours(init, now).toWeather(emptyMap(), features, now)
+        toPointHours(init, now).toWeather(emptyMap(), emptyMap(), features, now)
 
     @Test
     fun joinsActualWebsiteFieldsAcrossDatesAndDoesNotSubstituteHeatIndexForTemperature() {
@@ -81,9 +81,9 @@ class PanahonConverterTest {
     @Test
     fun trueTemperaturesAreJoinedByHourSeparatelyFromHeatIndex() {
         val rows = report.toPointHours(init, at(6).toEpochMilli())
-        val actual = listOf(6 to 28, 17 to 31, 102 to 29, 123 to 25)
-            .associate { (hour, temp) -> at(hour).toEpochMilli() to temp.celsius }
-        val result = rows.toWeather(actual, features, at(6).toEpochMilli())
+        val actual = listOf(6 to 28.0, 17 to 31.0, 102 to 29.0, 123 to 25.0)
+            .associate { (hour, temp) -> at(hour).toEpochMilli() to temp }
+        val result = rows.toWeather(actual, emptyMap(), features, at(6).toEpochMilli())
         result.current?.temperature?.temperature?.inCelsius shouldBe 28.0
         result.current?.temperature?.feelsLike?.inCelsius shouldBe 30.0
         result.hourlyForecast!![1].temperature?.temperature shouldBe null
@@ -126,9 +126,9 @@ class PanahonConverterTest {
     @Test
     fun checksTemperatureLayerCoordinatesAndRun() {
         val value = PanahonMapValue(listOf(121.91932, 11.98013), listOf(JsonPrimitive(28.4)), "2026-12-30 16:00:00")
-        value.airTemperature(11.98013, 121.91932, init)?.temperature?.inCelsius shouldBe 28.4
-        value.airTemperature(14.5995, 120.9842, init) shouldBe null
-        value.airTemperature(11.98013, 121.91932, at(6)) shouldBe null
+        value.valueAt(11.98013, 121.91932, init) shouldBe 28.4
+        value.valueAt(14.5995, 120.9842, init) shouldBe null
+        value.valueAt(11.98013, 121.91932, at(6)) shouldBe null
     }
 
     @Test
@@ -139,6 +139,18 @@ class PanahonConverterTest {
         )
         val hours = report.copy(data = values).toPointHours(init, init.toEpochMilli())
         hours.isEmpty() shouldBe true
-        hours.toWeather(emptyMap(), features, init.toEpochMilli()).failedFeatures?.keys shouldBe features.toSet()
+        hours.toWeather(emptyMap(), emptyMap(), features, init.toEpochMilli()).failedFeatures?.keys shouldBe
+            features.toSet()
+    }
+
+    @Test
+    fun joinsRelativeHumidityByHourAndExposesItAsCurrentConditions() {
+        val rows = report.toPointHours(init, at(6).toEpochMilli())
+        val humidity = listOf(6 to 67.9, 17 to 80.0)
+            .associate { (hour, value) -> at(hour).toEpochMilli() to value }
+        val result = rows.toWeather(emptyMap(), humidity, features, at(6).toEpochMilli())
+        result.current?.relativeHumidity?.inPercent shouldBe 67.9
+        result.hourlyForecast!!.first { it.date == Date.from(at(17)) }.relativeHumidity?.inPercent shouldBe 80.0
+        result.hourlyForecast!!.first { it.date == Date.from(at(18)) }.relativeHumidity shouldBe null
     }
 }

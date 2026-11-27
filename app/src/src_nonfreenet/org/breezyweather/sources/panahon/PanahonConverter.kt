@@ -32,6 +32,7 @@ import org.breezyweather.common.exceptions.InvalidOrIncompleteDataException
 import org.breezyweather.common.exceptions.OutdatedServerDataException
 import org.breezyweather.sources.halfDayPeakWind
 import org.breezyweather.unit.precipitation.Precipitation.Companion.millimeters
+import org.breezyweather.unit.ratio.Ratio.Companion.percent
 import org.breezyweather.unit.speed.Speed.Companion.metersPerSecond
 import org.breezyweather.unit.temperature.Temperature
 import org.breezyweather.unit.temperature.Temperature.Companion.celsius
@@ -53,17 +54,16 @@ private val manila = ZoneId.of("Asia/Manila")
 
 internal fun Instant.mapLocalTime(): String = clockFormat.format(atZone(manila)).replace(' ', 'T')
 
-internal fun PanahonMapValue.airTemperature(
+internal fun PanahonMapValue.valueAt(
     latitude: Double,
     longitude: Double,
     initialization: Instant,
-): TemperatureWrapper? {
+): Double? {
     val lon = coordinates?.getOrNull(0) ?: return null
     val lat = coordinates.getOrNull(1) ?: return null
     if (!lat.isFinite() || !lon.isFinite() || abs(lon - longitude) > 0.0001 || abs(lat - latitude) > 0.0001) return null
     if (run != clockFormat.format(initialization.atOffset(ZoneOffset.UTC))) return null
-    val temp = values?.firstOrNull()?.doubleOrNull?.takeIf(Double::isFinite)?.celsius?.toValidOrNull()
-    return temp?.let { TemperatureWrapper(temperature = it) }
+    return values?.firstOrNull()?.doubleOrNull?.takeIf(Double::isFinite)
 }
 
 private fun <T : Any> List<PanahonPoint?>?.readSeries(
@@ -123,26 +123,50 @@ internal fun PanahonPointReport.toPointHours(initialization: Instant, now: Long)
 }
 
 internal fun List<HourlyWrapper>.toWeather(
-    temperatures: Map<Long, Temperature>,
+    temperatures: Map<Long, Double>,
+    humidities: Map<Long, Double>,
     features: List<SourceFeature>,
     now: Long,
 ): WeatherWrapper {
     val today = midnight(now)
     val end = today + 120.hours.inWholeMilliseconds
     val hours = map { row ->
-        val actual = temperatures[row.date.time]
-        if (actual != null) row.copy(temperature = TemperatureWrapper(actual, row.temperature?.feelsLike)) else row
+        val actual = temperatures[row.date.time]?.celsius?.toValidOrNull()
+        val humidity = humidities[row.date.time]?.percent?.toValidRangeOrNull()
+        if (actual == null && humidity == null) {
+            row
+        } else {
+            row.copy(
+                temperature = actual?.let {
+                    TemperatureWrapper(it, row.temperature?.feelsLike)
+                } ?: row.temperature,
+                relativeHumidity = humidity
+            )
+        }
     }
     val hourNow = now - now % 1.hours.inWholeMilliseconds
     val failures = mutableMapOf<SourceFeature, Throwable>()
     val current = if (SourceFeature.CURRENT in features) {
         val row = hours.firstOrNull { it.date.time == hourNow }
-            ?: temperatures[hourNow]?.let { HourlyWrapper(Date(hourNow), temperature = TemperatureWrapper(it)) }
+            ?: if (temperatures[hourNow] != null || humidities[hourNow] != null) {
+                HourlyWrapper(
+                    date = Date(hourNow),
+                    temperature = temperatures[hourNow]?.celsius?.toValidOrNull()?.let { TemperatureWrapper(it) },
+                    relativeHumidity = humidities[hourNow]?.percent?.toValidRangeOrNull()
+                )
+            } else {
+                null
+            }
         if (row == null || (row.weatherCode == null && row.temperature == null && row.wind == null)) {
             failures[SourceFeature.CURRENT] = OutdatedServerDataException()
             null
         } else {
-            CurrentWrapper(weatherCode = row.weatherCode, temperature = row.temperature, wind = row.wind)
+            CurrentWrapper(
+                weatherCode = row.weatherCode,
+                temperature = row.temperature,
+                relativeHumidity = row.relativeHumidity,
+                wind = row.wind
+            )
         }
     } else {
         null

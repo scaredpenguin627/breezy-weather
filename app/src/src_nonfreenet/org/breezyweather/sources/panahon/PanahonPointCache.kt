@@ -3,8 +3,6 @@ package org.breezyweather.sources.panahon
 import io.reactivex.rxjava3.core.Maybe
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.schedulers.Schedulers
-import org.breezyweather.unit.temperature.Temperature
-import org.breezyweather.unit.temperature.Temperature.Companion.celsius
 import java.io.File
 import java.io.IOException
 import java.time.Instant
@@ -12,24 +10,27 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.math.abs
 
-/** Each temperature tile contains one coordinate, model run and valid time. */
-internal class PanahonTemperatureCache(private val directory: File) {
-    private val inFlight = mutableMapOf<File, Observable<Temperature>>()
+/** Each point tile contains one coordinate, layer, model run and valid time. */
+internal class PanahonPointCache(private val directory: File) {
+    private val inFlight = mutableMapOf<File, Observable<Double>>()
     private val activeRuns = mutableMapOf<File, Int>()
 
     fun get(
         api: PanahonMapApi,
         session: PanahonMapSession,
+        layer: String,
         latitude: Double,
         longitude: Double,
         times: Collection<Long>,
-    ): Observable<Map<Long, Temperature>> = Observable.defer {
+    ): Observable<Map<Long, Double>> = Observable.defer {
         if (times.isEmpty()) return@defer Observable.just(emptyMap())
-        val run =
-            File(directory, "ecmwf_${latitude.toBits()}_${longitude.toBits()}_${session.initialization.toEpochMilli()}")
+        val run = File(
+            File(directory, layer),
+            "ecmwf_${latitude.toBits()}_${longitude.toBits()}_${session.initialization.toEpochMilli()}"
+        )
         val requested = times.distinct().sorted()
         begin(run)
-        val cached = mutableMapOf<Long, Temperature>()
+        val cached = mutableMapOf<Long, Double>()
         val missing = requested.filter { time ->
             val value = read(File(run, time.toString()))
             if (value != null) cached[time] = value
@@ -42,8 +43,9 @@ internal class PanahonTemperatureCache(private val directory: File) {
                 Observable.defer request@{
                     if (failures.get() >= PARALLELISM) return@request Observable.empty()
                     val file = File(run, time.toString())
-                    shared(file) {
-                        api.getTemperature(
+                    shared(file, layer) {
+                        api.getPointValue(
+                            layer,
                             latitude,
                             longitude,
                             Instant.ofEpochMilli(time).mapLocalTime(),
@@ -52,12 +54,12 @@ internal class PanahonTemperatureCache(private val directory: File) {
                             session.cookie
                         ).flatMapMaybe { point ->
                             Maybe.fromCallable {
-                                point.airTemperature(latitude, longitude, session.initialization)?.temperature
+                                point.valueAt(latitude, longitude, session.initialization)
                             }
                         }
-                    }.map { temperature ->
+                    }.map { value ->
                         failures.set(0)
-                        time to temperature
+                        time to value
                     }.onErrorResumeNext { _: Throwable ->
                         failures.incrementAndGet()
                         Observable.empty()
@@ -65,14 +67,14 @@ internal class PanahonTemperatureCache(private val directory: File) {
                 }
             }, false, PARALLELISM)
             .take(if (requested.size == 1) 8L else 35L, TimeUnit.SECONDS)
-            .collect({ cached }) { values, (time, temperature) -> values[time] = temperature }
-            .map<Map<Long, Temperature>> { it }
+            .collect({ cached }) { values, (time, value) -> values[time] = value }
+            .map<Map<Long, Double>> { it }
             .toObservable()
             .doFinally { end(run) }
     }.subscribeOn(Schedulers.io())
 
     @Synchronized
-    private fun shared(file: File, fetch: () -> Observable<Temperature>): Observable<Temperature> {
+    private fun shared(file: File, layer: String, fetch: () -> Observable<Double>): Observable<Double> {
         // A concurrent refresh may have filled this time since our initial disk scan.
         read(file)?.let { return Observable.just(it) }
         return inFlight.getOrPut(file) {
@@ -85,22 +87,22 @@ internal class PanahonTemperatureCache(private val directory: File) {
         }
     }
 
-    private fun read(file: File): Temperature? {
+    private fun read(file: File): Double? {
         if (!file.isFile) return null
         return try {
-            file.readText().toDoubleOrNull()?.takeIf(Double::isFinite)?.celsius?.toValidOrNull()
+            file.readText().toDoubleOrNull()?.takeIf(Double::isFinite)
         } catch (_: IOException) {
             null
         }
     }
 
-    private fun write(file: File, value: Temperature) {
+    private fun write(file: File, value: Double) {
         // Immutable per-time entries: readers see either no file or the complete number.
         try {
             file.parentFile?.mkdirs()
-            val temporary = File.createTempFile("temperature-", ".tmp", file.parentFile)
+            val temporary = File.createTempFile("tile-", ".tmp", file.parentFile)
             try {
-                temporary.writeText(value.inCelsius.toString())
+                temporary.writeText(value.toString())
                 temporary.renameTo(file)
             } finally {
                 temporary.delete()
@@ -115,7 +117,8 @@ internal class PanahonTemperatureCache(private val directory: File) {
         activeRuns[run] = (activeRuns[run] ?: 0) + 1
         run.mkdirs()
         run.setLastModified(System.currentTimeMillis())
-        val runs = directory.listFiles { file -> file.isDirectory && file.name.startsWith("ecmwf_") }.orEmpty()
+        val root = run.parentFile ?: return
+        val runs = root.listFiles { file -> file.isDirectory && file.name.startsWith("ecmwf_") }.orEmpty()
         runs.sortedByDescending { it.lastModified() }.drop(12)
             .filterNot { it in activeRuns || inFlight.keys.any { sample -> sample.parentFile == it } }
             .forEach { it.deleteRecursively() }
@@ -130,11 +133,11 @@ internal class PanahonTemperatureCache(private val directory: File) {
     companion object {
         private const val HOUR = 3_600_000L
         private const val PARALLELISM = 4
-        private var appCache: PanahonTemperatureCache? = null
+        private var appCache: PanahonPointCache? = null
 
         @Synchronized
-        fun forDirectory(directory: File): PanahonTemperatureCache =
-            appCache?.takeIf { it.directory == directory } ?: PanahonTemperatureCache(directory).also { appCache = it }
+        fun forDirectory(directory: File): PanahonPointCache =
+            appCache?.takeIf { it.directory == directory } ?: PanahonPointCache(directory).also { appCache = it }
 
         private fun prioritize(times: List<Long>, currentHour: Long) = buildSet {
             if (currentHour in times) add(currentHour)

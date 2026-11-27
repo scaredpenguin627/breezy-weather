@@ -43,8 +43,9 @@ internal interface PanahonMapApi {
         @Header("Cookie") cookie: String?,
     ): Observable<PanahonPointReport>
 
-    @GET("/api/v1/tiles/point?url=temp&model=ecmwf")
-    fun getTemperature(
+    @GET("/api/v1/tiles/point?model=ecmwf")
+    fun getPointValue(
+        @Query("url") layer: String,
         @Query("lat") latitude: Double,
         @Query("lon") longitude: Double,
         @Query("t") localTime: String,

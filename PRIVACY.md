@@ -8,7 +8,7 @@ The icon packs feature (which allows you to customize weather icons) requires to
 
 Breezy Weather relies on third-party APIs to get various data such as your current location (if you decide to not use native GPS), location search or weather, please review their privacy policy (from Settings > Info icon > Privacy policy) and only use the ones you agree with.
 
-In this fork, selecting PANaHON for current conditions or forecasts sends the chosen coordinates to PAGASA’s PANaHON website. The app caches the website’s air-temperature readings on the device by coordinates and forecast initialization. Selecting DENR-EMB downloads a shared station feed from GitHub or your configured service. The app matches the location to a station on your device.
+In this fork, selecting PANaHON for current conditions or forecasts sends the chosen coordinates to PAGASA’s PANaHON website. The app caches the website’s temperature and humidity readings on the device by coordinates and forecast initialization. Selecting DENR-EMB downloads a shared station feed from GitHub or your configured service. The app matches the location to a station on your device.
 
 Breezy Weather can optionally share your location and weather data with other apps. Please review their privacy policy before you decide to grant them permission.
 

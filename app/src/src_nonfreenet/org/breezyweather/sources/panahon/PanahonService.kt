@@ -44,8 +44,8 @@ class PanahonService @Inject constructor(
 ) : PanahonServiceStub() {
 
     private val retrofit by lazy { client.baseUrl("https://panahon.gov.ph/").build() }
-    private val temperatures by lazy {
-        PanahonTemperatureCache.forDirectory(File(applicationContext.cacheDir, "panahon-temperature"))
+    private val tiles by lazy {
+        PanahonPointCache.forDirectory(File(applicationContext.cacheDir, "panahon-tiles"))
     }
     private val api by lazy { retrofit.create(PanahonApi::class.java) }
     private val mapApi by lazy {
@@ -117,9 +117,19 @@ class PanahonService @Inject constructor(
                     val lead = ChronoUnit.HOURS.between(session.initialization, hour)
                     if (lead in 0L..144L && (lead <= 90 || lead % 3 == 0L)) times.add(hour.toEpochMilli())
                 }
-                temperatures.get(mapApi, session, location.latitude, location.longitude, times)
-                    .map { actual ->
-                        val result = hours.toWeather(actual, features, System.currentTimeMillis())
+                Observable.zip(
+                    tiles.get(mapApi, session, "temp", location.latitude, location.longitude, times)
+                        .onErrorReturn { emptyMap<Long, Double>() },
+                    tiles.get(mapApi, session, "rh", location.latitude, location.longitude, times)
+                        .onErrorReturn { emptyMap<Long, Double>() }
+                ) { temperatures, humidities -> temperatures to humidities }
+                    .map { (temperatures, humidities) ->
+                        val result = hours.toWeather(
+                            temperatures,
+                            humidities,
+                            features,
+                            System.currentTimeMillis()
+                        )
                         val error = point.exceptionOrNull()
                         if (error != null) {
                             result.copy(failedFeatures = result.failedFeatures.orEmpty().mapValues { error })
