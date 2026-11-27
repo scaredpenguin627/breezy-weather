@@ -44,8 +44,8 @@ class PanahonService @Inject constructor(
     private val mapApi by lazy {
         // The map's guest token and cookies must stay off disk, out of logs and on this origin.
         val mapClient = (retrofit.callFactory() as OkHttpClient).newBuilder().apply {
-            interceptors.removeAll { it is HttpLoggingInterceptor }
-            networkInterceptors.removeAll { it is HttpLoggingInterceptor }
+            interceptors().removeAll { it is HttpLoggingInterceptor }
+            networkInterceptors().removeAll { it is HttpLoggingInterceptor }
         }.cache(null).cookieJar(CookieJar.NO_COOKIES).followRedirects(false).build()
         retrofit.newBuilder().baseUrl("https://panahon.gov.ph/").client(mapClient).build()
             .create(PanahonMapApi::class.java)
