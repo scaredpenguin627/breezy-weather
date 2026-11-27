@@ -23,7 +23,6 @@ import android.graphics.Paint
 import android.graphics.Shader
 import androidx.annotation.ColorInt
 import androidx.core.graphics.ColorUtils
-import androidx.core.view.isNotEmpty
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ItemDecoration
 import org.breezyweather.R
@@ -33,7 +32,6 @@ class TrendRecyclerViewScrollBar : ItemDecoration() {
     private val mPaint = Paint().apply {
         isAntiAlias = true
     }
-    private var mScrollBarWidth = 0
     private var mScrollBarHeight = 0
     private var mThemeChanged = false
 
@@ -62,11 +60,16 @@ class TrendRecyclerViewScrollBar : ItemDecoration() {
         parent: RecyclerView,
         state: RecyclerView.State,
     ) {
-        if (parent.isNotEmpty()) {
-            if (mScrollBarWidth == 0) mScrollBarWidth = parent.getChildAt(0).measuredWidth
-            if (mScrollBarHeight == 0) mScrollBarHeight = parent.getChildAt(0).measuredHeight
-        }
-        if (consumedThemeChanged()) {
+        val firstColumn = parent.getChildAt(0) ?: return
+        val extent = parent.computeHorizontalScrollExtent()
+        val range = parent.computeHorizontalScrollRange()
+        if (range <= extent) return
+
+        val scrollBarWidth = firstColumn.measuredWidth
+        val scrollBarHeight = firstColumn.measuredHeight
+        if (scrollBarWidth <= 0 || scrollBarHeight <= 0) return
+        if (consumedThemeChanged() || mScrollBarHeight != scrollBarHeight) {
+            mScrollBarHeight = scrollBarHeight
             mPaint.setShader(
                 LinearGradient(
                     0f,
@@ -79,15 +82,13 @@ class TrendRecyclerViewScrollBar : ItemDecoration() {
                 )
             )
         }
-        val extent = parent.computeHorizontalScrollExtent()
-        val range = parent.computeHorizontalScrollRange()
         val offset = parent.computeHorizontalScrollOffset()
         val offsetPercent = 1f * offset / (range - extent)
-        val scrollBarOffsetX = offsetPercent * (parent.measuredWidth - mScrollBarWidth)
+        val scrollBarOffsetX = offsetPercent * (parent.measuredWidth - scrollBarWidth)
         c.drawRect(
             scrollBarOffsetX,
             0f,
-            mScrollBarWidth + scrollBarOffsetX,
+            scrollBarWidth + scrollBarOffsetX,
             mScrollBarHeight.toFloat(),
             mPaint
         )

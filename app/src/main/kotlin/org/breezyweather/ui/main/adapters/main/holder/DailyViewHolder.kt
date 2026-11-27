@@ -31,7 +31,7 @@ import org.breezyweather.common.activities.BreezyActivity
 import org.breezyweather.common.extensions.getThemeColor
 import org.breezyweather.domain.settings.SettingsManager
 import org.breezyweather.ui.common.adapters.ButtonAdapter
-import org.breezyweather.ui.common.widgets.trend.TrendLayoutManager
+import org.breezyweather.ui.common.widgets.trend.DailyTrendLayoutManager
 import org.breezyweather.ui.common.widgets.trend.TrendRecyclerView
 import org.breezyweather.ui.main.adapters.trend.DailyTrendAdapter
 import org.breezyweather.ui.main.widgets.TrendRecyclerViewScrollBar
@@ -135,7 +135,7 @@ class DailyViewHolder(parent: ViewGroup) : AbstractMainCardViewHolder(
                 )
             }
         }
-        trendRecyclerView.layoutManager = TrendLayoutManager(context)
+        trendRecyclerView.layoutManager = DailyTrendLayoutManager(context)
         trendRecyclerView.setLineColor(
             context.getThemeColor(com.google.android.material.R.attr.colorOutline)
         )
