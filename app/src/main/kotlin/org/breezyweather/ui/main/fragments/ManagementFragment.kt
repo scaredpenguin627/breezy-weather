@@ -98,7 +98,7 @@ import org.breezyweather.common.source.getName
 import org.breezyweather.common.utils.helpers.IntentHelper
 import org.breezyweather.common.utils.helpers.PermissionHelper
 import org.breezyweather.common.utils.helpers.SnackbarHelper
-import org.breezyweather.domain.location.model.applyDefaultPreset
+import org.breezyweather.domain.location.model.applyWeatherSourcePreference
 import org.breezyweather.domain.location.model.getPlace
 import org.breezyweather.domain.settings.SettingsManager
 import org.breezyweather.sources.SourceManager
@@ -239,7 +239,10 @@ open class ManagementFragment : MainModuleFragment(), TouchReactor {
                                 onClick = {
                                     viewModel.openChooseWeatherSourcesDialog(
                                         Location(isCurrentPosition = true)
-                                            .applyDefaultPreset((requireActivity() as MainActivity).sourceManager)
+                                            .applyWeatherSourcePreference(
+                                                requireContext(),
+                                                (requireActivity() as MainActivity).sourceManager
+                                            )
                                     )
                                 }
                             ) {
@@ -405,7 +408,10 @@ open class ManagementFragment : MainModuleFragment(), TouchReactor {
                             onClick = {
                                 viewModel.openChooseWeatherSourcesDialog(
                                     Location(isCurrentPosition = true)
-                                        .applyDefaultPreset((requireActivity() as MainActivity).sourceManager)
+                                        .applyWeatherSourcePreference(
+                                            requireContext(),
+                                            (requireActivity() as MainActivity).sourceManager
+                                        )
                                 )
                             }
                         ) {

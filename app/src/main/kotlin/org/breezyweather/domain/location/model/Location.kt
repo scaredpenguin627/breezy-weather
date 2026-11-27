@@ -22,7 +22,9 @@ import breezyweather.domain.location.model.Location.Companion.CLOSE_DISTANCE
 import breezyweather.domain.source.SourceFeature
 import com.google.maps.android.SphericalUtil
 import com.google.maps.android.model.LatLng
+import org.breezyweather.BuildConfig
 import org.breezyweather.R
+import org.breezyweather.domain.settings.SettingsManager
 import org.breezyweather.domain.weather.model.getRiseProgress
 import org.breezyweather.sources.SourceManager
 
@@ -51,12 +53,29 @@ val Location.isDaylight: Boolean
         return 0 < sunRiseProgress && sunRiseProgress < 1
     }
 
+fun Location.applyWeatherSourcePreference(context: Context, sourceManager: SourceManager): Location {
+    val preference = SettingsManager.getInstance(context).defaultForecastSource
+    if (preference == "auto") return applyDefaultPreset(sourceManager)
+    val source = sourceManager.getWeatherSource(preference) ?: return applyDefaultPreset(sourceManager)
+    fun preferred(feature: SourceFeature): String? = source.id.takeIf {
+        feature in source.supportedFeatures && source.isFeatureSupportedForLocation(this, feature)
+    }
+    return copy(
+        forecastSourcePreference = source.id,
+        currentSourcePreference = preferred(SourceFeature.CURRENT),
+        airQualitySource = preferred(SourceFeature.AIR_QUALITY),
+        pollenSource = preferred(SourceFeature.POLLEN),
+        minutelySource = preferred(SourceFeature.MINUTELY),
+        alertSource = preferred(SourceFeature.ALERT)
+    )
+}
+
 fun Location.applyDefaultPreset(sourceManager: SourceManager): Location {
     val forecastSource = sourceManager.getBestSourceForFeatureOrDefault(this, SourceFeature.FORECAST)!!.id
 
-    return copy(
-        forecastSource = forecastSource,
-        currentSource = sourceManager.getBestSourceForFeature(this, SourceFeature.CURRENT)?.id
+    val preset = copy(
+        forecastSourcePreference = forecastSource,
+        currentSourcePreference = sourceManager.getBestSourceForFeature(this, SourceFeature.CURRENT)?.id
             ?: sourceManager.getDefaultSourceForFeature(this, SourceFeature.CURRENT)?.id?.let {
                 // If current source is the default (Open-Meteo), let it be null to fallback to forecast,
                 // instead of using Open-Meteo "forecast" as current, which would make it inconsistent
@@ -69,7 +88,19 @@ fun Location.applyDefaultPreset(sourceManager: SourceManager): Location {
         reverseGeocodingSource = sourceManager
             .getBestSourceForFeatureOrDefault(this, SourceFeature.REVERSE_GEOCODING)?.id
     )
+    return if (BuildConfig.FLAVOR != "freenet" && isCurrentPosition && !isUsable) {
+        preset.copy(
+            forecastSourcePreference = Location.automaticGpsPreference(preset.forecastSource),
+            currentSourcePreference = Location.automaticGpsPreference(preset.currentSource),
+            automaticPhSource = Location.PANAHON_SOURCE
+        )
+    } else {
+        preset
+    }
 }
+
+fun Location.forecastOrCurrentSourceChanged(other: Location): Boolean =
+    forecastSource != other.forecastSource || currentSource != other.currentSource
 
 fun Location.isCloseTo(location: Location): Boolean {
     return cityId == location.cityId ||

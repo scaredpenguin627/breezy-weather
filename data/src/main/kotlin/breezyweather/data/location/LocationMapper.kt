@@ -19,7 +19,7 @@ package breezyweather.data.location
 import breezyweather.domain.location.model.Location
 import java.util.TimeZone
 
-object LocationMapper {
+class LocationMapper(private val automaticPhSource: String?) {
 
     fun mapLocation(
         cityId: String?,
@@ -68,8 +68,9 @@ object LocationMapper {
         admin4Code = admin4Code,
         city = city,
         district = district,
-        forecastSource = weatherSource,
-        currentSource = currentSource,
+        automaticPhSource = automaticPhSource.takeIf { isCurrentPosition },
+        forecastSourcePreference = weatherSource,
+        currentSourcePreference = currentSource,
         airQualitySource = airQualitySource,
         pollenSource = pollenSource,
         minutelySource = minutelySource,

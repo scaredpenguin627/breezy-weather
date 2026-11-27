@@ -41,7 +41,7 @@ import org.breezyweather.common.extensions.hasPermission
 import org.breezyweather.common.extensions.launchIO
 import org.breezyweather.common.source.RefreshError
 import org.breezyweather.common.utils.helpers.SnackbarHelper
-import org.breezyweather.domain.location.model.applyDefaultPreset
+import org.breezyweather.domain.location.model.applyWeatherSourcePreference
 import org.breezyweather.domain.location.model.isCloseTo
 import org.breezyweather.domain.settings.CurrentLocationStore
 import org.breezyweather.domain.settings.SettingsManager
@@ -298,9 +298,10 @@ class MainActivityViewModel @Inject constructor(
         location: Location,
         errors: List<RefreshError> = emptyList(),
     ) {
-        snackbarError.postValue(errors)
-
-        updateInnerData(location)
+        if (!hasNewerGpsSourceSelection(location)) {
+            snackbarError.postValue(errors)
+            updateInnerData(location)
+        }
 
         _loading.value = false
         updating = false
@@ -455,10 +456,19 @@ class MainActivityViewModel @Inject constructor(
             it.formattedId == location.formattedId
         } ?: currentLocation.value?.location
 
+        if (hasNewerGpsSourceSelection(location)) return
         if (currentLocation.value?.location?.formattedId == (oldLocation?.formattedId ?: location.formattedId)) {
             cancelRequest()
         }
         updateInnerData(location, oldLocation)
+    }
+
+    // A location fix or weather request can complete after the user saves a new selection.
+    private fun hasNewerGpsSourceSelection(result: Location): Boolean {
+        if (!result.isCurrentPosition) return false
+        val saved = validLocationList.value.firstOrNull { it.isCurrentPosition } ?: return true
+        return saved.forecastSourcePreference != result.forecastSourcePreference ||
+            saved.currentSourcePreference != result.currentSourcePreference
     }
 
     // set location.
@@ -574,7 +584,7 @@ class MainActivityViewModel @Inject constructor(
                                     // Allows the user to select a one-time address lookup source
                                     needsGeocodeRefresh = true
                                 )
-                                .applyDefaultPreset(sourceManager)
+                                .applyWeatherSourcePreference(context, sourceManager)
                         )
                     }
                 } catch (_: Exception) {

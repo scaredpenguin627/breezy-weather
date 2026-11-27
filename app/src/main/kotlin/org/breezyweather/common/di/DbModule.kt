@@ -45,6 +45,7 @@ import breezyweather.data.WeatherCodeColumnAdapter
 import breezyweather.data.Weathers
 import breezyweather.data.location.LocationRepository
 import breezyweather.data.weather.WeatherRepository
+import breezyweather.domain.location.model.Location
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -259,7 +260,8 @@ class DbModule {
     @Provides
     @Singleton
     fun provideLocationRepository(databaseHandler: DatabaseHandler): LocationRepository {
-        return LocationRepository(databaseHandler)
+        val automaticPhSource = Location.PANAHON_SOURCE.takeUnless { BuildConfig.FLAVOR == "freenet" }
+        return LocationRepository(databaseHandler, automaticPhSource)
     }
 
     @Provides

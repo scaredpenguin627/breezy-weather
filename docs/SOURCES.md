@@ -1129,7 +1129,7 @@ This source aggregates data from Beijing Meteorological Service, ColorfulClouds 
 
 ### PANaHON
 
-For a Philippine location, select **PANaHON (PAGASA)** for the forecast, current conditions, or both. PAGASA’s [PANaHON dashboard](https://www.panahon.gov.ph/) provides a local nowcast, up to 24 hourly forecast entries and five daily forecasts. The current conditions come from the nowcast. These options are available in the standard build of this fork.
+The automatic preset uses **PANaHON (PAGASA)** for both forecasts and current conditions at new Philippine locations. A GPS location using **Automatic** follows this preference while it is in the Philippines and uses its worldwide fallback elsewhere. To use **PAGASA** instead, select it in the location’s weather source settings. Existing locations retain their saved providers. You can also switch an existing GPS location to **Automatic** in its weather source settings. PAGASA’s [PANaHON dashboard](https://www.panahon.gov.ph/) provides a local nowcast, up to 24 hourly forecast entries and five daily forecasts. The current conditions come from the nowcast. These options are available in the standard build of this fork.
 
 To receive local warnings independently of your forecast provider, select PANaHON under **Alerts** in the location’s weather source settings. The home screen shows the highest-severity active bulletin for that location. Tap it to read the official messages, affected areas, issuing offices and validity times. The app checks for new bulletins when it refreshes the weather. Android background scheduling and your notification settings affect delivery.
 

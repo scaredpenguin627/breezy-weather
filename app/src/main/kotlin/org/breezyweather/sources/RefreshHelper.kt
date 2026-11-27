@@ -74,6 +74,7 @@ import org.breezyweather.common.source.WeatherResult
 import org.breezyweather.common.utils.helpers.IntentHelper
 import org.breezyweather.common.utils.helpers.LogHelper
 import org.breezyweather.common.utils.helpers.ShortcutsHelper
+import org.breezyweather.domain.location.model.forecastOrCurrentSourceChanged
 import org.breezyweather.domain.location.model.getPlace
 import org.breezyweather.domain.location.model.isDaylight
 import org.breezyweather.domain.settings.CurrentLocationStore
@@ -370,7 +371,11 @@ class RefreshHelper @Inject constructor(
         val point = clearCachedEmbAirQualityOutsideCoverage(locationWithTimeZone)
         val movedAlertLocation = point.alertSource == "panahon" &&
             (point.latitude != location.latitude || point.longitude != location.longitude)
-        val updatedLocation = if (movedAlertLocation) {
+        val changedWeatherSource = location.isCurrentPosition && location.forecastOrCurrentSourceChanged(point)
+        val updatedLocation = if (changedWeatherSource) {
+            // The cached weather belongs to a different country and provider.
+            point.copy(weather = null)
+        } else if (movedAlertLocation) {
             point.copy(
                 weather = point.weather?.let {
                     it.copy(base = it.base.copy(alertsUpdateTime = null), alertList = emptyList())
@@ -380,7 +385,12 @@ class RefreshHelper @Inject constructor(
             point
         }
         if (needsSavingToDb) {
-            locationRepository.update(updatedLocation, clearAlerts = movedAlertLocation)
+            locationRepository.update(
+                updatedLocation,
+                clearAlerts = movedAlertLocation,
+                preserveWeatherSourcePreferences = location.isCurrentPosition,
+                clearWeather = changedWeatherSource
+            )
         }
 
         return LocationResult(updatedLocation, currentErrors)

@@ -48,8 +48,8 @@ data class Location(
 
     val weather: Weather? = null,
 
-    val forecastSource: String = "openmeteo",
-    val currentSource: String? = null,
+    val forecastSourcePreference: String = "openmeteo",
+    val currentSourcePreference: String? = null,
     val airQualitySource: String? = null,
     val pollenSource: String? = null,
     val minutelySource: String? = null,
@@ -64,7 +64,23 @@ data class Location(
      * etc
      */
     val parameters: Map<String, Map<String, String>> = emptyMap(),
+    val automaticPhSource: String? = null,
 ) : Parcelable {
+
+    // A new GPS location can be saved before its country is known. Keep the user's choice
+    // independently for each feature; an automatic choice carries its original worldwide fallback.
+    val forecastSource: String get() = resolveWeatherSource(forecastSourcePreference) ?: "openmeteo"
+    val currentSource: String? get() = resolveWeatherSource(currentSourcePreference)
+
+    private fun resolveWeatherSource(preference: String?): String? {
+        if (preference == null || !preference.startsWith(GPS_AUTO_PREFIX)) return preference
+        val fallback = preference.removePrefix(GPS_AUTO_PREFIX).ifEmpty { null }
+        return if (isCurrentPosition && countryCode.equals("PH", ignoreCase = true)) {
+            automaticPhSource ?: fallback
+        } else {
+            fallback
+        }
+    }
 
     val formattedId: String
         get() = if (isCurrentPosition) {
@@ -102,13 +118,13 @@ data class Location(
         parcel.writeString(admin4Code)
         parcel.writeString(city)
         parcel.writeString(district)
-        parcel.writeString(forecastSource)
-        parcel.writeString(currentSource)
+        parcel.writeString(forecastSourcePreference)
+        parcel.writeString(currentSourcePreference)
         parcel.writeString(airQualitySource)
         parcel.writeString(pollenSource)
         parcel.writeString(minutelySource)
         parcel.writeString(alertSource)
-        parcel.writeString(null) // Reserved slot in the location parcel
+        parcel.writeString(automaticPhSource) // Reuses the retired normals-source slot
         parcel.writeString(reverseGeocodingSource)
         parcel.writeByte(if (isCurrentPosition) 1 else 0)
         parcel.writeByte(if (needsGeocodeRefresh) 1 else 0)
@@ -134,16 +150,14 @@ data class Location(
         admin4Code = parcel.readString(),
         city = parcel.readString()!!,
         district = parcel.readString(),
-        forecastSource = parcel.readString()!!,
-        currentSource = parcel.readString(),
+        forecastSourcePreference = parcel.readString()!!,
+        currentSourcePreference = parcel.readString(),
         airQualitySource = parcel.readString(),
         pollenSource = parcel.readString(),
         minutelySource = parcel.readString(),
         alertSource = parcel.readString(),
-        reverseGeocodingSource = parcel.run {
-            readString() // Skip the retired source slot in older location parcels
-            readString()
-        },
+        automaticPhSource = parcel.readString()?.takeIf { it == PANAHON_SOURCE },
+        reverseGeocodingSource = parcel.readString(),
         isCurrentPosition = parcel.readByte() != 0.toByte(),
         needsGeocodeRefresh = parcel.readByte() != 0.toByte()
     )
@@ -168,11 +182,11 @@ data class Location(
             return false
         }
 
-        if (forecastSource != other.forecastSource) {
+        if (forecastSourcePreference != other.forecastSourcePreference || forecastSource != other.forecastSource) {
             return false
         }
 
-        if (currentSource != other.currentSource) {
+        if (currentSourcePreference != other.currentSourcePreference || currentSource != other.currentSource) {
             return false
         }
 
@@ -357,6 +371,11 @@ data class Location(
         }
 
     companion object {
+
+        const val PANAHON_SOURCE = "panahon"
+        private const val GPS_AUTO_PREFIX = "auto:"
+
+        fun automaticGpsPreference(fallback: String?): String = GPS_AUTO_PREFIX + fallback.orEmpty()
 
         const val CURRENT_POSITION_ID = "CURRENT_POSITION"
         const val CLOSE_DISTANCE = 5000 // 5 km

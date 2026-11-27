@@ -209,8 +209,8 @@ class DebugService @Inject constructor() : WeatherSource {
                     timeZone = TimeZone.getTimeZone("Europe/Paris"),
                     country = "France",
                     countryCode = "FR",
-                    forecastSource = id,
-                    currentSource = id
+                    forecastSourcePreference = id,
+                    currentSourcePreference = id
                 )
             )
         }
@@ -231,7 +231,7 @@ class DebugService @Inject constructor() : WeatherSource {
                     timeZone = TimeZone.getTimeZone("Europe/Paris"),
                     country = "France",
                     countryCode = "FR",
-                    forecastSource = id,
+                    forecastSourcePreference = id,
                     minutelySource = id
                 )
             )

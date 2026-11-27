@@ -23,12 +23,13 @@ import org.breezyweather.common.source.HttpSource
 import org.breezyweather.common.source.NonFreeNetSource
 import org.breezyweather.common.source.WeatherSource
 import org.breezyweather.common.source.WeatherSource.Companion.PRIORITY_HIGH
+import org.breezyweather.common.source.WeatherSource.Companion.PRIORITY_HIGHEST
 import org.breezyweather.common.source.WeatherSource.Companion.PRIORITY_NONE
 import java.util.TimeZone
 
 abstract class PanahonServiceStub : HttpSource(), WeatherSource, NonFreeNetSource {
 
-    override val id = "panahon"
+    override val id = Location.PANAHON_SOURCE
     override val name = "PANaHON (PAGASA)"
     override val continent = SourceContinent.ASIA
     override val privacyPolicyUrl = ""
@@ -45,7 +46,11 @@ abstract class PanahonServiceStub : HttpSource(), WeatherSource, NonFreeNetSourc
         feature in supportedFeatures && location.countryCode.equals("PH", ignoreCase = true)
 
     override fun getFeaturePriorityForLocation(location: Location, feature: SourceFeature): Int =
-        if (isFeatureSupportedForLocation(location, feature)) PRIORITY_HIGH else PRIORITY_NONE
+        when {
+            !isFeatureSupportedForLocation(location, feature) -> PRIORITY_NONE
+            feature == SourceFeature.ALERT -> PRIORITY_HIGH
+            else -> PRIORITY_HIGHEST
+        }
 
     override val testingLocations = listOf(
         Location(
@@ -54,8 +59,8 @@ abstract class PanahonServiceStub : HttpSource(), WeatherSource, NonFreeNetSourc
             longitude = 120.9842,
             timeZone = TimeZone.getTimeZone("Asia/Manila"),
             countryCode = "PH",
-            forecastSource = id,
-            currentSource = id,
+            forecastSourcePreference = id,
+            currentSourcePreference = id,
             alertSource = id
         )
     )

@@ -64,6 +64,7 @@ import org.breezyweather.common.source.WeatherSource
 import org.breezyweather.common.source.getName
 import org.breezyweather.common.utils.helpers.IntentHelper
 import org.breezyweather.common.utils.helpers.SnackbarHelper
+import org.breezyweather.domain.location.model.applyDefaultPreset
 import org.breezyweather.domain.settings.SettingsManager
 import org.breezyweather.domain.source.SelectableSource
 import org.breezyweather.domain.source.resourceName
@@ -369,9 +370,16 @@ fun SecondarySourcesPreference(
     val dialogLinkOpenState = remember { mutableStateOf(false) }
     val hasChangedReverseGeocodingSource = remember { mutableStateOf(false) }
     val hasChangedASource = remember { mutableStateOf(false) }
-    val forecastSource = remember { mutableStateOf(location.forecastSource) }
+    val automaticGpsPreset = remember(location.isCurrentPosition) {
+        if (location.isCurrentPosition && BuildConfig.FLAVOR != "freenet") {
+            Location(isCurrentPosition = true).applyDefaultPreset(sourceManager)
+        } else {
+            null
+        }
+    }
+    val forecastSource = remember { mutableStateOf(location.forecastSourcePreference) }
     val isLocationDuplicate = remember { mutableStateOf(false) }
-    val currentSource = remember { mutableStateOf(location.currentSource ?: "") }
+    val currentSource = remember { mutableStateOf(location.currentSourcePreference ?: "") }
     val airQualitySource = remember { mutableStateOf(location.airQualitySource ?: "") }
     val pollenSource = remember { mutableStateOf(location.pollenSource ?: "") }
     val minutelySource = remember { mutableStateOf(location.minutelySource ?: "") }
@@ -515,15 +523,25 @@ fun SecondarySourcesPreference(
                     title = stringResource(SourceFeature.FORECAST.resourceName),
                     selectedKey = forecastSource.value,
                     sourceList = buildMap {
-                        if (
-                            forecastSource.value.isNotEmpty() &&
-                            !compatibleForecastSources.values.any { l ->
-                                l.any { it.id == forecastSource.value }
-                            }
-                        ) {
-                            put(
-                                null,
-                                buildList {
+                        put(
+                            null,
+                            buildList {
+                                automaticGpsPreset?.let {
+                                    add(
+                                        SelectableSource(
+                                            it.forecastSourcePreference,
+                                            stringResource(R.string.settings_automatic),
+                                            true,
+                                            null
+                                        )
+                                    )
+                                }
+                                if (forecastSource.value != automaticGpsPreset?.forecastSourcePreference &&
+                                    forecastSource.value.isNotEmpty() &&
+                                    compatibleForecastSources.values.none { group ->
+                                        group.any { it.id == forecastSource.value }
+                                    }
+                                ) {
                                     add(
                                         SelectableSource(
                                             forecastSource.value,
@@ -535,18 +553,18 @@ fun SecondarySourcesPreference(
                                             null
                                         )
                                     )
-                                }.toImmutableList()
-                            )
-                        }
+                                }
+                            }.toImmutableList()
+                        )
                         putAll(compatibleForecastSources)
                     }.toImmutableMap(),
                     withState = false
                 ) { sourceId ->
                     if (locationExists != null) {
-                        if (sourceId != location.forecastSource) {
+                        if (sourceId != location.forecastSourcePreference) {
                             isLocationDuplicate.value = locationExists(
                                 location.copy(
-                                    forecastSource = sourceId
+                                    forecastSourcePreference = sourceId
                                 )
                             )
                         } else {
@@ -571,7 +589,11 @@ fun SecondarySourcesPreference(
                         put(
                             null,
                             buildList {
-                                if (currentSource.value.isNotEmpty() &&
+                                automaticGpsPreset?.currentSourcePreference?.let {
+                                    add(SelectableSource(it, stringResource(R.string.settings_automatic), true, null))
+                                }
+                                if (currentSource.value != automaticGpsPreset?.currentSourcePreference &&
+                                    currentSource.value.isNotEmpty() &&
                                     !compatibleCurrentSources.values.any { l ->
                                         l.any { it.id == currentSource.value }
                                     }
@@ -822,8 +844,9 @@ fun SecondarySourcesPreference(
                         val newLocation = location.copy(
                             // Reset cityId as they differ from one reverse geocoding source to another
                             cityId = if (hasChangedReverseGeocodingSource.value) "" else location.cityId,
-                            forecastSource = forecastSource.value,
-                            currentSource = currentSource.value,
+                            automaticPhSource = automaticGpsPreset?.automaticPhSource ?: location.automaticPhSource,
+                            forecastSourcePreference = forecastSource.value,
+                            currentSourcePreference = currentSource.value,
                             airQualitySource = airQualitySource.value,
                             pollenSource = pollenSource.value,
                             minutelySource = minutelySource.value,

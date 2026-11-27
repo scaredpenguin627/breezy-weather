@@ -19,7 +19,6 @@ package org.breezyweather.ui.search
 import android.content.Context
 import breezyweather.domain.location.model.Location
 import breezyweather.domain.location.model.LocationAddressInfo
-import breezyweather.domain.source.SourceFeature
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.observers.DisposableObserver
@@ -27,9 +26,8 @@ import org.breezyweather.BuildConfig
 import org.breezyweather.common.rxjava.ObserverContainer
 import org.breezyweather.common.rxjava.SchedulerTransformer
 import org.breezyweather.common.source.LocationSearchSource
-import org.breezyweather.domain.location.model.applyDefaultPreset
+import org.breezyweather.domain.location.model.applyWeatherSourcePreference
 import org.breezyweather.domain.settings.ConfigStore
-import org.breezyweather.domain.settings.SettingsManager
 import org.breezyweather.sources.RefreshHelper
 import org.breezyweather.sources.SourceManager
 import org.breezyweather.ui.main.utils.RefreshErrorType
@@ -102,76 +100,7 @@ class SearchActivityRepository @Inject internal constructor(
         location: Location,
         context: Context,
     ): Location {
-        val defaultSource = SettingsManager.getInstance(context).defaultForecastSource
-
-        return when (defaultSource) {
-            "auto" -> location.applyDefaultPreset(mSourceManager)
-            else -> {
-                val source = mSourceManager.getWeatherSource(defaultSource)
-                if (source == null) {
-                    location.applyDefaultPreset(mSourceManager)
-                } else {
-                    location.copy(
-                        forecastSource = source.id,
-                        currentSource = if (SourceFeature.CURRENT in
-                            source.supportedFeatures &&
-                            source.isFeatureSupportedForLocation(
-                                location,
-                                SourceFeature.CURRENT
-                            )
-                        ) {
-                            source.id
-                        } else {
-                            null
-                        },
-                        airQualitySource = if (SourceFeature.AIR_QUALITY in
-                            source.supportedFeatures &&
-                            source.isFeatureSupportedForLocation(
-                                location,
-                                SourceFeature.AIR_QUALITY
-                            )
-                        ) {
-                            source.id
-                        } else {
-                            null
-                        },
-                        pollenSource = if (SourceFeature.POLLEN in
-                            source.supportedFeatures &&
-                            source.isFeatureSupportedForLocation(
-                                location,
-                                SourceFeature.POLLEN
-                            )
-                        ) {
-                            source.id
-                        } else {
-                            null
-                        },
-                        minutelySource = if (SourceFeature.MINUTELY in
-                            source.supportedFeatures &&
-                            source.isFeatureSupportedForLocation(
-                                location,
-                                SourceFeature.MINUTELY
-                            )
-                        ) {
-                            source.id
-                        } else {
-                            null
-                        },
-                        alertSource = if (SourceFeature.ALERT in
-                            source.supportedFeatures &&
-                            source.isFeatureSupportedForLocation(
-                                location,
-                                SourceFeature.ALERT
-                            )
-                        ) {
-                            source.id
-                        } else {
-                            null
-                        }
-                    )
-                }
-            }
-        }
+        return location.applyWeatherSourcePreference(context, mSourceManager)
     }
 
     var lastSelectedLocationSearchSource: String

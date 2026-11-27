@@ -23,11 +23,13 @@ import breezyweather.domain.location.model.Location
 
 class LocationRepository(
     private val handler: DatabaseHandler,
+    automaticPhSource: String? = null,
 ) {
+    private val mapper = LocationMapper(automaticPhSource)
 
     suspend fun getLocation(formattedId: String, withParameters: Boolean = true): Location? {
         val location = handler.awaitOneOrNull {
-            locationsQueries.getLocationById(formattedId, LocationMapper::mapLocation)
+            locationsQueries.getLocationById(formattedId, mapper::mapLocation)
         }
         return if (withParameters) {
             location?.copy(
@@ -48,7 +50,7 @@ class LocationRepository(
 
     suspend fun getFirstLocation(withParameters: Boolean = true): Location? {
         val location = handler.awaitOneOrNull {
-            locationsQueries.getFirstLocation(LocationMapper::mapLocation)
+            locationsQueries.getFirstLocation(mapper::mapLocation)
         }
         return if (withParameters) {
             location?.copy(
@@ -69,7 +71,7 @@ class LocationRepository(
 
     suspend fun getXLocations(limit: Int, withParameters: Boolean = true): List<Location> {
         val locations = handler.awaitList {
-            locationsQueries.getXLocations(limit.toLong(), LocationMapper::mapLocation)
+            locationsQueries.getXLocations(limit.toLong(), mapper::mapLocation)
         }
         return if (withParameters) {
             locations.map { location ->
@@ -92,7 +94,7 @@ class LocationRepository(
 
     suspend fun getAllLocations(withParameters: Boolean = true): List<Location> {
         val locations = handler.awaitList {
-            locationsQueries.getAllLocations(LocationMapper::mapLocation)
+            locationsQueries.getAllLocations(mapper::mapLocation)
         }
         return if (withParameters) {
             locations.map { location ->
@@ -141,8 +143,8 @@ class LocationRepository(
                         admin4Code = location.admin4Code,
                         city = location.city,
                         district = location.district,
-                        weatherSource = location.forecastSource,
-                        currentSource = location.currentSource,
+                        weatherSource = location.forecastSourcePreference,
+                        currentSource = location.currentSourcePreference,
                         airQualitySource = location.airQualitySource,
                         pollenSource = location.pollenSource,
                         minutelySource = location.minutelySource,
@@ -241,6 +243,8 @@ class LocationRepository(
         location: Location,
         oldFormattedId: String? = null,
         clearAlerts: Boolean = false,
+        preserveWeatherSourcePreferences: Boolean = false,
+        clearWeather: Boolean = false,
     ): Boolean {
         return try {
             handler.await(inTransaction = true) {
@@ -250,7 +254,13 @@ class LocationRepository(
                         newFormattedId = location.formattedId
                     )
                 }
-                if (clearAlerts) {
+                if (clearWeather) {
+                    weathersQueries.deleteWeatherForLocationId(location.formattedId)
+                    dailysQueries.deleteDailyListForLocationId(location.formattedId)
+                    hourlysQueries.deleteHourlyListForLocationId(location.formattedId)
+                    minutelysQueries.deleteMinutelyListForLocationId(location.formattedId)
+                    alertsQueries.deleteAlertListForLocationId(location.formattedId)
+                } else if (clearAlerts) {
                     alertsQueries.deleteAlertListForLocationId(location.formattedId)
                     weathersQueries.clearAlertsUpdateTime(location.formattedId)
                 }
@@ -273,8 +283,8 @@ class LocationRepository(
                     admin4Code = location.admin4Code,
                     city = location.city,
                     district = location.district,
-                    weatherSource = location.forecastSource,
-                    currentSource = location.currentSource,
+                    weatherSource = location.forecastSourcePreference.takeUnless { preserveWeatherSourcePreferences },
+                    currentSource = location.currentSourcePreference.takeUnless { preserveWeatherSourcePreferences },
                     airQualitySource = location.airQualitySource,
                     pollenSource = location.pollenSource,
                     minutelySource = location.minutelySource,

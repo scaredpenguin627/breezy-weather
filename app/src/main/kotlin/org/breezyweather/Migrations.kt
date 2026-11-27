@@ -108,13 +108,13 @@ object Migrations {
                                 if (source != null) {
                                     locationRepository.update(
                                         it.copy(
-                                            currentSource = if (it.currentSource.isNullOrEmpty() &&
+                                            currentSourcePreference = if (it.currentSource.isNullOrEmpty() &&
                                                 SourceFeature.CURRENT in source.supportedFeatures &&
                                                 source.isFeatureSupportedForLocation(it, SourceFeature.CURRENT)
                                             ) {
                                                 source.id
                                             } else {
-                                                it.currentSource
+                                                it.currentSourcePreference
                                             },
                                             airQualitySource = if (it.airQualitySource.isNullOrEmpty() &&
                                                 SourceFeature.AIR_QUALITY in source.supportedFeatures &&
