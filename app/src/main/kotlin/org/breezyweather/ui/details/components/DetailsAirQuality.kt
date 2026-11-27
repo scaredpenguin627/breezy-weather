@@ -161,6 +161,9 @@ fun DetailsAirQuality(
                 text = reportedAqi.format(decimals = 0, locale = context.currentLocale),
                 style = MaterialTheme.typography.displaySmall
             )
+            PollutantIndex.getAqiToName(context, reportedAqi)?.let {
+                Text(text = it, style = MaterialTheme.typography.titleMedium)
+            }
             current.reportedStation?.let { Text(stringResource(R.string.emb_monitoring_station, it)) }
             current.reportedClock?.let { Text(stringResource(R.string.emb_report_clock, it)) }
             location.weather?.base?.airQualityUpdateTime?.let {

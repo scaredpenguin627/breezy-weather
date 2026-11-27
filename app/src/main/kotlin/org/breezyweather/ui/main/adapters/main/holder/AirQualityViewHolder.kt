@@ -37,9 +37,7 @@ import org.breezyweather.common.extensions.getThemeColor
 import org.breezyweather.common.options.appearance.DetailScreen
 import org.breezyweather.common.utils.helpers.IntentHelper
 import org.breezyweather.domain.weather.index.PollutantIndex
-import org.breezyweather.domain.weather.model.getColor
 import org.breezyweather.domain.weather.model.getIndex
-import org.breezyweather.domain.weather.model.getName
 import org.breezyweather.domain.weather.model.validAirQuality
 import org.breezyweather.sources.emb.isOutsideEmbAirQualityCoverage
 import org.breezyweather.ui.common.widgets.ArcProgress
@@ -91,18 +89,11 @@ class AirQualityViewHolder(parent: ViewGroup) : AbstractMainCardViewHolder(
         }
 
         val reportedAqi = location.weather?.validAirQuality?.reportedAqi
-        aqiProgress.isVisible = reportedAqi == null
-        if (reportedAqi != null) {
-            mEnable = false
-            aqiLevelView.setText(R.string.emb_particulate_aqi)
-            aqiValueView.text = reportedAqi.format(decimals = 0, locale = context.currentLocale)
-            itemView.contentDescription = "${aqiLevelView.text} ${aqiValueView.text}"
-            return
-        }
-        val talkBackBuilder = StringBuilder()
-        location.weather!!.validAirQuality?.let { airQuality ->
-            mAqiIndex = airQuality.getIndex() ?: 0
+        val aqiIndex = reportedAqi ?: location.weather?.validAirQuality?.getIndex()
+        if (aqiIndex != null) {
+            mAqiIndex = aqiIndex
             mEnable = true
+            val aqiColor = PollutantIndex.getAqiToColor(context, aqiIndex)
             if (itemAnimationEnabled) {
                 aqiProgress.apply {
                     progress = 0f
@@ -113,7 +104,6 @@ class AirQualityViewHolder(parent: ViewGroup) : AbstractMainCardViewHolder(
                     setArcBackgroundColor(context.getThemeColor(com.google.android.material.R.attr.colorOutline))
                 }
             } else {
-                val aqiColor = airQuality.getColor(aqiProgress.context)
                 aqiProgress.apply {
                     progress = mAqiIndex.toFloat()
                     aqiValueView.text = mAqiIndex.format(decimals = 0, locale = context.currentLocale)
@@ -122,55 +112,58 @@ class AirQualityViewHolder(parent: ViewGroup) : AbstractMainCardViewHolder(
                 }
             }
             aqiProgress.apply {
-                max = PollutantIndex.indexExcessivePollution.toFloat()
+                // EMB publishes an index of its own, which can be higher than the chart's usual maximum.
+                max = maxOf(PollutantIndex.indexExcessivePollution, mAqiIndex).toFloat()
             }
-            aqiLevelView.text = airQuality.getName(context)
+            aqiLevelView.text = PollutantIndex.getAqiToName(context, aqiIndex)
+            val talkBackBuilder = StringBuilder()
             talkBackBuilder
                 .append(context.getString(R.string.air_quality_index))
                 .append(context.getString(R.string.colon_separator))
                 .append(mAqiIndex.format(decimals = 0, locale = context.currentLocale))
                 .append(context.getString(org.breezyweather.unit.R.string.locale_separator))
-                .append(airQuality.getName(context))
+                .append(aqiLevelView.text)
+            location.weather?.validAirQuality?.reportedStation?.let { station ->
+                talkBackBuilder.append(" · ").append(station)
+            }
+            itemView.contentDescription = talkBackBuilder.toString()
         }
-        itemView.contentDescription = talkBackBuilder.toString()
     }
 
     override fun onEnterScreen() {
         super.onEnterScreen()
         if (itemAnimationEnabled && mEnable) {
-            mLocation!!.weather!!.validAirQuality?.let { airQuality ->
-                val aqiColor = airQuality.getColor(aqiProgress.context)
-                val progressColor = ValueAnimator.ofObject(
-                    ArgbEvaluator(),
-                    ContextCompat.getColor(context, R.color.colorLevel_1),
-                    aqiColor
+            val aqiColor = PollutantIndex.getAqiToColor(context, mAqiIndex)
+            val progressColor = ValueAnimator.ofObject(
+                ArgbEvaluator(),
+                ContextCompat.getColor(context, R.color.colorLevel_1),
+                aqiColor
+            )
+            progressColor.addUpdateListener { animation: ValueAnimator ->
+                aqiProgress.setProgressColor(
+                    animation.animatedValue as Int
                 )
-                progressColor.addUpdateListener { animation: ValueAnimator ->
-                    aqiProgress.setProgressColor(
-                        animation.animatedValue as Int
-                    )
+            }
+            val backgroundColor = ValueAnimator.ofObject(
+                ArgbEvaluator(),
+                context.getThemeColor(com.google.android.material.R.attr.colorOutline),
+                ColorUtils.setAlphaComponent(aqiColor, (255 * 0.1).toInt())
+            )
+            backgroundColor.addUpdateListener { animation: ValueAnimator ->
+                aqiProgress.setArcBackgroundColor((animation.animatedValue as Int))
+            }
+            val aqiNumber = ValueAnimator.ofObject(FloatEvaluator(), 0, mAqiIndex)
+            aqiNumber.addUpdateListener { animation: ValueAnimator ->
+                aqiProgress.apply {
+                    progress = (animation.animatedValue as Float)
                 }
-                val backgroundColor = ValueAnimator.ofObject(
-                    ArgbEvaluator(),
-                    context.getThemeColor(com.google.android.material.R.attr.colorOutline),
-                    ColorUtils.setAlphaComponent(aqiColor, (255 * 0.1).toInt())
-                )
-                backgroundColor.addUpdateListener { animation: ValueAnimator ->
-                    aqiProgress.setArcBackgroundColor((animation.animatedValue as Int))
-                }
-                val aqiNumber = ValueAnimator.ofObject(FloatEvaluator(), 0, mAqiIndex)
-                aqiNumber.addUpdateListener { animation: ValueAnimator ->
-                    aqiProgress.apply {
-                        progress = (animation.animatedValue as Float)
-                    }
-                    aqiValueView.text = aqiProgress.progress.roundToInt().format(decimals = 0, context.currentLocale)
-                }
-                mAttachAnimatorSet = AnimatorSet().apply {
-                    playTogether(progressColor, backgroundColor, aqiNumber)
-                    interpolator = DecelerateInterpolator()
-                    duration = (1500 + mAqiIndex / 400f * 1500).toLong()
-                    start()
-                }
+                aqiValueView.text = aqiProgress.progress.roundToInt().format(decimals = 0, context.currentLocale)
+            }
+            mAttachAnimatorSet = AnimatorSet().apply {
+                playTogether(progressColor, backgroundColor, aqiNumber)
+                interpolator = DecelerateInterpolator()
+                duration = (1500 + mAqiIndex / 400f * 1500).toLong()
+                start()
             }
         }
     }
