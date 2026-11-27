@@ -44,12 +44,6 @@ class DailyTrendDisplayTest {
     private val justAfterLocalMidnight = Date.from(Instant.parse("2026-11-26T16:05:00Z"))
 
     @Test
-    fun sameFixedDimensionsForEveryLocation() {
-        DailyTrendDisplay.entries.map { it.id } shouldBe
-            listOf("temperature", "wind", "precipitation", "feels_like")
-    }
-
-    @Test
     fun currentAirQualityNeverUsesDailyAverages() {
         val average = AirQuality(pM25 = 20.microgramsPerCubicMeter)
         val weather = Weather(dailyForecast = listOf(Daily(date = Date(), airQuality = average)))
@@ -75,14 +69,13 @@ class DailyTrendDisplayTest {
         )
         val weather = Weather(dailyForecast = listOf(earlier, forecast))
         val manila = Location(timeZone = TimeZone.getTimeZone("Asia/Manila"), weather = weather)
-        DailyTrendDisplay.TAG_WIND.hasData(manila, justAfterLocalMidnight) shouldBe false
-        DailyTrendDisplay.TAG_TEMPERATURE.hasData(manila, justAfterLocalMidnight) shouldBe true
-        DailyTrendDisplay.TAG_PRECIPITATION.hasData(manila, justAfterLocalMidnight) shouldBe true
-        DailyTrendDisplay.TAG_FEELS_LIKE.hasData(manila, justAfterLocalMidnight) shouldBe true
+        DailyTrendDisplay.availableFor(manila, justAfterLocalMidnight).map { it.id } shouldBe
+            listOf("temperature", "precipitation", "feels_like")
 
         val withWind = forecast.copy(day = forecast.day!!.copy(wind = Wind(speed = 0.metersPerSecond)))
         val boracay = manila.copy(weather = weather.copy(dailyForecast = listOf(earlier, withWind)))
-        DailyTrendDisplay.entries.all { it.hasData(boracay, justAfterLocalMidnight) } shouldBe true
+        DailyTrendDisplay.availableFor(boracay, justAfterLocalMidnight).map { it.id } shouldBe
+            listOf("temperature", "wind", "precipitation", "feels_like")
     }
 
     @Test
@@ -110,6 +103,6 @@ class DailyTrendDisplayTest {
         DailyTrendDisplay.TAG_WIND.hasData(cached, justAfterLocalMidnight) shouldBe true
         DailyTrendDisplay.TAG_TEMPERATURE.hasData(cached, justAfterLocalMidnight) shouldBe false
         val empty = cached.copy(weather = Weather())
-        DailyTrendDisplay.entries.none { it.hasData(empty, justAfterLocalMidnight) } shouldBe true
+        DailyTrendDisplay.availableFor(empty, justAfterLocalMidnight).isEmpty() shouldBe true
     }
 }

@@ -109,6 +109,8 @@ import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 
+internal class SupersededGpsRefreshException : Exception()
+
 class RefreshHelper @Inject constructor(
     private val sourceManager: SourceManager,
     private val locationRepository: LocationRepository,
@@ -368,9 +370,10 @@ class RefreshHelper @Inject constructor(
         }
 
         // STEP 5 - Update the saved location and invalidate AQI for a station left behind.
-        val point = clearCachedEmbAirQualityOutsideCoverage(locationWithTimeZone)
-        val movedAlertLocation = point.alertSource == "panahon" &&
-            (point.latitude != location.latitude || point.longitude != location.longitude)
+        val moved =
+            locationWithTimeZone.latitude != location.latitude || locationWithTimeZone.longitude != location.longitude
+        val point = locationWithTimeZone.withoutMovedPanahonWind(moved)
+        val movedAlertLocation = point.alertSource == "panahon" && moved
         val changedWeatherSource = location.isCurrentPosition && location.forecastOrCurrentSourceChanged(point)
         val updatedLocation = if (changedWeatherSource) {
             // The cached weather belongs to a different country and provider.
@@ -389,17 +392,21 @@ class RefreshHelper @Inject constructor(
                 updatedLocation,
                 clearAlerts = movedAlertLocation,
                 preserveWeatherSourcePreferences = location.isCurrentPosition,
-                clearWeather = changedWeatherSource
+                clearWeather = changedWeatherSource,
+                clearForecastWind = moved && point.forecastSource == "panahon",
+                clearCurrentWind = moved && point.usesPanahonCurrentWind
             )
         }
 
-        return LocationResult(updatedLocation, currentErrors)
+        return LocationResult(clearCachedEmbAirQualityOutsideCoverage(updatedLocation), currentErrors)
     }
 
     private suspend fun clearCachedEmbAirQualityOutsideCoverage(location: Location): Location {
         val updatedLocation = location.withoutUncoveredEmbAirQuality()
         if (updatedLocation !== location) {
-            weatherRepository.insert(updatedLocation, requireNotNull(updatedLocation.weather))
+            if (!weatherRepository.insert(updatedLocation, requireNotNull(updatedLocation.weather))) {
+                throw SupersededGpsRefreshException()
+            }
         }
         return updatedLocation
     }
@@ -553,7 +560,7 @@ class RefreshHelper @Inject constructor(
         coordinatesChanged: Boolean,
         ignoreCaching: Boolean = false,
     ): WeatherResult {
-        val location = resolvedLocation.withoutUncoveredEmbAirQuality()
+        val location = resolvedLocation.withoutUncoveredEmbAirQuality().withoutMovedPanahonWind(coordinatesChanged)
         try {
             if (!location.isUsable || location.needsGeocodeRefresh) {
                 return WeatherResult(
@@ -599,6 +606,7 @@ class RefreshHelper @Inject constructor(
                 .getIsoFormattedDate(location)
                 .toDateNoHour(location.timeZone)!!
             var forecastUpdateTime = base.forecastUpdateTime
+            var freshPanahonForecast = false
             var currentUpdateTime = base.currentUpdateTime
             var airQualityUpdateTime = base.airQualityUpdateTime
             var pollenUpdateTime = base.pollenUpdateTime
@@ -808,6 +816,7 @@ class RefreshHelper @Inject constructor(
                                     null
                                 } else {
                                     forecastUpdateTime = Date()
+                                    freshPanahonForecast = location.forecastSource == "panahon"
                                     it
                                 }
                             }
@@ -815,6 +824,11 @@ class RefreshHelper @Inject constructor(
                     } else {
                         null
                     } ?: location.weather?.toDailyWrapperList(yesterdayMidnight),
+                    forecastWindSamples = when {
+                        location.forecastSource != Location.PANAHON_SOURCE -> emptyMap()
+                        freshPanahonForecast -> sourceCalls[location.forecastSource]?.forecastWindSamples.orEmpty()
+                        else -> location.weather?.forecastWindSamples.orEmpty()
+                    },
                     hourlyForecast = if (location.forecastSource.isNotEmpty()) {
                         if (errors.any {
                                 it.feature == SourceFeature.FORECAST &&
@@ -925,7 +939,8 @@ class RefreshHelper @Inject constructor(
                 location.weather,
                 yesterdayMidnight,
                 location.airQualitySource,
-                location.pollenSource
+                location.pollenSource,
+                keepPreviousForecastWind = !freshPanahonForecast
             )
 
             // 2) Computes as many data as possible (weather code, weather text, dew point, feels like temp., etc)
@@ -970,9 +985,10 @@ class RefreshHelper @Inject constructor(
             }
 
             // Example: 15:01 -> starts at 15:00, 15:59 -> starts at 15:00
-            val currentHour = hourlyForecast.firstOrNull {
-                it.date.time >= System.currentTimeMillis() - 1.hours.inWholeMilliseconds
-            }
+            val currentHour = hourlyForecast.hourForCurrentConditions(
+                System.currentTimeMillis(),
+                location.forecastSource
+            )
             val currentDay = dailyForecast.firstOrNull {
                 // Adding 23 hours just to be safe in case of DST
                 it.date.time >= yesterdayMidnight.time + 23.hours.inWholeMilliseconds
@@ -991,7 +1007,7 @@ class RefreshHelper @Inject constructor(
                     weatherWrapperCompleted.current
                         ?: if (isUpdateStillValid(base.currentUpdateTime, wait = 30)) {
                             // Allow to re-use current data if it was successfully refreshed less than 30 min ago
-                            location.weather?.current?.toCurrentWrapper()
+                            location.weather?.current?.toCachedCurrentWrapper(location)
                         } else {
                             null
                         },
@@ -1013,14 +1029,17 @@ class RefreshHelper @Inject constructor(
                 ),
                 dailyForecast = dailyForecast,
                 hourlyForecast = hourlyForecast,
+                forecastWindSamples = weatherWrapperCompleted.forecastWindSamples,
                 minutelyForecast = weatherWrapperCompleted.minutelyForecast
                     ?.mapNotNull { it.toValidOrNull() }
                     ?: emptyList(),
                 alertList = weatherWrapperCompleted.alertList ?: emptyList()
             )
+            if (!weatherRepository.insert(location, weather)) throw SupersededGpsRefreshException()
             locationRepository.insertParameters(location.formattedId, locationParameters)
-            weatherRepository.insert(location, weather)
             return WeatherResult(weather, errors)
+        } catch (e: SupersededGpsRefreshException) {
+            throw e
         } catch (e: Throwable) {
             e.printStackTrace()
             return WeatherResult(

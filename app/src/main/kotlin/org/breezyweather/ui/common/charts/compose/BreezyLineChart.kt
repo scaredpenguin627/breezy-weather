@@ -131,6 +131,7 @@ fun BreezyLineChart(
     minY: Double? = null,
     markerFormatter: DefaultCartesianMarker.ValueFormatter? = null,
     markerVisibilityListener: CartesianMarkerVisibilityListener? = null,
+    showPointsOnly: Boolean = false,
 ) {
     val context = LocalContext.current
 
@@ -214,6 +215,18 @@ fun BreezyLineChart(
             rememberLineCartesianLayer(
                 LineCartesianLayer.LineProvider.series(
                     colors.mapIndexed { index, colorList ->
+                        if (showPointsOnly) {
+                            val point = rememberShapeComponent(
+                                fill = Fill(Color(context.getThemeColor(androidx.appcompat.R.attr.colorPrimary))),
+                                shape = RoundedCornerShape(50)
+                            )
+                            return@mapIndexed LineCartesianLayer.rememberLine(
+                                fill = LineCartesianLayer.LineFill.single(Fill(Color.Transparent)),
+                                pointProvider = LineCartesianLayer.PointProvider.single(
+                                    LineCartesianLayer.Point(point, 6.dp)
+                                )
+                            )
+                        }
                         LineCartesianLayer.rememberLine(
                             fill = LineCartesianLayer.LineFill.colorScale(
                                 if (context.isRtl) {

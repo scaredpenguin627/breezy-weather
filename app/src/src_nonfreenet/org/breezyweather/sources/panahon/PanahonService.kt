@@ -23,6 +23,9 @@ import breezyweather.domain.weather.wrappers.WeatherWrapper
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.schedulers.Schedulers
+import okhttp3.CookieJar
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import org.breezyweather.common.exceptions.InvalidLocationException
 import org.breezyweather.common.extensions.currentLocale
 import org.breezyweather.common.extensions.getStringByLocale
@@ -36,8 +39,16 @@ class PanahonService @Inject constructor(
     @Named("JsonClient") client: Retrofit.Builder,
 ) : PanahonServiceStub(context) {
 
-    private val api by lazy {
-        client.baseUrl("https://api.mobile.panahon.gov.ph/").build().create(PanahonApi::class.java)
+    private val retrofit by lazy { client.baseUrl("https://api.mobile.panahon.gov.ph/").build() }
+    private val api by lazy { retrofit.create(PanahonApi::class.java) }
+    private val mapApi by lazy {
+        // The map's guest token and cookies must stay off disk, out of logs and on this origin.
+        val mapClient = (retrofit.callFactory() as OkHttpClient).newBuilder().apply {
+            interceptors.removeAll { it is HttpLoggingInterceptor }
+            networkInterceptors.removeAll { it is HttpLoggingInterceptor }
+        }.cache(null).cookieJar(CookieJar.NO_COOKIES).followRedirects(false).build()
+        retrofit.newBuilder().baseUrl("https://panahon.gov.ph/").client(mapClient).build()
+            .create(PanahonMapApi::class.java)
     }
 
     override fun requestWeather(
@@ -70,11 +81,22 @@ class PanahonService @Inject constructor(
         }
         if (SourceFeature.FORECAST !in features) return weather
 
-        val wind = api.getForecastWind(location.latitude, location.longitude)
-            .timeout(8, TimeUnit.SECONDS)
+        val wind = mapApi.getMap()
+            .flatMap { response ->
+                val session = response.toPanahonWindSession()
+                mapApi.getForecastWind(
+                    location.latitude,
+                    location.longitude,
+                    session.initialization.toString(),
+                    session.token,
+                    session.cookie
+                ).map { it to session.initialization }
+            }
+            .timeout(12, TimeUnit.SECONDS)
             .asResult()
         return Observable.zip(weather.subscribeOn(Schedulers.io()), wind) { native, result ->
-            result.getOrNull()?.let { native.withForecastWind(it) } ?: native
+            result.getOrNull()?.let { (report, initialization) -> native.withForecastWind(report, initialization) }
+                ?: native
         }
     }
 }

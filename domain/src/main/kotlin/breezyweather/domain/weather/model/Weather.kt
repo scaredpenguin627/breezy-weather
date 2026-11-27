@@ -36,6 +36,7 @@ data class Weather(
     val hourlyForecast: List<Hourly> = emptyList(),
     val minutelyForecast: List<Minutely> = emptyList(),
     val alertList: List<Alert> = emptyList(),
+    val forecastWindSamples: Map<Date, Wind> = emptyMap(),
 ) : Serializable {
 
     // Only hourly in the future, starting from current hour until the next 24 hours
@@ -131,7 +132,8 @@ data class Weather(
         dailyForecast = this.dailyForecast.map { it.toDailyWrapper() },
         hourlyForecast = this.hourlyForecast.map { it.toHourlyWrapper() },
         minutelyForecast = this.minutelyForecast,
-        alertList = this.alertList
+        alertList = this.alertList,
+        forecastWindSamples = this.forecastWindSamples
     )
 
     fun toDailyWrapperList(startDate: Date): List<DailyWrapper> {

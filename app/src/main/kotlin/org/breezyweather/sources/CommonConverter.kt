@@ -111,6 +111,7 @@ internal fun completeNewWeatherWithPreviousData(
     startDate: Date,
     airQualitySource: String?,
     pollenSource: String?,
+    keepPreviousForecastWind: Boolean,
 ): WeatherWrapper {
     if (oldWeather == null ||
         (oldWeather.dailyForecast.isEmpty() && oldWeather.hourlyForecast.isEmpty())
@@ -121,11 +122,24 @@ internal fun completeNewWeatherWithPreviousData(
     val missingDailyList = oldWeather.dailyForecast.filter {
         it.date >= startDate &&
             (newWeather.dailyForecast?.getOrNull(0) == null || it.date < newWeather.dailyForecast!![0].date)
-    }.map { it.toDailyWrapper() }
+    }.map { day ->
+        val previous = day.toDailyWrapper()
+        if (keepPreviousForecastWind) {
+            previous
+        } else {
+            previous.copy(
+                day = previous.day?.copy(wind = null),
+                night = previous.night?.copy(wind = null)
+            )
+        }
+    }
     val missingHourlyList = oldWeather.hourlyForecast.filter {
         it.date >= startDate &&
             (newWeather.hourlyForecast?.getOrNull(0) == null || it.date < newWeather.hourlyForecast!![0].date)
-    }.map { it.toHourlyWrapper() }
+    }.map { hour ->
+        val previous = hour.toHourlyWrapper()
+        if (keepPreviousForecastWind) previous else previous.copy(wind = null)
+    }
     val missingDailyAirQualityList = oldWeather.dailyForecast.filter {
         it.date >= startDate &&
             it.airQuality?.isValid == true &&
@@ -1353,6 +1367,40 @@ private fun getCurrentUVFromDayMax(
 /*
  * CURRENT FROM DAILY AND HOURLY LIST
  */
+
+internal val Location.usesPanahonCurrentWind: Boolean
+    get() = forecastSource == "panahon" && (currentSource.isNullOrEmpty() || currentSource == "panahon")
+
+internal fun Current.toCachedCurrentWrapper(location: Location): CurrentWrapper {
+    val cached = toCurrentWrapper()
+    // This merged reading can contain wind borrowed from an earlier forecast hour.
+    return if (location.usesPanahonCurrentWind) cached.copy(wind = null) else cached
+}
+
+internal fun Location.withoutMovedPanahonWind(moved: Boolean): Location {
+    val previous = weather ?: return this
+    if (!moved || forecastSource != "panahon") return this
+    return copy(
+        weather = previous.copy(
+            base = previous.base.copy(forecastUpdateTime = null),
+            forecastWindSamples = emptyMap(),
+            current = if (usesPanahonCurrentWind) previous.current?.copy(wind = null) else previous.current,
+            hourlyForecast = previous.hourlyForecast.map { it.copy(wind = null) },
+            dailyForecast = previous.dailyForecast.map { day ->
+                day.copy(day = day.day?.copy(wind = null), night = day.night?.copy(wind = null))
+            }
+        )
+    )
+}
+
+internal fun List<Hourly>.hourForCurrentConditions(now: Long, forecastSource: String): Hourly? {
+    val hour = 1.hours.inWholeMilliseconds
+    val first = firstOrNull { it.date.time >= now - hour } ?: return null
+    if (forecastSource != "panahon") return first
+    // Philippine time has whole-hour UTC offsets. A later official forecast must leave a gap here.
+    val currentWind = lastOrNull { it.date.time in (now - now % hour)..now }?.wind
+    return if (currentWind == first.wind) first else first.copy(wind = currentWind)
+}
 
 internal fun Map<Date, AirQuality>.currentHourAirQuality(now: Long): AirQuality? =
     entries.asSequence()

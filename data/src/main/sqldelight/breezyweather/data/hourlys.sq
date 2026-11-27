@@ -77,3 +77,7 @@ VALUES (:locationFormattedId, :date, :daylight, :weatherText, :weatherCode, :tem
 deleteHourlyListForLocationId:
 DELETE FROM hourlys
 WHERE location_formatted_id = :locationFormattedId;
+
+clearWind:
+UPDATE hourlys SET wind_speed = NULL, wind_degree = NULL, wind_gusts = NULL
+WHERE location_formatted_id = :locationFormattedId;

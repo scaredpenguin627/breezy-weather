@@ -81,23 +81,23 @@ class DailyViewHolder(parent: ViewGroup) : AbstractMainCardViewHolder(
         val trendAdapter = DailyTrendAdapter(activity, trendRecyclerView).apply {
             bindData(location)
         }
-        fun showTrend(trend: DailyTrendDisplay) {
-            trendAdapter.selectedIndex = trend.ordinal
-            val hasData = trend.hasData(location)
-            trendRecyclerView.isVisible = hasData
-            emptyState.isVisible = !hasData
-        }
-
+        val available = DailyTrendDisplay.availableFor(location)
         DailyTrendDisplay.entries.forEach { trend ->
-            chips[trend.ordinal].setOnClickListener {
-                showTrend(trend)
+            val chip = chips[trend.ordinal]
+            chip.isVisible = trend in available
+            chip.setOnClickListener {
+                trendAdapter.selectedIndex = trend.ordinal
                 setSelectedTab(trend.id)
             }
         }
-        val selected = DailyTrendDisplay.entries.firstOrNull { it.id == selectedTab }
-            ?: DailyTrendDisplay.TAG_TEMPERATURE
-        chipGroup.check(chips[selected.ordinal].id)
-        showTrend(selected)
+        val selected = available.firstOrNull { it.id == selectedTab } ?: available.firstOrNull()
+        chipGroup.isVisible = selected != null
+        trendRecyclerView.isVisible = selected != null
+        emptyState.isVisible = selected == null
+        if (selected != null) {
+            chipGroup.check(chips[selected.ordinal].id)
+            trendAdapter.selectedIndex = selected.ordinal
+        }
         trendRecyclerView.layoutManager = DailyTrendLayoutManager(context)
         trendRecyclerView.setLineColor(
             context.getThemeColor(com.google.android.material.R.attr.colorOutline)

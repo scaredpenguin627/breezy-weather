@@ -19,6 +19,8 @@ package breezyweather.domain.weather.wrappers
 import breezyweather.domain.source.SourceFeature
 import breezyweather.domain.weather.model.Alert
 import breezyweather.domain.weather.model.Minutely
+import breezyweather.domain.weather.model.Wind
+import java.util.Date
 
 /**
  * Wrapper very similar to the object in database.
@@ -33,4 +35,6 @@ data class WeatherWrapper(
     val minutelyForecast: List<Minutely>? = null,
     val alertList: List<Alert>? = null,
     val failedFeatures: Map<SourceFeature, Throwable>? = null,
+    /** Wind-only forecast times may extend beyond the source's main hourly weather forecast. */
+    val forecastWindSamples: Map<Date, Wind> = emptyMap(),
 )

@@ -47,6 +47,7 @@ import org.breezyweather.domain.settings.CurrentLocationStore
 import org.breezyweather.domain.settings.SettingsManager
 import org.breezyweather.sources.RefreshHelper
 import org.breezyweather.sources.SourceManager
+import org.breezyweather.sources.SupersededGpsRefreshException
 import org.breezyweather.ui.main.utils.RefreshErrorType
 import org.breezyweather.ui.main.utils.StatementManager
 import java.util.Date
@@ -744,6 +745,8 @@ class MainActivityViewModel @Inject constructor(
                     locationPositionErrors + locationResult.errors
                 )
             }
+        } catch (_: SupersededGpsRefreshException) {
+            cancelRequest()
         } catch (e: Throwable) {
             // Should never happen
             e.printStackTrace()

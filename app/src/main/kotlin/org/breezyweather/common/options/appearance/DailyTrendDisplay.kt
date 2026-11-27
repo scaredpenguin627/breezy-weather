@@ -47,4 +47,8 @@ enum class DailyTrendDisplay(val id: String, @StringRes val nameId: Int) {
             }
         }
     }
+
+    companion object {
+        fun availableFor(location: Location, now: Date = Date()) = entries.filter { it.hasData(location, now) }
+    }
 }

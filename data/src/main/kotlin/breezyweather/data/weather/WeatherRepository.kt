@@ -18,12 +18,15 @@
 package breezyweather.data.weather
 
 import breezyweather.data.DatabaseHandler
+import breezyweather.data.SpeedColumnAdapter
+import breezyweather.data.location.LocationMapper
 import breezyweather.domain.location.model.Location
 import breezyweather.domain.weather.model.Alert
 import breezyweather.domain.weather.model.Daily
 import breezyweather.domain.weather.model.Hourly
 import breezyweather.domain.weather.model.Minutely
 import breezyweather.domain.weather.model.Weather
+import breezyweather.domain.weather.model.Wind
 import java.util.Date
 
 class WeatherRepository(
@@ -52,6 +55,15 @@ class WeatherRepository(
                     getHourlyListByLocationId(locationFormattedId)
                 } else {
                     emptyList()
+                },
+                forecastWindSamples = if (withHourly) {
+                    handler.awaitList {
+                        forecast_wind_samplesQueries.getByLocation(locationFormattedId) { date, speed, direction ->
+                            Date(date) to Wind(degree = direction, speed = SpeedColumnAdapter.decode(speed))
+                        }
+                    }.toMap()
+                } else {
+                    emptyMap()
                 },
                 minutelyForecast = if (withMinutely) {
                     getMinutelyListByLocationId(locationFormattedId)
@@ -103,8 +115,24 @@ class WeatherRepository(
         }
     }
 
-    suspend fun insert(location: Location, weather: Weather) {
-        handler.await(inTransaction = true) {
+    suspend fun insert(location: Location, weather: Weather): Boolean {
+        return handler.await(inTransaction = true) {
+            // A GPS location keeps its ID as it moves. Discard a late response for the previous point.
+            if (location.isCurrentPosition) {
+                val saved = locationsQueries.getLocationById(
+                    location.formattedId,
+                    LocationMapper(location.automaticPhSource)::mapLocation
+                ).executeAsOneOrNull() ?: return@await false
+                val panahonForecast = location.forecastSource == "panahon" || saved.forecastSource == "panahon"
+                val pointOrSourceChanged = location.latitude != saved.latitude ||
+                    location.longitude != saved.longitude ||
+                    location.forecastSourcePreference != saved.forecastSourcePreference ||
+                    location.currentSourcePreference != saved.currentSourcePreference ||
+                    location.forecastSource != saved.forecastSource || location.currentSource != saved.currentSource
+                if (panahonForecast && pointOrSourceChanged) {
+                    return@await false
+                }
+            }
             // 1. Save Weather (will replace if necessary)
             weathersQueries.insert(
                 // base
@@ -354,6 +382,18 @@ class WeatherRepository(
                 )
             }
 
+            // Replacing the parent weather row cascades deletion of its previous wind samples.
+            weather.forecastWindSamples.forEach { (date, wind) ->
+                wind.speed?.let { speed ->
+                    forecast_wind_samplesQueries.insert(
+                        location.formattedId,
+                        date.time,
+                        SpeedColumnAdapter.encode(speed),
+                        wind.degree
+                    )
+                }
+            }
+
             // 4. Save minutely (delete first, then re-add)
             minutelysQueries.deleteMinutelyListForLocationId(location.formattedId)
             weather.minutelyForecast.forEach { minutely ->
@@ -381,6 +421,7 @@ class WeatherRepository(
                     color = alert.color.toLong()
                 )
             }
+            true
         }
     }
 

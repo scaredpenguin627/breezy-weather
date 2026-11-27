@@ -39,20 +39,21 @@ abstract class PanahonServiceStub(private val context: Context) : HttpSource(), 
     override val privacyPolicyUrl = ""
 
     private val attribution = "PAGASA PANaHON"
+    private val windModel = "ECMWF"
     override val attributionLinks = mapOf(
-        attribution to "https://www.panahon.gov.ph/",
-        "Open-Meteo" to "https://open-meteo.com/"
+        attribution to "https://panahon.gov.ph/",
+        windModel to "https://panahon.gov.ph/?model=ecmwf"
     )
     override val supportedFeatures: Map<SourceFeature, String>
         get() {
             val locale = context.currentLocale
             val windCredit = context.getStringByLocale(R.string.panahon_forecast_wind_credit, locale)
-                .format(locale, "Open-Meteo")
+                .format(locale, windModel)
             val currentWindCredit = context.getStringByLocale(R.string.panahon_current_wind_credit, locale)
-                .format(locale, "Open-Meteo")
+                .format(locale, windModel)
             return mapOf(
-                SourceFeature.FORECAST to "$attribution • $windCredit (CC BY 4.0)",
-                SourceFeature.CURRENT to "$attribution • $currentWindCredit (CC BY 4.0)",
+                SourceFeature.FORECAST to "$attribution • $windCredit",
+                SourceFeature.CURRENT to "$attribution • $currentWindCredit",
                 SourceFeature.ALERT to attribution
             )
         }

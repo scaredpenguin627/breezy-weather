@@ -79,11 +79,13 @@ import org.breezyweather.common.extensions.getFormattedTime
 import org.breezyweather.common.extensions.is12Hour
 import org.breezyweather.common.extensions.roundUpToNearestMultiplier
 import org.breezyweather.common.extensions.toBitmap
+import org.breezyweather.common.extensions.toCalendarWithTimeZone
 import org.breezyweather.common.extensions.toDate
 import org.breezyweather.common.options.appearance.DetailScreen
 import org.breezyweather.common.utils.UnitUtils
 import org.breezyweather.domain.settings.SettingsManager
 import org.breezyweather.domain.weather.model.drawableArrow
+import org.breezyweather.domain.weather.model.getContentDescription
 import org.breezyweather.domain.weather.model.getDirection
 import org.breezyweather.domain.weather.model.getIndex
 import org.breezyweather.ui.common.charts.compose.BreezyLineChart
@@ -95,8 +97,10 @@ import org.breezyweather.unit.speed.Speed.Companion.beaufort
 import org.breezyweather.unit.speed.Speed.Companion.metersPerSecond
 import org.breezyweather.unit.speed.SpeedUnit
 import org.breezyweather.unit.speed.toSpeed
+import java.util.Calendar
 import java.util.Date
 import kotlin.math.max
+import kotlin.time.Duration.Companion.hours
 
 @Composable
 fun DetailsWind(
@@ -106,18 +110,30 @@ fun DetailsWind(
     defaultValue: Pair<Date, Wind>?,
     modifier: Modifier = Modifier,
 ) {
-    val mappedValues = remember(hourlyList) {
-        buildMap(hourlyList.size) {
+    val samples = location.weather?.forecastWindSamples.orEmpty()
+    val mappedValues = remember(hourlyList, samples, daily.date, location.timeZone) {
+        val start = daily.date.time
+        val end = daily.date.toCalendarWithTimeZone(location.timeZone).apply {
+            add(Calendar.DAY_OF_MONTH, 1)
+        }.timeInMillis
+        buildMap {
+            samples.forEach { (date, wind) ->
+                if (date.time in start until end && wind.speed != null) put(date.time, wind)
+            }
             hourlyList.forEach { hourly ->
                 val wind = hourly.wind ?: return@forEach
-                if (wind.speed != null) {
+                if (wind.speed != null && (samples.isEmpty() || hourly.date.time in start until end)) {
                     put(hourly.date.time, wind)
                 }
             }
         }.toImmutableMap()
     }
-    var activeItem: Pair<Date, Wind>? by remember { mutableStateOf(null) }
-    val markerVisibilityListener = remember {
+    val discreteSamples = remember(mappedValues, samples) {
+        samples.isNotEmpty() &&
+            mappedValues.keys.sorted().zipWithNext().any { (a, b) -> b - a > 1.hours.inWholeMilliseconds }
+    }
+    var activeItem: Pair<Date, Wind>? by remember(mappedValues) { mutableStateOf(null) }
+    val markerVisibilityListener = remember(mappedValues, defaultValue) {
         object : CartesianMarkerVisibilityListener {
             override fun onShown(marker: CartesianMarker, targets: List<CartesianMarker.Target>) {
                 activeItem = targets.firstOrNull()?.let { target ->
@@ -152,7 +168,16 @@ fun DetailsWind(
         }
         if (mappedValues.size >= DetailScreen.CHART_MIN_COUNT) {
             item {
-                WindChart(location, mappedValues, daily, markerVisibilityListener)
+                WindChart(location, mappedValues, daily, markerVisibilityListener, discreteSamples)
+            }
+        } else if (samples.isNotEmpty() && mappedValues.size == 1) {
+            item {
+                val sample = mappedValues.entries.single()
+                val context = LocalContext.current
+                WindItem(
+                    header = { Text(sample.key.toDate().getFormattedTime(location, context, context.is12Hour)) },
+                    wind = sample.value
+                )
             }
         } else {
             item {
@@ -327,6 +352,7 @@ private fun WindChart(
     mappedValues: ImmutableMap<Long, Wind>,
     daily: Daily,
     markerVisibilityListener: CartesianMarkerVisibilityListener,
+    discreteSamples: Boolean,
 ) {
     val context = LocalContext.current
 
@@ -367,6 +393,17 @@ private fun WindChart(
 
     BreezyLineChart(
         location = location,
+        showPointsOnly = discreteSamples,
+        modifier = if (discreteSamples) {
+            Modifier.semantics {
+                contentDescription = mappedValues.toSortedMap().entries.joinToString("\n") { (time, wind) ->
+                    time.toDate().getFormattedTime(location, context, context.is12Hour) + " " +
+                        wind.getContentDescription(context)
+                }
+            }
+        } else {
+            Modifier
+        },
         modelProducer = modelProducer,
         theDay = daily.date,
         maxY = maxY,

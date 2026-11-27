@@ -113,13 +113,13 @@ You can drag a guideline on the chart to see the expected precipitation quantity
 
 ### Daily forecast
 
-The daily forecast shows Conditions, Wind, Precipitation and Feels like, in that order at every location.
+The daily forecast lists Conditions, Wind, Precipitation and Feels like in that order. A trend appears if at least one forecast day has data for it.
 
 For each trend, the day of the week or "Today" is shown on top of each column, and just below, the day of the month and the month are shown.
 
 The number of columns shown at once depends on your display size and font scale.
 
-When daily data is unavailable for a trend, its tab stays visible and shows an availability message. The air quality card shows the current reading.
+The air quality card shows the current reading.
 
 
 #### Conditions trends

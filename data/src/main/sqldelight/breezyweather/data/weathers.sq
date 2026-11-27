@@ -116,3 +116,10 @@ WHERE location_formatted_id = :locationFormattedId;
 
 deleteAllWeathers:
 DELETE FROM weathers;
+
+clearForecastUpdateTime:
+UPDATE weathers SET main_update_time = NULL WHERE location_formatted_id = :locationFormattedId;
+
+clearCurrentWind:
+UPDATE weathers SET wind_speed = NULL, wind_degree = NULL, wind_gusts = NULL
+WHERE location_formatted_id = :locationFormattedId;

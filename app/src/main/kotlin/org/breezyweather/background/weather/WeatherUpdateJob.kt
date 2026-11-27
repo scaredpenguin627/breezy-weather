@@ -65,6 +65,7 @@ import org.breezyweather.remoteviews.Notifications
 import org.breezyweather.remoteviews.presenters.MultiCityWidgetIMP
 import org.breezyweather.sources.RefreshHelper
 import org.breezyweather.sources.SourceManager
+import org.breezyweather.sources.SupersededGpsRefreshException
 import org.breezyweather.ui.main.utils.RefreshErrorType
 import java.io.File
 import java.util.Date
@@ -278,6 +279,8 @@ class WeatherUpdateJob @AssistedInject constructor(
                             failedUpdates.add(location to it.getMessage(context, sourceManager))
                         }
                     }
+                } catch (_: SupersededGpsRefreshException) {
+                    return@withUpdateNotification
                 } catch (e: Throwable) {
                     e.printStackTrace()
                     val errorMessage = if (e.message.isNullOrEmpty()) {

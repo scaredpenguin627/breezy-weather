@@ -180,3 +180,8 @@ VALUES (:locationFormattedId, :date, :daytimeWeatherText, :daytimeweatherSummary
 deleteDailyListForLocationId:
 DELETE FROM dailys
 WHERE location_formatted_id = :locationFormattedId;
+
+clearWind:
+UPDATE dailys SET daytime_wind_speed = NULL, daytime_wind_degree = NULL, daytime_wind_gusts = NULL,
+    nighttime_wind_speed = NULL, nighttime_wind_degree = NULL, nighttime_wind_gusts = NULL
+WHERE location_formatted_id = :locationFormattedId;
