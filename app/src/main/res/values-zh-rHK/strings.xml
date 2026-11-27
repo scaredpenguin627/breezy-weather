@@ -503,6 +503,7 @@
     <string name="notification_style_cities">多城市</string>
     <string name="notification_app_update_available">有新版本！</string>
     <string name="about_app">關於</string>
+    <string name="about_fork_notice">Breezy Weather 的非官方分支</string>
     <string name="about_check_for_app_updates">檢查應用程式更新</string>
     <string name="about_no_new_updates">沒有可用的更新</string>
     <string name="about_contact">聯絡</string>

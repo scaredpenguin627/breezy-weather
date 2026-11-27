@@ -1,14 +1,14 @@
 <div align="center">
 <br />
-<img src="app/src/res_breezy/mipmap-xxxhdpi/ic_launcher_round.webp" alt="Logo" />
+<img src="app/src/res_fork/mipmap-xxxhdpi/ic_launcher_round.webp" alt="Phweather logo" />
 </div>
 
-<h1 align="center">Breezy Weather</h1>
+<h1 align="center">Phweather</h1>
 
-<br />
+<h4 align="center">Unofficial fork of Breezy Weather with Philippine data sources: PAGASA PANaHON forecasts and weather alerts, and DENR-EMB Metro Manila air quality.</h4>
 
 <div align="center">
-  <img alt="API 21+" src="https://img.shields.io/badge/Api%2021+-50f270?logo=android&logoColor=black&style=for-the-badge" />
+  <img alt="API 24+" src="https://img.shields.io/badge/Api%2024+-50f270?logo=android&logoColor=black&style=for-the-badge" />
   <a href="https://kotlinlang.org/">
     <img alt="Kotlin" src="https://img.shields.io/badge/Kotlin-a503fc?logo=kotlin&logoColor=white&style=for-the-badge" />
   </a>
@@ -19,66 +19,36 @@
     <img alt="Material 3 Expressive" src="https://custom-icon-badges.demolab.com/badge/m3%20expressive-lightblue?style=for-the-badge&logoColor=333&logo=material-you" />
   </a>
   <br />
-  <a href="https://github.com/breezy-weather/breezy-weather/blob/main/LICENSE">
-    <img src="https://img.shields.io/github/license/breezy-weather/breezy-weather?style=for-the-badge" alt="License LGPL-3.0" />
+  <a href="https://github.com/scaredpenguin627/breezy-weather/blob/main/LICENSE">
+    <img src="https://img.shields.io/github/license/scaredpenguin627/breezy-weather?style=for-the-badge" alt="License LGPL-3.0" />
   </a>
-  <img src="https://img.shields.io/github/languages/code-size/breezy-weather/breezy-weather?style=for-the-badge" alt="GitHub code size in bytes" />
-  <br /><br />
-  <a href="https://github.com/breezy-weather/breezy-weather/releases">
-      <img src="https://img.shields.io/github/v/release/breezy-weather/breezy-weather?color=purple&include_prereleases&logo=github&style=for-the-badge" alt="Download from GitHub" />
-  </a>
-  <a href="https://apt.izzysoft.de/fdroid/index/apk/org.breezyweather/">
-      <img src="https://img.shields.io/endpoint?url=https://apt.izzysoft.de/fdroid/api/v1/shield/org.breezyweather?color=purple&include_prereleases&logo=FDROID&style=for-the-badge" alt="Download from IzzyOnDroid repo" />
-  </a>
-  <a href="https://f-droid.org/packages/org.breezyweather/">
-      <img src="https://img.shields.io/f-droid/v/org.breezyweather?color=purple&include_prereleases&logo=FDROID&style=for-the-badge" alt="Download from F-Droid default repo" />
+  <a href="https://github.com/scaredpenguin627/breezy-weather/releases">
+    <img src="https://img.shields.io/github/v/release/scaredpenguin627/breezy-weather?color=purple&include_prereleases&logo=github&style=for-the-badge" alt="Download from GitHub" />
   </a>
 </div>
 
-
-<h4 align="center">Breezy Weather is a feature-rich free and open source Material 3 Expressive weather app with well-thought-out visualizations, supporting forecast, observations, nowcasting, air quality, pollen, alerts, from more than 50 weather sources.</h4>
-
-<div align="center">
+> **This is not Breezy Weather.**
+> Phweather is an unofficial fork of [Breezy Weather](https://github.com/breezy-weather/breezy-weather),
+> not affiliated with or endorsed by the Breezy Weather project.
+> It uses its own app name **Phweather** and application ID `io.github.scaredpenguin627.phweather`,
+> so it can be installed alongside the official app.
+> Each release is signed with a one-off key, so uninstall the previous build before installing another one.
 
 # ⬇️ Download
 
-<a href="https://github.com/breezy-weather/breezy-weather/releases">
-<img src="https://user-images.githubusercontent.com/69304392/148696068-0cfea65d-b18f-4685-82b5-329a330b1c0d.png"
-alt="Get it on GitHub" align="center" height="80" /></a>
+Get the latest APK from the [Releases page](https://github.com/scaredpenguin627/breezy-weather/releases/latest):
 
-<a href="https://github.com/breezy-weather/breezy-weather/blob/main/INSTALL.md#obtainium">
-<img src="https://github.com/ImranR98/Obtainium/blob/main/assets/graphics/badge_obtainium.png"
-alt="Get it on Obtainium" align="center" height="54" />
-</a>
+- **Standard (recommended)** — `breezy-weather-<version>_standard.apk`, includes PANaHON and DENR-EMB.
+- **Architecture-specific** — `arm64-v8a` (v8), `armeabi-v7a` (v7), `x86`, `x86_64` builds of the standard flavor.
+- **Freenet** — free-network sources only; PANaHON and DENR-EMB are not available there.
 
-<a href="https://github.com/breezy-weather/breezy-weather/blob/main/INSTALL.md#f-droid-client">
-<img src="https://f-droid.org/badge/get-it-on.png"
-alt="Get it on F-Droid" align="center" height="80" /></a>
-</div>
-
-<div align="center">
-    <p><a href="https://github.com/breezy-weather/breezy-weather/blob/main/INSTALL.md"><strong>All installation methods</strong></a></p>
-</div>
-
-<div align="center">
-  <p><strong>SHA-256 hash of the signing certificate:</strong> 29d435f70aa9aec3c1faff7f7ffa6e15785088d87f06ecfcab9c3cc62dc269d8<br />
-  SHA-256 checksums are also provided per file on the <a href="https://github.com/breezy-weather/breezy-weather/releases">GitHub releases page</a>.</p>
-</div>
+Installation details: [INSTALL.md](INSTALL.md). Philippine sources: [docs/SOURCES.md](docs/SOURCES.md#panahon).
 
 <hr />
 
-<div align="center">
-    <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/01-main-header-light.png" alt="" style="width: 300px" />
-    <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/02-main-header-dark.png" alt="" style="width: 300px" />
-    <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/03-main-blocks-1.png" alt="" style="width: 300px" />
-    <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/04-main-blocks-2.png" alt="" style="width: 300px" />
-    <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/05-settings.png" alt="" style="width: 300px" />
-    <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/06-sources.png" alt="" style="width: 300px" />
-    <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/07-details.png" alt="" style="width: 300px" />
-</div>
-
 # ✨ Features
 
+- 🇵🇭 Philippine sources: PAGASA PANaHON website forecasts and weather alerts, DENR-EMB Metro Manila particulate AQI
 - 🌤️ Weather data
   - Daily and hourly forecasts up to 16 days
   - Precipitation in the next hour

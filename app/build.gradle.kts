@@ -22,7 +22,8 @@ configure<ApplicationExtension> {
     namespace = "org.breezyweather"
 
     defaultConfig {
-        applicationId = "org.breezyweather"
+        // Own application ID: keep Breezy Weather installable side by side (fork requirement).
+        applicationId = "io.github.scaredpenguin627.phweather"
         versionCode = 60203
         versionName = "6.2.3"
 

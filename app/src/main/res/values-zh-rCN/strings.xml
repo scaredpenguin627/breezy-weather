@@ -101,6 +101,7 @@
     <string name="action_help">帮助</string>
     <string name="action_learn_more">了解更多</string>
     <string name="about_app">关于本应用</string>
+    <string name="about_fork_notice">Breezy Weather 的非官方分支</string>
     <string name="about_contributors">贡献者</string>
     <string name="about_translators">译者</string>
     <!-- feedback. -->

@@ -112,10 +112,11 @@ internal fun AboutScreen(
     }
 
     val contactLinks = buildList {
+        // Hide only the official Breezy Weather repository: a fork may link its own source.
         BuildConfig.SOURCE_CODE_LINK.takeIf {
             it.startsWith("https://") &&
                 (
-                    !BuildConfig.SOURCE_CODE_LINK.contains("breezy", ignoreCase = true) ||
+                    it.trimEnd('/') != "https://github.com/breezy-weather/breezy-weather" ||
                         BreezyWeather.instance.isSignedByBreezy ||
                         BreezyWeather.instance.debugMode
                     )
@@ -396,6 +397,11 @@ private fun Header() {
             text = versionFormatted,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             style = MaterialTheme.typography.labelMedium
+        )
+        Text(
+            text = stringResource(R.string.about_fork_notice),
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = MaterialTheme.typography.labelSmall
         )
     }
 }
