@@ -113,13 +113,13 @@ You can drag a guideline on the chart to see the expected precipitation quantity
 
 ### Daily forecast
 
-Daily forecast is made of multiple tabs called trends. Order of daily trends can be changed in settings.
+The daily forecast shows Conditions, Air quality, Wind, Precipitation and Feels like, in that order at every location.
 
 For each trend, the day of the week or "Today" is shown on top of each column, and just below, the day of the month and the month are shown.
 
 The number of columns shown at once depends on your display size and font scale.
 
-When data is missing for the whole period, the tab will be hidden.
+When daily data is unavailable for a trend, its tab stays visible and shows an availability message. An air quality source that provides only a current station reading will show that reading on the air quality card.
 
 
 #### Conditions trends
@@ -171,21 +171,6 @@ Wind icons and speed bars have a different color according to Beaufort wind scal
 Two lines are shown corresponding to show when wind speed is exceeding Gentle breeze level for daytime and for nighttime. It can be disabled in the settings (Appearance).
 
 
-#### UV trends
-
-Each column shows the maximum UV index for the day (bar + text).
-
-Bar color will have a different color according to UV level:
-
-- Green: from 0 to 2
-- Yellow: from 3 to 5
-- Orange: from 6 to 7
-- Red: from 8 to 10
-- Purple: 11 and above
-
-A line shows the alert level (7). It can be disabled in the settings (Appearance).
-
-
 #### Precipitation trends
 
 From top to bottom:
@@ -196,13 +181,6 @@ From top to bottom:
 - Weather condition of nighttime (icon)
 
 
-#### Sunshine trends
-
-Each column shows the sunshine duration in hours for the day (bar + text) from 00:00 to 23:59.
-
-Bar color is always light orange. It’s filled relative to the maximum daylight duration (from sunrise to sunset) of the daily forecast period. For example, if there are 6 hours of sunshine today, and the maximum daylight duration is 12 hours, the bar will be half-filled (50%).
-
-
 #### Feels like trends
 
 Feels like temperature is the first available data from this list:
@@ -211,7 +189,6 @@ Feels like temperature is the first available data from this list:
 - Computed apparent temperature
 - Computed wind chill temperature
 - Computed Humidex
-- Temperature
 
 From top to bottom:
 
@@ -223,7 +200,7 @@ From top to bottom:
 
 ### Hourly forecast
 
-Just like daily forecast, hourly is made of the same tabs called trends. Order of hourly trends can be changed in settings.
+The hourly forecast has its own trend tabs. Their order can be changed in settings.
 
 For each trend, the hour is shown on top of each column. If it is the first hour listed or if it midnight, the subtitle will be highlighted.
 

@@ -167,11 +167,6 @@
             android:theme="@style/BreezyWeatherTheme" />
 
         <activity
-            android:name=".ui.settings.activities.DailyTrendDisplayManageActivity"
-            android:label="@string/settings_main_daily_trends_title"
-            android:theme="@style/BreezyWeatherTheme" />
-
-        <activity
             android:name=".ui.settings.activities.HourlyTrendDisplayManageActivity"
             android:label="@string/settings_main_hourly_trends_title"
             android:theme="@style/BreezyWeatherTheme" />

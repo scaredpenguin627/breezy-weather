@@ -30,11 +30,7 @@ enum class CardDisplay(
 ) : BaseEnum {
 
     CARD_NOWCAST("nowcast", R.string.precipitation_nowcasting),
-    CARD_DAILY_FORECAST(
-        "daily_forecast",
-        R.string.daily_forecast,
-        { activity -> IntentHelper.startDailyTrendDisplayManageActivity(activity) }
-    ),
+    CARD_DAILY_FORECAST("daily_forecast", R.string.daily_forecast),
     CARD_HOURLY_FORECAST(
         "hourly_forecast",
         R.string.hourly_forecast,

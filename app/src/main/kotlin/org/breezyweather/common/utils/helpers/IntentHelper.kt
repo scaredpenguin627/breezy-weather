@@ -32,7 +32,6 @@ import org.breezyweather.ui.details.DetailsActivity
 import org.breezyweather.ui.main.MainActivity
 import org.breezyweather.ui.search.SearchActivity
 import org.breezyweather.ui.settings.activities.CardDisplayManageActivity
-import org.breezyweather.ui.settings.activities.DailyTrendDisplayManageActivity
 import org.breezyweather.ui.settings.activities.DependenciesActivity
 import org.breezyweather.ui.settings.activities.HourlyTrendDisplayManageActivity
 import org.breezyweather.ui.settings.activities.PreviewIconActivity
@@ -136,10 +135,6 @@ object IntentHelper {
 
     fun startCardDisplayManageActivity(activity: Activity) {
         activity.startActivity(Intent(activity, CardDisplayManageActivity::class.java))
-    }
-
-    fun startDailyTrendDisplayManageActivity(activity: Activity) {
-        activity.startActivity(Intent(activity, DailyTrendDisplayManageActivity::class.java))
     }
 
     fun startHourlyTrendDisplayManageActivity(activity: Activity) {

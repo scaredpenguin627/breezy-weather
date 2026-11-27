@@ -31,7 +31,6 @@ import org.breezyweather.common.extensions.isMotionReduced
 import org.breezyweather.common.extensions.plus
 import org.breezyweather.common.options.appearance.BackgroundAnimationMode
 import org.breezyweather.common.options.appearance.CardDisplay
-import org.breezyweather.common.options.appearance.DailyTrendDisplay
 import org.breezyweather.common.options.appearance.HourlyTrendDisplay
 import org.breezyweather.common.utils.helpers.IntentHelper
 import org.breezyweather.common.utils.helpers.SnackbarHelper
@@ -57,7 +56,6 @@ fun MainScreenSettingsScreen(
     context: Context,
     onNavigateBack: () -> Unit,
     cardDisplayList: ImmutableList<CardDisplay>,
-    dailyTrendDisplayList: ImmutableList<DailyTrendDisplay>,
     hourlyTrendDisplayList: ImmutableList<HourlyTrendDisplay>,
     updateWidgetIfNecessary: (Context) -> Unit,
     modifier: Modifier = Modifier,
@@ -89,19 +87,6 @@ fun MainScreenSettingsScreen(
                 ) {
                     (context as? Activity)?.let { a ->
                         IntentHelper.startCardDisplayManageActivity(a)
-                    }
-                }
-            }
-            smallSeparatorItem()
-            clickablePreferenceItem(
-                R.string.settings_main_daily_trends_title
-            ) {
-                PreferenceViewWithCard(
-                    title = stringResource(it),
-                    summary = DailyTrendDisplay.getSummary(context, dailyTrendDisplayList)
-                ) {
-                    (context as? Activity)?.let { a ->
-                        IntentHelper.startDailyTrendDisplayManageActivity(a)
                     }
                 }
             }

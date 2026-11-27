@@ -26,7 +26,6 @@ import kotlinx.coroutines.runBlocking
 import org.breezyweather.background.forecast.TodayForecastNotificationJob
 import org.breezyweather.background.forecast.TomorrowForecastNotificationJob
 import org.breezyweather.background.weather.WeatherUpdateJob
-import org.breezyweather.common.options.appearance.DailyTrendDisplay
 import org.breezyweather.common.options.appearance.HourlyTrendDisplay
 import org.breezyweather.domain.settings.SettingsManager
 import org.breezyweather.sources.SourceManager
@@ -65,13 +64,6 @@ object Migrations {
                                     "$curHourlyTrendDisplayList&feels_like&humidity&pressure&cloud_cover&visibility"
                                 )
                         }
-                        val curDailyTrendDisplayList = DailyTrendDisplay.toValue(
-                            SettingsManager.getInstance(context).dailyTrendDisplayList
-                        )
-                        if (curDailyTrendDisplayList != SettingsManager.DEFAULT_DAILY_TREND_DISPLAY) {
-                            SettingsManager.getInstance(context).dailyTrendDisplayList =
-                                DailyTrendDisplay.toDailyTrendDisplayList("$curDailyTrendDisplayList&feels_like")
-                        }
                     } catch (ignored: Throwable) {
                         // ignored
                     }
@@ -82,20 +74,6 @@ object Migrations {
                         if (file.exists() && file.isDirectory) {
                             file.deleteRecursively()
                         }
-                    }
-                }
-
-                if (oldVersion < 50102) {
-                    // V5.1.2 adds daily sunshine chart
-                    try {
-                        val curDailyTrendDisplayList =
-                            DailyTrendDisplay.toValue(SettingsManager.getInstance(context).dailyTrendDisplayList)
-                        if (curDailyTrendDisplayList != SettingsManager.DEFAULT_DAILY_TREND_DISPLAY) {
-                            SettingsManager.getInstance(context).dailyTrendDisplayList =
-                                DailyTrendDisplay.toDailyTrendDisplayList("$curDailyTrendDisplayList&sunshine")
-                        }
-                    } catch (ignored: Throwable) {
-                        // ignored
                     }
                 }
 

@@ -49,14 +49,15 @@
         <com.google.android.material.button.MaterialButtonGroup
             android:id="@+id/daily_block_button_group"
             style="@style/Widget.Material3Expressive.MaterialButtonGroup.Connected"
-            app:overflowMode="menu"
+            app:overflowMode="wrap"
             android:layout_marginTop="@dimen/small_margin"
-            android:layout_marginStart="@dimen/large_margin"
-            android:layout_width="match_parent"
+            android:layout_marginHorizontal="@dimen/large_margin"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
             app:layout_constraintTop_toBottomOf="@+id/daily_block_subtitle"
-            app:layout_constraintStart_toStartOf="@+id/daily_block_title_icon" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
         <org.breezyweather.ui.common.widgets.trend.TrendRecyclerView
             android:id="@+id/daily_block_trendRecyclerView"
@@ -66,6 +67,21 @@
             tools:ignore="UnusedAttribute"
             app:layout_constraintTop_toBottomOf="@+id/daily_block_button_group"
             app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
+            android:id="@+id/daily_block_empty"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/large_margin"
+            android:minHeight="88dp"
+            android:gravity="center"
+            android:accessibilityLiveRegion="polite"
+            android:textAppearance="?attr/textAppearanceBodyMedium"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@id/daily_block_button_group"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

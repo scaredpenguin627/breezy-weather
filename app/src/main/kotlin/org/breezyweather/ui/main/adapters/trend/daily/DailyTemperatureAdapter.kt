@@ -17,7 +17,6 @@
 package org.breezyweather.ui.main.adapters.trend.daily
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -57,7 +56,8 @@ class DailyTemperatureAdapter(
     private var mLowestTemperature: Float? = null
 
     inner class ViewHolder(itemView: View) : AbsDailyTrendAdapter.ViewHolder(itemView) {
-        private val mPolylineAndHistogramView = PolylineAndHistogramView(itemView.context, hasTopPolylineLabel = true)
+        private val mPolylineAndHistogramView =
+            PolylineAndHistogramView(itemView.context, isDailyTemperatureChart = true)
 
         init {
             dailyItem.chartItemView = mPolylineAndHistogramView
@@ -110,7 +110,9 @@ class DailyTemperatureAdapter(
             }
             dailyItem.setDayIconDrawable(
                 daily.day?.weatherCode?.let { ResourceHelper.getWeatherIcon(mResourceProvider, it, true) },
-                missingIconVisibility = View.INVISIBLE
+                missingIconVisibility = View.INVISIBLE,
+                fallbackText = daily.day?.takeIf { it.weatherCode == null && it.temperature?.temperature == null }
+                    ?.weatherText.localizedWeatherText(activity)
             )
             val daytimePrecipitationProbability = daily.day?.precipitationProbability?.total
             val nighttimePrecipitationProbability = daily.night?.precipitationProbability?.total
@@ -165,7 +167,9 @@ class DailyTemperatureAdapter(
             mPolylineAndHistogramView.setHistogramAlpha(if (lightTheme) 0.2f else 0.5f)
             dailyItem.setNightIconDrawable(
                 daily.night?.weatherCode?.let { ResourceHelper.getWeatherIcon(mResourceProvider, it, false) },
-                missingIconVisibility = View.INVISIBLE
+                missingIconVisibility = View.INVISIBLE,
+                fallbackText = daily.night?.takeIf { it.weatherCode == null && it.temperature?.temperature == null }
+                    ?.weatherText.localizedWeatherText(activity)
             )
             dailyItem.contentDescription = talkBackBuilder.toString()
             dailyItem.setOnClickListener {
@@ -264,8 +268,6 @@ class DailyTemperatureAdapter(
     }
 
     override fun getItemCount() = location.weather!!.dailyForecast.size
-
-    override fun getDisplayName(context: Context) = context.getString(R.string.tag_temperature)
 
     override fun bindBackgroundForHost(host: TrendRecyclerView) {
         host.setData(null, 0f, 0f)

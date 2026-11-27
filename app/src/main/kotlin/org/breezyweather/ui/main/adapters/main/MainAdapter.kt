@@ -24,7 +24,6 @@ import androidx.recyclerview.widget.RecyclerView
 import breezyweather.domain.location.model.Location
 import org.breezyweather.common.extensions.toCalendarWithTimeZone
 import org.breezyweather.common.options.appearance.CardDisplay
-import org.breezyweather.common.options.appearance.DailyTrendDisplay
 import org.breezyweather.domain.settings.SettingsManager
 import org.breezyweather.domain.weather.model.hasMinutelyPrecipitation
 import org.breezyweather.domain.weather.model.isIndexValid
@@ -115,11 +114,6 @@ class MainAdapter(
                     (!weather.hasMinutelyPrecipitation || weather.minutelyForecast.size < 3)
                 ) {
                     continue
-                }
-                if (c === CardDisplay.CARD_DAILY_FORECAST) {
-                    val hasSummary = !weather.current?.dailyForecast.isNullOrEmpty()
-                    val trends = DailyTrendDisplay.availableFor(location, settings.dailyTrendDisplayList)
-                    if (weather.dailyForecast.isEmpty() || (trends.isEmpty() && !hasSummary)) continue
                 }
                 if (c === CardDisplay.CARD_HOURLY_FORECAST && weather.nextHourlyForecast.isEmpty()) {
                     continue

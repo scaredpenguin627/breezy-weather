@@ -83,9 +83,6 @@ class SettingsActivity : BreezyActivity() {
     private val cardDisplayState = mutableStateOf(
         SettingsManager.getInstance(this).cardDisplayList
     )
-    private val dailyTrendDisplayState = mutableStateOf(
-        SettingsManager.getInstance(this).dailyTrendDisplayList
-    )
     private val hourlyTrendDisplayState = mutableStateOf(
         SettingsManager.getInstance(this).hourlyTrendDisplayList
     )
@@ -124,11 +121,6 @@ class SettingsActivity : BreezyActivity() {
             val cardDisplayList = SettingsManager.getInstance(this).cardDisplayList
             if (cardDisplayState.value != cardDisplayList) {
                 cardDisplayState.value = cardDisplayList
-            }
-
-            val dailyTrendDisplayList = SettingsManager.getInstance(this).dailyTrendDisplayList
-            if (dailyTrendDisplayState.value != dailyTrendDisplayList) {
-                dailyTrendDisplayState.value = dailyTrendDisplayList
             }
 
             val hourlyTrendDisplayList = SettingsManager.getInstance(this).hourlyTrendDisplayList
@@ -251,7 +243,6 @@ class SettingsActivity : BreezyActivity() {
                     context = this@SettingsActivity,
                     onNavigateBack = { onBack() },
                     cardDisplayList = remember { cardDisplayState }.value.toImmutableList(),
-                    dailyTrendDisplayList = remember { dailyTrendDisplayState }.value.toImmutableList(),
                     hourlyTrendDisplayList = remember { hourlyTrendDisplayState }.value.toImmutableList(),
                     updateWidgetIfNecessary = { context: Context ->
                         scope.launch {

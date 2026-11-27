@@ -17,7 +17,6 @@
 package org.breezyweather.ui.main.adapters.trend.daily
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -57,7 +56,8 @@ class DailyFeelsLikeAdapter(
     private var mLowestTemperature: Float? = null
 
     inner class ViewHolder(itemView: View) : AbsDailyTrendAdapter.ViewHolder(itemView) {
-        private val mPolylineAndHistogramView = PolylineAndHistogramView(itemView.context, hasTopPolylineLabel = true)
+        private val mPolylineAndHistogramView =
+            PolylineAndHistogramView(itemView.context, isDailyTemperatureChart = true)
 
         init {
             dailyItem.chartItemView = mPolylineAndHistogramView
@@ -72,11 +72,14 @@ class DailyFeelsLikeAdapter(
                 talkBackBuilder.append(activity.getString(org.breezyweather.unit.R.string.locale_separator))
                     .append(activity.getString(R.string.daytime))
                     .append(activity.getString(R.string.colon_separator))
-                day.temperature?.feelsLikeTemperature?.let {
-                    talkBackBuilder.append(it.formatMeasure(activity, temperatureUnit, unitWidth = UnitWidth.LONG))
-                }
+                talkBackBuilder.append(
+                    day.temperature?.feelsLikeTemperature
+                        ?.formatMeasure(activity, temperatureUnit, unitWidth = UnitWidth.LONG)
+                        ?: activity.getString(R.string.null_data_text)
+                )
                 if (!day.weatherText.isNullOrEmpty()) {
-                    talkBackBuilder.append(day.weatherText.localizedWeatherText(activity))
+                    talkBackBuilder.append(activity.getString(org.breezyweather.unit.R.string.locale_separator))
+                        .append(day.weatherText.localizedWeatherText(activity))
                 }
                 if (showPrecipitationProbability) {
                     day.precipitationProbability?.total?.let { p ->
@@ -91,11 +94,14 @@ class DailyFeelsLikeAdapter(
                 talkBackBuilder.append(activity.getString(org.breezyweather.unit.R.string.locale_separator))
                     .append(activity.getString(R.string.nighttime))
                     .append(activity.getString(R.string.colon_separator))
-                night.temperature?.feelsLikeTemperature?.let {
-                    talkBackBuilder.append(it.formatMeasure(activity, temperatureUnit, unitWidth = UnitWidth.LONG))
-                }
+                talkBackBuilder.append(
+                    night.temperature?.feelsLikeTemperature
+                        ?.formatMeasure(activity, temperatureUnit, unitWidth = UnitWidth.LONG)
+                        ?: activity.getString(R.string.null_data_text)
+                )
                 if (!night.weatherText.isNullOrEmpty()) {
-                    talkBackBuilder.append(night.weatherText.localizedWeatherText(activity))
+                    talkBackBuilder.append(activity.getString(org.breezyweather.unit.R.string.locale_separator))
+                        .append(night.weatherText.localizedWeatherText(activity))
                 }
                 if (showPrecipitationProbability) {
                     night.precipitationProbability?.total?.let { p ->
@@ -117,14 +123,14 @@ class DailyFeelsLikeAdapter(
             mPolylineAndHistogramView.setData(
                 buildTemperatureArrayForItem(mDaytimeTemperatures, position),
                 buildTemperatureArrayForItem(mNighttimeTemperatures, position),
-                (daily.day?.temperature?.feelsLikeTemperature ?: daily.day?.temperature?.temperature)
+                daily.day?.temperature?.feelsLikeTemperature
                     ?.formatMeasure(
                         activity,
                         temperatureUnit,
                         valueWidth = UnitWidth.NARROW,
                         unitWidth = UnitWidth.NARROW
                     ),
-                (daily.night?.temperature?.feelsLikeTemperature ?: daily.night?.temperature?.temperature)
+                daily.night?.temperature?.feelsLikeTemperature
                     ?.formatMeasure(
                         activity,
                         temperatureUnit,
@@ -199,7 +205,6 @@ class DailyFeelsLikeAdapter(
             while (i < mDaytimeTemperatures.size) {
                 mDaytimeTemperatures[i] =
                     weather.dailyForecast.getOrNull(i / 2)?.day?.temperature?.feelsLikeTemperature?.value?.toFloat()
-                        ?: weather.dailyForecast.getOrNull(i / 2)?.day?.temperature?.temperature?.value?.toFloat()
                 i += 2
             }
         }
@@ -220,7 +225,6 @@ class DailyFeelsLikeAdapter(
             while (i < mNighttimeTemperatures.size) {
                 mNighttimeTemperatures[i] =
                     weather.dailyForecast.getOrNull(i / 2)?.night?.temperature?.feelsLikeTemperature?.value?.toFloat()
-                        ?: weather.dailyForecast.getOrNull(i / 2)?.night?.temperature?.temperature?.value?.toFloat()
                 i += 2
             }
         }
@@ -237,7 +241,7 @@ class DailyFeelsLikeAdapter(
             }
         }
         weather.dailyForecast.forEach { daily ->
-            (daily.day?.temperature?.feelsLikeTemperature ?: daily.day?.temperature?.temperature)?.value?.let {
+            daily.day?.temperature?.feelsLikeTemperature?.value?.let {
                 if (mHighestTemperature == null || it > mHighestTemperature!!) {
                     mHighestTemperature = it.toFloat()
                 }
@@ -245,7 +249,7 @@ class DailyFeelsLikeAdapter(
                     mLowestTemperature = it.toFloat()
                 }
             }
-            (daily.night?.temperature?.feelsLikeTemperature ?: daily.night?.temperature?.temperature)?.value?.let {
+            daily.night?.temperature?.feelsLikeTemperature?.value?.let {
                 if (mHighestTemperature == null || it > mHighestTemperature!!) {
                     mHighestTemperature = it.toFloat()
                 }
@@ -266,8 +270,6 @@ class DailyFeelsLikeAdapter(
     }
 
     override fun getItemCount() = location.weather!!.dailyForecast.size
-
-    override fun getDisplayName(context: Context) = context.getString(R.string.tag_feels_like)
 
     override fun bindBackgroundForHost(host: TrendRecyclerView) {
         host.setData(null, 0f, 0f)

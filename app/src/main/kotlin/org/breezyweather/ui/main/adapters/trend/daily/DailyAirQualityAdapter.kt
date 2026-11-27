@@ -17,7 +17,6 @@
 package org.breezyweather.ui.main.adapters.trend.daily
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
@@ -127,8 +126,6 @@ class DailyAirQualityAdapter(
     }
 
     override fun getItemCount() = location.weather!!.dailyForecast.size
-
-    override fun getDisplayName(context: Context) = context.getString(R.string.tag_aqi)
 
     override fun bindBackgroundForHost(host: TrendRecyclerView) {
         val keyLineList = mutableListOf<TrendRecyclerView.KeyLine>()

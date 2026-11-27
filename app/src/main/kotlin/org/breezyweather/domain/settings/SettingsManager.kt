@@ -28,7 +28,6 @@ import org.breezyweather.common.options.UpdateInterval
 import org.breezyweather.common.options.WidgetWeekIconMode
 import org.breezyweather.common.options.appearance.BackgroundAnimationMode
 import org.breezyweather.common.options.appearance.CardDisplay
-import org.breezyweather.common.options.appearance.DailyTrendDisplay
 import org.breezyweather.common.options.appearance.HourlyTrendDisplay
 import org.breezyweather.unit.distance.DistanceUnit
 import org.breezyweather.unit.precipitation.PrecipitationUnit
@@ -71,13 +70,6 @@ class SettingsManager private constructor(
             "&pressure" +
             "&sun" +
             "&moon"
-        const val DEFAULT_DAILY_TREND_DISPLAY = "temperature" +
-            "&air_quality" +
-            "&wind" +
-            "&uv_index" +
-            "&precipitation" +
-            "&sunshine" +
-            "&feels_like"
         const val DEFAULT_HOURLY_TREND_DISPLAY = "temperature" +
             "&air_quality" +
             "&wind" +
@@ -285,20 +277,6 @@ class SettingsManager private constructor(
         get() = CardDisplay
             .toCardDisplayList(
                 config.getString("card_display", DEFAULT_CARD_DISPLAY)
-            )
-            .toMutableList()
-
-    var dailyTrendDisplayList: List<DailyTrendDisplay>
-        set(value) {
-            config
-                .edit()
-                .putString("daily_trend_display", DailyTrendDisplay.toValue(value))
-                .apply()
-            notifySettingsChanged()
-        }
-        get() = DailyTrendDisplay
-            .toDailyTrendDisplayList(
-                config.getString("daily_trend_display", DEFAULT_DAILY_TREND_DISPLAY)
             )
             .toMutableList()
 

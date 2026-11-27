@@ -17,7 +17,6 @@
 package org.breezyweather.ui.main.adapters.trend.daily
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
@@ -65,40 +64,28 @@ class DailyPrecipitationAdapter(
             val daily = weather.dailyForecast[position]
             val daytimePrecipitation = daily.day?.precipitation?.total
             val nighttimePrecipitation = daily.night?.precipitation?.total
-            if ((daytimePrecipitation != null && daytimePrecipitation.value > 0) ||
-                (nighttimePrecipitation != null && nighttimePrecipitation.value > 0)
-            ) {
-                talkBackBuilder.append(activity.getString(org.breezyweather.unit.R.string.locale_separator))
-                    .append(activity.getString(R.string.daytime))
-                    .append(activity.getString(R.string.colon_separator))
-                    .append(
-                        if (daytimePrecipitation != null && daytimePrecipitation.value > 0) {
-                            daytimePrecipitation.formatMeasure(activity, unitWidth = UnitWidth.LONG)
-                        } else {
-                            activity.getString(R.string.precipitation_none)
-                        }
-                    )
-                talkBackBuilder.append(activity.getString(org.breezyweather.unit.R.string.locale_separator))
-                    .append(activity.getString(R.string.nighttime))
-                    .append(activity.getString(R.string.colon_separator))
-                    .append(
-                        if (nighttimePrecipitation != null && nighttimePrecipitation.value > 0) {
-                            nighttimePrecipitation.formatMeasure(activity, unitWidth = UnitWidth.LONG)
-                        } else {
-                            activity.getString(R.string.precipitation_none)
-                        }
-                    )
-            } else {
-                talkBackBuilder.append(activity.getString(org.breezyweather.unit.R.string.locale_separator))
-                    .append(activity.getString(R.string.precipitation_none))
-            }
+            talkBackBuilder
+                .append(activity.getString(org.breezyweather.unit.R.string.locale_separator))
+                .append(activity.getString(R.string.daytime))
+                .append(activity.getString(R.string.colon_separator))
+                .append(
+                    daytimePrecipitation?.formatMeasure(activity, unitWidth = UnitWidth.LONG)
+                        ?: activity.getString(R.string.null_data_text)
+                )
+                .append(activity.getString(org.breezyweather.unit.R.string.locale_separator))
+                .append(activity.getString(R.string.nighttime))
+                .append(activity.getString(R.string.colon_separator))
+                .append(
+                    nighttimePrecipitation?.formatMeasure(activity, unitWidth = UnitWidth.LONG)
+                        ?: activity.getString(R.string.null_data_text)
+                )
             dailyItem.setDayIconDrawable(
                 daily.day?.weatherCode?.let { ResourceHelper.getWeatherIcon(mResourceProvider, it, true) },
                 missingIconVisibility = View.INVISIBLE
             )
             mDoubleHistogramView.setData(
-                daily.day?.precipitation?.total?.value?.toFloat(),
-                daily.night?.precipitation?.total?.value?.toFloat(),
+                daytimePrecipitation?.value?.toFloat(),
+                nighttimePrecipitation?.value?.toFloat(),
                 daytimePrecipitation?.formatValue(activity),
                 nighttimePrecipitation?.formatValue(activity),
                 mHighestPrecipitation
@@ -149,8 +136,6 @@ class DailyPrecipitationAdapter(
     }
 
     override fun getItemCount() = location.weather!!.dailyForecast.size
-
-    override fun getDisplayName(context: Context) = context.getString(R.string.tag_precipitation)
 
     override fun bindBackgroundForHost(host: TrendRecyclerView) {
         val keyLineList = mutableListOf<TrendRecyclerView.KeyLine>()

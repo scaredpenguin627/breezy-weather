@@ -16,21 +16,22 @@
 
 package org.breezyweather.ui.main.adapters.main.holder
 
-import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.content.ContextCompat
-import androidx.core.view.children
+import androidx.core.view.isVisible
 import breezyweather.domain.location.model.Location
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.button.MaterialButtonGroup
 import org.breezyweather.R
 import org.breezyweather.common.activities.BreezyActivity
 import org.breezyweather.common.extensions.getThemeColor
+import org.breezyweather.common.options.appearance.DailyTrendDisplay
 import org.breezyweather.domain.settings.SettingsManager
-import org.breezyweather.ui.common.adapters.ButtonAdapter
+import org.breezyweather.sources.emb.EmbServiceStub
+import org.breezyweather.sources.emb.isOutsideEmbAirQualityCoverage
 import org.breezyweather.ui.common.widgets.trend.DailyTrendLayoutManager
 import org.breezyweather.ui.common.widgets.trend.TrendRecyclerView
 import org.breezyweather.ui.main.adapters.trend.DailyTrendAdapter
@@ -44,14 +45,21 @@ class DailyViewHolder(parent: ViewGroup) : AbstractMainCardViewHolder(
     private val subtitle: TextView = itemView.findViewById(R.id.daily_block_subtitle)
     private val buttonGroup: MaterialButtonGroup = itemView.findViewById(R.id.daily_block_button_group)
     private val trendRecyclerView: TrendRecyclerView = itemView.findViewById(R.id.daily_block_trendRecyclerView)
+    private val emptyState: TextView = itemView.findViewById(R.id.daily_block_empty)
     private val scrollBar = TrendRecyclerViewScrollBar()
+    private val buttons = DailyTrendDisplay.entries.map { trend ->
+        MaterialButton(context, null, com.google.android.material.R.attr.materialButtonStyle).apply {
+            setText(trend.nameId)
+            isCheckable = true
+            buttonGroup.addView(this)
+        }
+    }
 
     init {
         trendRecyclerView.setHasFixedSize(true)
         trendRecyclerView.addItemDecoration(scrollBar)
     }
 
-    @SuppressLint("NotifyDataSetChanged")
     override fun onBindView(
         activity: BreezyActivity,
         location: Location,
@@ -75,66 +83,31 @@ class DailyViewHolder(parent: ViewGroup) : AbstractMainCardViewHolder(
         val trendAdapter = DailyTrendAdapter(activity, trendRecyclerView).apply {
             bindData(location)
         }
-        val buttonList: MutableList<ButtonAdapter.Button> = trendAdapter.adapters.map {
-            object : ButtonAdapter.Button {
-                override val name = it.getDisplayName(activity)
-            }
-        }.toMutableList()
-        selectedTab?.let { tab ->
-            buttonList.indexOfFirst { it.name == tab }.let {
-                if (it >= 0) {
-                    trendAdapter.selectedIndex = it
-                } else {
-                    setSelectedTab(null) // Reset
-                }
-            }
-        }
-
-        if (buttonList.size < 2) {
-            buttonGroup.visibility = View.GONE
-        } else {
-            buttonGroup.visibility = View.VISIBLE
-            // Dirty trick to get the button group to actually redraw with the correct styles AND the overflow menu
-            while (
-                buttonGroup.children
-                    .filter { it is MaterialButton && it.tag != MaterialButtonGroup.OVERFLOW_BUTTON_TAG }
-                    .count() != 0
-            ) {
-                buttonGroup.children
-                    .filter { it is MaterialButton && it.tag != MaterialButtonGroup.OVERFLOW_BUTTON_TAG }
-                    .forEach {
-                        buttonGroup.removeView(it)
-                    }
-            }
-            buttonGroup.children
-                .filter { it is MaterialButton && it.tag == MaterialButtonGroup.OVERFLOW_BUTTON_TAG }
-                .forEach {
-                    it.contentDescription = context.getString(R.string.action_more)
-                }
-            buttonList.forEachIndexed { index, button ->
-                buttonGroup.addView(
-                    MaterialButton(
-                        context,
-                        null,
-                        com.google.android.material.R.attr.materialButtonStyle
-                    ).apply {
-                        text = button.name
-                        isCheckable = true
-                        isChecked = index == trendAdapter.selectedIndex
-                        setOnClickListener {
-                            trendAdapter.selectedIndex = index
-                            setSelectedTab(button.name)
-                            buttonGroup.children
-                                .filter { it is MaterialButton && it.tag != MaterialButtonGroup.OVERFLOW_BUTTON_TAG }
-                                .forEach { button ->
-                                    (button as MaterialButton).isChecked = false
-                                }
-                            isChecked = true
-                        }
+        fun showTrend(trend: DailyTrendDisplay) {
+            trendAdapter.selectedIndex = trend.ordinal
+            buttons.forEachIndexed { index, button -> button.isChecked = index == trend.ordinal }
+            val hasData = trend.hasData(location)
+            trendRecyclerView.isVisible = hasData
+            emptyState.isVisible = !hasData
+            if (!hasData) {
+                emptyState.setText(
+                    when {
+                        trend != DailyTrendDisplay.TAG_AIR_QUALITY -> R.string.daily_trend_no_data
+                        location.isOutsideEmbAirQualityCoverage -> R.string.emb_no_nearby_station
+                        location.airQualitySource == EmbServiceStub.ID -> R.string.daily_trend_emb_current_only
+                        else -> R.string.daily_trend_no_data
                     }
                 )
             }
         }
+
+        DailyTrendDisplay.entries.forEach { trend ->
+            buttons[trend.ordinal].setOnClickListener {
+                showTrend(trend)
+                setSelectedTab(trend.id)
+            }
+        }
+        showTrend(DailyTrendDisplay.entries.firstOrNull { it.id == selectedTab } ?: DailyTrendDisplay.TAG_TEMPERATURE)
         trendRecyclerView.layoutManager = DailyTrendLayoutManager(context)
         trendRecyclerView.setLineColor(
             context.getThemeColor(com.google.android.material.R.attr.colorOutline)

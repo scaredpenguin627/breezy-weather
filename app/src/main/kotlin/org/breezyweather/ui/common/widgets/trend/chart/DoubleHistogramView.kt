@@ -132,10 +132,10 @@ class DoubleHistogramView @JvmOverloads constructor(
             ) {
                 drawLowSecondaryHistogram(canvas)
             }
-            if (mHighHistogramValue != null && mHighHistogramValue != 0f && mHighHistogramValueStr != null) {
+            if (mHighHistogramValue != null && mHighHistogramValueStr != null) {
                 drawHighHistogram(canvas)
             }
-            if (mLowHistogramValue != null && mLowHistogramValue != 0f && mLowHistogramValueStr != null) {
+            if (mLowHistogramValue != null && mLowHistogramValueStr != null) {
                 drawLowHistogram(canvas)
             }
         }

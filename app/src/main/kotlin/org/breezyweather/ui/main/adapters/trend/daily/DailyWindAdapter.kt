@@ -17,7 +17,6 @@
 package org.breezyweather.ui.main.adapters.trend.daily
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.graphics.Color
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
@@ -63,7 +62,7 @@ class DailyWindAdapter(
             super.onBindView(activity, location, talkBackBuilder, position)
             val daily = location.weather!!.dailyForecast[position]
 
-            if (daily.day?.wind?.isValid == true) {
+            if (daily.day?.wind?.speed != null) {
                 talkBackBuilder
                     .append(activity.getString(org.breezyweather.unit.R.string.locale_separator))
                     .append(activity.getString(R.string.daytime))
@@ -97,8 +96,8 @@ class DailyWindAdapter(
             }
 
             mDoubleHistogramView.setData(
-                daySpeed?.value?.toFloat() ?: 0f,
-                nightSpeed?.value?.toFloat() ?: 0f,
+                daySpeed?.value?.toFloat(),
+                nightSpeed?.value?.toFloat(),
                 daySpeed?.formatValue(activity),
                 nightSpeed?.formatValue(activity),
                 mHighestWindSpeed,
@@ -117,7 +116,7 @@ class DailyWindAdapter(
             mDoubleHistogramView.setTextColors(activity.getThemeColor(R.attr.colorBodyText))
             mDoubleHistogramView.setHistogramAlphas(1f, 0.5f)
 
-            if (daily.night?.wind?.isValid == true) {
+            if (daily.night?.wind?.speed != null) {
                 talkBackBuilder
                     .append(activity.getString(org.breezyweather.unit.R.string.locale_separator))
                     .append(activity.getString(R.string.nighttime))
@@ -172,8 +171,6 @@ class DailyWindAdapter(
     }
 
     override fun getItemCount() = location.weather!!.dailyForecast.size
-
-    override fun getDisplayName(context: Context) = context.getString(R.string.tag_wind)
 
     override fun bindBackgroundForHost(host: TrendRecyclerView) {
         val keyLineList = mutableListOf<TrendRecyclerView.KeyLine>()

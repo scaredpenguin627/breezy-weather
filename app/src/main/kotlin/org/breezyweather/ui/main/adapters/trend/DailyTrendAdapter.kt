@@ -28,9 +28,7 @@ import org.breezyweather.ui.main.adapters.trend.daily.AbsDailyTrendAdapter
 import org.breezyweather.ui.main.adapters.trend.daily.DailyAirQualityAdapter
 import org.breezyweather.ui.main.adapters.trend.daily.DailyFeelsLikeAdapter
 import org.breezyweather.ui.main.adapters.trend.daily.DailyPrecipitationAdapter
-import org.breezyweather.ui.main.adapters.trend.daily.DailySunshineAdapter
 import org.breezyweather.ui.main.adapters.trend.daily.DailyTemperatureAdapter
-import org.breezyweather.ui.main.adapters.trend.daily.DailyUVAdapter
 import org.breezyweather.ui.main.adapters.trend.daily.DailyWindAdapter
 import org.breezyweather.ui.theme.resource.ResourcesProviderFactory
 
@@ -40,8 +38,7 @@ class DailyTrendAdapter(
     private val host: TrendRecyclerView,
 ) : RecyclerView.Adapter<AbsDailyTrendAdapter.ViewHolder>() {
 
-    var adapters: Array<AbsDailyTrendAdapter> = emptyArray()
-        private set
+    private var adapters: Array<AbsDailyTrendAdapter> = emptyArray()
 
     var selectedIndex: Int = 0
         set(value) {
@@ -54,15 +51,12 @@ class DailyTrendAdapter(
         val provider = ResourcesProviderFactory.newInstance
         val tempUnit = SettingsManager.getInstance(activity).getTemperatureUnit(activity)
 
-        val configured = SettingsManager.getInstance(activity).dailyTrendDisplayList
-        adapters = DailyTrendDisplay.availableFor(location, configured).map {
+        adapters = DailyTrendDisplay.entries.map {
             when (it) {
                 DailyTrendDisplay.TAG_TEMPERATURE -> DailyTemperatureAdapter(activity, location, provider, tempUnit)
                 DailyTrendDisplay.TAG_AIR_QUALITY -> DailyAirQualityAdapter(activity, location)
                 DailyTrendDisplay.TAG_WIND -> DailyWindAdapter(activity, location)
-                DailyTrendDisplay.TAG_UV_INDEX -> DailyUVAdapter(activity, location)
                 DailyTrendDisplay.TAG_PRECIPITATION -> DailyPrecipitationAdapter(activity, location, provider)
-                DailyTrendDisplay.TAG_SUNSHINE -> DailySunshineAdapter(activity, location)
                 DailyTrendDisplay.TAG_FEELS_LIKE -> DailyFeelsLikeAdapter(activity, location, provider, tempUnit)
             }
         }.toTypedArray()

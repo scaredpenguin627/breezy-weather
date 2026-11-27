@@ -1337,4 +1337,6 @@
     <string name="emb_report_fetched">Report fetched %1$s</string>
     <string name="settings_weather_source_emb_endpoint">EMB air quality JSON URL</string>
     <string name="settings_weather_source_emb_endpoint_hint">Leave blank to use the default feed, or enter the full HTTPS URL of your EMB JSON feed.</string>
+    <string name="daily_trend_no_data">No daily forecast data for this tab.</string>
+    <string name="daily_trend_emb_current_only">EMB provides current air quality readings only.</string>
 </resources>

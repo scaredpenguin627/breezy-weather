@@ -21,6 +21,8 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.drawable.Drawable
+import android.text.TextPaint
+import android.text.TextUtils
 import android.util.AttributeSet
 import androidx.annotation.ColorInt
 import androidx.annotation.IntDef
@@ -44,7 +46,7 @@ class DailyTrendItemView @JvmOverloads constructor(
         isAntiAlias = true
         textAlign = Paint.Align.CENTER
     }
-    private val mDateTextPaint = Paint().apply {
+    private val mDateTextPaint = TextPaint().apply {
         isAntiAlias = true
         textAlign = Paint.Align.CENTER
     }
@@ -57,10 +59,12 @@ class DailyTrendItemView @JvmOverloads constructor(
     @IconVisibility
     private var mMissingDayIconVisibility: Int = GONE
     private var mDayIconDrawable: Drawable? = null
+    private var mDayConditionText: String? = null
 
     @IconVisibility
     private var mMissingNightIconVisibility: Int = GONE
     private var mNightIconDrawable: Drawable? = null
+    private var mNightConditionText: String? = null
 
     @ColorInt
     private var mContentColor = 0
@@ -176,7 +180,7 @@ class DailyTrendItemView @JvmOverloads constructor(
             canvas.translate(mDayIconLeft, mDayIconTop)
             it.draw(canvas)
             canvas.restoreToCount(restoreCount)
-        }
+        } ?: drawConditionText(canvas, mDayConditionText, mDayIconTop)
 
         // night icon.
         mNightIconDrawable?.let {
@@ -184,7 +188,16 @@ class DailyTrendItemView @JvmOverloads constructor(
             canvas.translate(mNightIconLeft, mNightIconTop)
             it.draw(canvas)
             canvas.restoreToCount(restoreCount)
-        }
+        } ?: drawConditionText(canvas, mNightConditionText, mNightIconTop)
+    }
+
+    private fun drawConditionText(canvas: Canvas, text: String?, top: Float) {
+        if (text.isNullOrBlank()) return
+        mDateTextPaint.color = mContentColor
+        val width = (measuredWidth - 2 * context.dpToPx(TEXT_MARGIN_DIP.toFloat())).coerceAtLeast(0f)
+        val label = TextUtils.ellipsize(text, mDateTextPaint, width, TextUtils.TruncateAt.END)
+        val baseline = top + (mIconSize - mDateTextPaint.ascent() - mDateTextPaint.descent()) / 2f
+        canvas.drawText(label, 0, label.length, measuredWidth / 2f, baseline, mDateTextPaint)
     }
 
     fun setWeekText(weekText: String?) {
@@ -203,7 +216,12 @@ class DailyTrendItemView @JvmOverloads constructor(
         invalidate()
     }
 
-    fun setDayIconDrawable(d: Drawable?, @IconVisibility missingIconVisibility: Int) {
+    fun setDayIconDrawable(
+        d: Drawable?,
+        @IconVisibility missingIconVisibility: Int,
+        fallbackText: String? = null,
+    ) {
+        mDayConditionText = fallbackText
         val nullDrawable = mDayIconDrawable == null
         mDayIconDrawable = d
         mMissingDayIconVisibility = missingIconVisibility
@@ -219,7 +237,12 @@ class DailyTrendItemView @JvmOverloads constructor(
         }
     }
 
-    fun setNightIconDrawable(d: Drawable?, @IconVisibility missingIconVisibility: Int) {
+    fun setNightIconDrawable(
+        d: Drawable?,
+        @IconVisibility missingIconVisibility: Int,
+        fallbackText: String? = null,
+    ) {
+        mNightConditionText = fallbackText
         val nullDrawable = mNightIconDrawable == null
         mNightIconDrawable = d
         mMissingNightIconVisibility = missingIconVisibility

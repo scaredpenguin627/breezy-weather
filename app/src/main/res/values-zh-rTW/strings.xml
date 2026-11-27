@@ -866,4 +866,6 @@
     <string name="emb_report_fetched">取得報表的時間 · %1$s</string>
     <string name="settings_weather_source_emb_endpoint">EMB 空氣品質 JSON 網址</string>
     <string name="settings_weather_source_emb_endpoint_hint">留空以使用預設資料來源，或輸入自有 EMB 服務的完整 HTTPS JSON 網址。</string>
+    <string name="daily_trend_no_data">暫無這項逐日預報資料</string>
+    <string name="daily_trend_emb_current_only">EMB 僅提供目前的空氣品質讀數</string>
 </resources>

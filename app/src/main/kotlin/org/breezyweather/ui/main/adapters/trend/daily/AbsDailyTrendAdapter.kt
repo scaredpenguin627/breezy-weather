@@ -17,7 +17,6 @@
 package org.breezyweather.ui.main.adapters.trend.daily
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import breezyweather.domain.location.model.Location
@@ -93,6 +92,5 @@ abstract class AbsDailyTrendAdapter(
     }
 
     val key: String = javaClass.name
-    abstract fun getDisplayName(context: Context): String
     abstract fun bindBackgroundForHost(host: TrendRecyclerView)
 }

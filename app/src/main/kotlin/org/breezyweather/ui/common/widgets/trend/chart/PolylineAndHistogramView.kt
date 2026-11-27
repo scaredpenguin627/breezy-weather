@@ -42,7 +42,7 @@ class PolylineAndHistogramView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
-    hasTopPolylineLabel: Boolean = false,
+    private val isDailyTemperatureChart: Boolean = false,
 ) : AbsChartItemView(context, attrs, defStyleAttr) {
     private val mPaint = Paint().apply {
         strokeCap = Paint.Cap.ROUND
@@ -103,7 +103,7 @@ class PolylineAndHistogramView @JvmOverloads constructor(
     init {
         setTextColors(Color.BLACK, Color.DKGRAY, Color.GRAY)
         setHistogramAlpha(0.33f)
-        marginTop = getContext().dpToPx(if (hasTopPolylineLabel) MARGIN_TOP_DIP else MARGIN_TOP_COMPACT_DIP)
+        marginTop = getContext().dpToPx(if (isDailyTemperatureChart) MARGIN_TOP_DIP else MARGIN_TOP_COMPACT_DIP)
             .times(getContext().fontScaleToApply).toInt()
         mPolylineTextSize = getContext().dpToPx(POLYLINE_TEXT_SIZE_DIP)
             .times(getContext().fontScaleToApply).toInt()
@@ -173,10 +173,19 @@ class PolylineAndHistogramView @JvmOverloads constructor(
         )
     }
 
+    private fun drawIsolatedReading(canvas: Canvas, y: Int, @ColorInt color: Int) {
+        mPaint.shader = null
+        mPaint.color = color
+        mPaint.style = Paint.Style.FILL
+        canvas.drawCircle(measuredWidth / 2f, y.toFloat(), mPolylineWidth / 2f, mPaint)
+    }
+
     private fun drawHighPolyLine(canvas: Canvas) {
         assert(mHighPolylineValues != null)
         assert(mHighPolylineValueStr != null)
-        if (mHighPolylineValues!![0] != null && mHighPolylineValues!![2] != null) {
+        if (isDailyTemperatureChart && mHighPolylineValues!![0] == null && mHighPolylineValues!![2] == null) {
+            drawIsolatedReading(canvas, mHighPolylineY[1], mLineColors[0])
+        } else if (mHighPolylineValues!![0] != null && mHighPolylineValues!![2] != null) {
             // shadow.
             mPaint.apply {
                 color = Color.BLACK
@@ -294,7 +303,9 @@ class PolylineAndHistogramView @JvmOverloads constructor(
     private fun drawLowPolyline(canvas: Canvas) {
         assert(mLowPolylineValues != null)
         assert(mLowPolylineValueStr != null)
-        if (mLowPolylineValues!![0] != null && mLowPolylineValues!![2] != null) {
+        if (isDailyTemperatureChart && mLowPolylineValues!![0] == null && mLowPolylineValues!![2] == null) {
+            drawIsolatedReading(canvas, mLowPolylineY[1], mLineColors[1])
+        } else if (mLowPolylineValues!![0] != null && mLowPolylineValues!![2] != null) {
             mPaint.apply {
                 shader = null
                 style = Paint.Style.STROKE
@@ -611,6 +622,7 @@ class PolylineAndHistogramView @JvmOverloads constructor(
         max: Float,
         min: Float,
     ): Int {
+        if (isDailyTemperatureChart && max == min) return (marginTop + canvasHeight / 2f).toInt()
         return ((measuredHeight - marginBottom - (canvasHeight * (value - min) / (max - min)))).toInt()
     }
 
