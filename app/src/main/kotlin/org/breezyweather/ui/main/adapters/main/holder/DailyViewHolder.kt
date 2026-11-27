@@ -23,8 +23,8 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import breezyweather.domain.location.model.Location
-import com.google.android.material.button.MaterialButton
-import com.google.android.material.button.MaterialButtonGroup
+import com.google.android.material.chip.Chip
+import com.google.android.material.chip.ChipGroup
 import org.breezyweather.R
 import org.breezyweather.common.activities.BreezyActivity
 import org.breezyweather.common.extensions.getThemeColor
@@ -41,16 +41,16 @@ class DailyViewHolder(parent: ViewGroup) : AbstractMainCardViewHolder(
     LayoutInflater.from(parent.context).inflate(R.layout.container_main_daily_trend_card, parent, false)
 ) {
     private val subtitle: TextView = itemView.findViewById(R.id.daily_block_subtitle)
-    private val buttonGroup: MaterialButtonGroup = itemView.findViewById(R.id.daily_block_button_group)
+    private val chipGroup: ChipGroup = itemView.findViewById(R.id.daily_block_button_group)
     private val trendRecyclerView: TrendRecyclerView = itemView.findViewById(R.id.daily_block_trendRecyclerView)
     private val emptyState: TextView = itemView.findViewById(R.id.daily_block_empty)
     private val scrollBar = TrendRecyclerViewScrollBar()
-    private val buttons = DailyTrendDisplay.entries.map { trend ->
-        MaterialButton(buttonGroup.context, null, com.google.android.material.R.attr.materialButtonStyle).apply {
-            setText(trend.nameId)
-            isCheckable = true
-            buttonGroup.addView(this)
-        }
+    private val chips = DailyTrendDisplay.entries.map { trend ->
+        val inflater = LayoutInflater.from(chipGroup.context)
+        val chip = inflater.inflate(R.layout.item_daily_trend_chip, chipGroup, false) as Chip
+        chip.setText(trend.nameId)
+        chipGroup.addView(chip)
+        chip
     }
 
     init {
@@ -83,19 +83,21 @@ class DailyViewHolder(parent: ViewGroup) : AbstractMainCardViewHolder(
         }
         fun showTrend(trend: DailyTrendDisplay) {
             trendAdapter.selectedIndex = trend.ordinal
-            buttons.forEachIndexed { index, button -> button.isChecked = index == trend.ordinal }
             val hasData = trend.hasData(location)
             trendRecyclerView.isVisible = hasData
             emptyState.isVisible = !hasData
         }
 
         DailyTrendDisplay.entries.forEach { trend ->
-            buttons[trend.ordinal].setOnClickListener {
+            chips[trend.ordinal].setOnClickListener {
                 showTrend(trend)
                 setSelectedTab(trend.id)
             }
         }
-        showTrend(DailyTrendDisplay.entries.firstOrNull { it.id == selectedTab } ?: DailyTrendDisplay.TAG_TEMPERATURE)
+        val selected = DailyTrendDisplay.entries.firstOrNull { it.id == selectedTab }
+            ?: DailyTrendDisplay.TAG_TEMPERATURE
+        chipGroup.check(chips[selected.ordinal].id)
+        showTrend(selected)
         trendRecyclerView.layoutManager = DailyTrendLayoutManager(context)
         trendRecyclerView.setLineColor(
             context.getThemeColor(com.google.android.material.R.attr.colorOutline)

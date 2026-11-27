@@ -46,15 +46,17 @@
             tools:text="Rain Wednesday evening"
             app:layout_constraintTop_toBottomOf="@+id/daily_block_title" />
 
-        <com.google.android.material.button.MaterialButtonGroup
+        <com.google.android.material.chip.ChipGroup
             android:id="@+id/daily_block_button_group"
-            style="@style/Widget.Material3Expressive.MaterialButtonGroup.Connected"
-            app:overflowMode="wrap"
             android:layout_marginTop="@dimen/small_margin"
             android:layout_marginHorizontal="@dimen/large_margin"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"
+            app:chipSpacingHorizontal="4dp"
+            app:chipSpacingVertical="0dp"
+            app:singleLine="false"
+            app:singleSelection="true"
+            app:selectionRequired="true"
             app:layout_constraintTop_toBottomOf="@+id/daily_block_subtitle"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
