@@ -46,7 +46,7 @@ class DailyViewHolder(parent: ViewGroup) : AbstractMainCardViewHolder(
     private val emptyState: TextView = itemView.findViewById(R.id.daily_block_empty)
     private val scrollBar = TrendRecyclerViewScrollBar()
     private val buttons = DailyTrendDisplay.entries.map { trend ->
-        MaterialButton(context, null, com.google.android.material.R.attr.materialButtonStyle).apply {
+        MaterialButton(buttonGroup.context, null, com.google.android.material.R.attr.materialButtonStyle).apply {
             setText(trend.nameId)
             isCheckable = true
             buttonGroup.addView(this)
