@@ -44,8 +44,8 @@ class PanahonWindRequestTest {
             val current = service.requestWeather(context, location, listOf(SourceFeature.CURRENT)).blockingFirst()
             current.current?.temperature?.temperature?.inCelsius shouldBe 28.0
             verify(exactly = 0) { api.getForecastWind(any(), any()) }
-            val weather = service.requestWeather(context, location, listOf(SourceFeature.FORECAST, SourceFeature.CURRENT))
-                .blockingFirst()
+            val features = listOf(SourceFeature.FORECAST, SourceFeature.CURRENT)
+            val weather = service.requestWeather(context, location, features).blockingFirst()
             weather.failedFeatures?.isEmpty() shouldBe true
             weather.current shouldBe current.current
             weather.dailyForecast?.single()?.day?.temperature?.temperature?.inCelsius shouldBe 31.0
